@@ -1,0 +1,353 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Loan_Agent": {
+                "type": "Agent",
+                "inputs": {
+                    "parameters": {
+                        "deploymentId": "gpt-4.1",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are an AI Agent responsible for evaluating loan applications using the company’s risk and eligibility policies. \n\nConsider the company policy, customer credit score, risk profile, and any exception criterion to make final decsion. Do not make assumptions and use different tools available to you to get required data to make decisions. Customers are not required to have an existing account with the bank\n\nFollow the rules below to make a decision and escalate to a human when the loan cannot be approved automatically. Those scenarios where human should be looped in are defined in the company policy document."
+                            },
+                            {
+                                "role": "user",
+                                "content": "This is the SSN and other customer details  - @{outputs('Application_Summary')}"
+                            }
+                        ],
+                        "agentModelType": "AzureOpenAI",
+                        "agentModelSettings": {
+                            "deploymentModelProperties": {
+                                "name": "gpt-4.1",
+                                "format": "OpenAI",
+                                "version": "2025-04-14"
+                            }
+                        }
+                    },
+                    "modelConfigurations": {
+                        "model1": {
+                            "referenceName": "agent"
+                        }
+                    }
+                },
+                "tools": {
+                    "Get_loan_approval_policy": {
+                        "actions": {
+                            "HTTP": {
+                                "type": "Http",
+                                "inputs": {
+                                    "uri": "@parameters('outlook-1-ConnectionRuntimeUrl')",
+                                    "method": "GET"
+                                },
+                                "runtimeConfiguration": {
+                                    "contentTransfer": {
+                                        "transferMode": "Chunked"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Get the companys loan approval policy document and use it to make loan approval decision"
+                    },
+                    "Get_customers_bank_history": {
+                        "actions": {
+                            "Get_rows": {
+                                "type": "ServiceProvider",
+                                "inputs": {
+                                    "parameters": {
+                                        "tableName": "[dbo].[CustomersBankHistory]"
+                                    },
+                                    "serviceProviderConfiguration": {
+                                        "connectionName": "sql",
+                                        "operationId": "getRows",
+                                        "serviceProviderId": "/serviceProviders/sql"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Get the customers history with the bank such as amount in the account, account activity in terms of credits/debits/overdrafts and how long they have been our customer"
+                    },
+                    "Get_applicants_risk_profile": {
+                        "actions": {
+                            "Call_risk_profile_api": {
+                                "type": "ApiManagement",
+                                "inputs": {
+                                    "apiManagement": {
+                                        "operationId": "riskassessment",
+                                        "connection": "apiManagementOperation"
+                                    },
+                                    "method": "post",
+                                    "pathTemplate": {
+                                        "template": "/assessment"
+                                    },
+                                    "body": {
+                                        "SSN": "@body('Get_response_details')?['r8e83ba12429a4dd7ad4ca3bbfd174ce1']"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "This API returns the risk profile for the candidate based on their details."
+                    },
+                    "Get_special_vehicles": {
+                        "actions": {
+                            "Call_workflow_to_get_special_vehicles": {
+                                "type": "Workflow",
+                                "inputs": {
+                                    "host": {
+                                        "workflow": {
+                                            "id": "SpecialVehicles"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Get the list of special vehicles. These vehicles are either ultra luxury, custom or limited edition vehicles and require human involvement for approval"
+                    },
+                    "Notify_customer_": {
+                        "actions": {
+                            "Send_an_email_(V2)": {
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "referenceName": "outlook-1"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "body": {
+                                        "To": "FabrikamGoods@outlook.com",
+                                        "Subject": "@agentParameters('Subject')",
+                                        "Body": "<p class=\"editor-paragraph\">@{agentParameters('Body')}</p>",
+                                        "Importance": "Normal"
+                                    },
+                                    "path": "/v2/Mail"
+                                }
+                            }
+                        },
+                        "description": "Notify customer about the loan approval decision and the next steps. ",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "Subject": {
+                                    "type": "string",
+                                    "description": "The subject of the mail"
+                                },
+                                "Body": {
+                                    "type": "string",
+                                    "description": "The body of the mail to inform customer about the loan decision and the terms and conditions for it. Use wellformatted email in HTML"
+                                }
+                            },
+                            "required": [
+                                "Subject",
+                                "Body"
+                            ]
+                        }
+                    },
+                    "Wait_for_Human_Review": {
+                        "actions": {
+                            "Post_adaptive_card_and_wait_for_a_response": {
+                                "type": "ApiConnectionWebhook",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "referenceName": "teams"
+                                        }
+                                    },
+                                    "body": {
+                                        "notificationUrl": "@listCallbackUrl()",
+                                        "body": {
+                                            "messageBody": "{\n    \"type\": \"AdaptiveCard\",\n    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n    \"version\": \"1.2\",\n    \"body\": [\n        {\n            \"type\": \"Container\",\n            \"items\": [\n                {\n                    \"type\": \"TextBlock\",\n                    \"text\": \"The following item went through AI agents and needs additional review. Here is AI summary and relevant details - \",\n                    \"wrap\": true,\n \"weight\": \"bolder\",\n                            \"size\": \"medium\",\n                            \"style\": \"heading\"\n                },\n               {\n                    \"type\": \"TextBlock\",\n                    \"text\": \"@{agentParameters('aireview')}\",\n                    \"wrap\": true\n                },\n               {\n                    \"type\": \"TextBlock\",\n                    \"text\": \"Loan Amount: @{agentParameters('loanamount')}\",\n                    \"wrap\": true\n                },\n               {\n                    \"type\": \"TextBlock\",\n                    \"text\": \"Risk Profile : @{agentParameters('riskprofile')} \",\n                    \"wrap\": true\n                },\n            ]\n        },\n        {\n            \"type\":\"TextBlock\",\n \"id\": \"moreText\",\n \"text\": \"More Info\",\n \"isVisible\": false\n },\n {\n \"type\": \"ActionSet\",\n \"separator\": true,\n \"actions\": [\n {\n \"type\": \"Action.OpenUrl\",\n \"title\": \"View Details\",\n \"url\": \"https://adaptivecards.io/\"\n }\n ],\n \"spacing\": \"ExtraLarge\"\n },\n {\n \"type\":  \"ActionSet\",\n            \"actions\": [\n                {\n                    \"type\": \"Action.Submit\",\n                    \"title\": \"Approve\",\n                    \"style\": \"positive\"\n                }\n            ]\n        }\n    ],\n    \"actions\": [\n        {\n            \"type\": \"Action.Submit\",\n            \"title\": \"Reject\",\n            \"style\": \"destructive\"\n        }\n    ]\n}",
+                                            "updateMessage": "Thanks for your response!",
+                                            "recipient": {
+                                                "groupId": "@parameters('teams-GroupId')",
+                                                "channelId": "@parameters('teams-ChannelId')"
+                                            }
+                                        }
+                                    },
+                                    "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Channel')}/$subscriptions"
+                                }
+                            }
+                        },
+                        "description": "This task loops in a human agent to review the loan application. Send the AI recommendation to human, as well as other details. The human agent reviews the application and responds with the decision if approved or rejected.",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "aireview": {
+                                    "type": "string",
+                                    "description": "AI summary of the loan request as well as reason why human review is needed. Keep it precise but include all the relevant details and bullet points to consider. No need to suggest human on how they make decision"
+                                },
+                                "loanamount": {
+                                    "type": "string",
+                                    "description": "Loan amount requested by the applicant"
+                                },
+                                "riskprofile": {
+                                    "type": "string",
+                                    "description": "Applicants risk profile"
+                                }
+                            },
+                            "required": [
+                                "aireview",
+                                "loanamount",
+                                "riskprofile"
+                            ]
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Application_Summary": [
+                        "SUCCEEDED"
+                    ]
+                },
+                "limit": {
+                    "count": 100
+                }
+            },
+            "Get_response_details": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "microsoftforms-1"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/formapi/api/forms('@{encodeURIComponent('v4j5cvGGr0GRqy180BHbR8D0BGsaCb1KnkS_n2PEmQ9UOFhKMFlHM0hIMkpaQ05IUlRCOUpVM0lKQy4u')}')/responses",
+                    "queries": {
+                        "response_id": "@triggerBody()?['resourceData']?['responseId']"
+                    }
+                },
+                "runAfter": {}
+            },
+            "Employment_Verification_API": {
+                "type": "ApiManagement",
+                "inputs": {
+                    "apiManagement": {
+                        "operationId": "veryifyemployment",
+                        "connection": "apiManagementOperation-1"
+                    },
+                    "method": "post",
+                    "pathTemplate": {
+                        "template": "/employment"
+                    },
+                    "body": {
+                        "Employer": "@body('Get_response_details')?['r3099f90cf4334b749d7f72863ab10d5e']",
+                        "Salary": "@body('Get_response_details')?['r5d9848ce664b46c88c13d6020bfb8fb2']",
+                        "YearsWorked": "@body('Get_response_details')?['r4b78310cc1ce4720acd44307c0e41e96']"
+                    }
+                },
+                "runAfter": {
+                    "Get_response_details": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Credit_check_API": {
+                "type": "ApiManagement",
+                "inputs": {
+                    "apiManagement": {
+                        "operationId": "checkcredit",
+                        "connection": "apiManagementOperation-2"
+                    },
+                    "method": "post",
+                    "pathTemplate": {
+                        "template": "/creditscore"
+                    },
+                    "body": {
+                        "SSN": "@body('Get_response_details')?['r8e83ba12429a4dd7ad4ca3bbfd174ce1']",
+                        "Salary": "@body('Get_response_details')?['r5d9848ce664b46c88c13d6020bfb8fb2']",
+                        "YearsInRole": "@body('Get_response_details')?['r4b78310cc1ce4720acd44307c0e41e96']"
+                    }
+                },
+                "runAfter": {
+                    "Get_response_details": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Background_check_API": {
+                "type": "ApiManagement",
+                "inputs": {
+                    "apiManagement": {
+                        "operationId": "demographics",
+                        "connection": "apiManagementOperation-3"
+                    },
+                    "method": "post",
+                    "pathTemplate": {
+                        "template": "/demographics"
+                    },
+                    "body": {
+                        "Name": "@body('Get_response_details')?['rc5fec3ae6109415fa6f9e635fc855b24']",
+                        "DateOfBirth": "@body('Get_response_details')?['r8bbd953f51e5413da5385807db9eda84']",
+                        "SSN": "@body('Get_response_details')?['r8e83ba12429a4dd7ad4ca3bbfd174ce1']"
+                    }
+                },
+                "runAfter": {
+                    "Get_response_details": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Application_Summary": {
+                "type": "Compose",
+                "inputs": {
+                    "SSN": "@{body('Get_response_details')?['r8e83ba12429a4dd7ad4ca3bbfd174ce1']}",
+                    "LoanAmount": "@{body('Get_response_details')?['r7cfa1d61a133417da8dbc18dd28c6bab']}",
+                    "VehicleMake": "@{body('Get_response_details')?['r65f5322dbb18413dbcd34f2c0bc5d76b']}",
+                    "Salary": "@{body('Get_response_details')?['r5d9848ce664b46c88c13d6020bfb8fb2']}",
+                    "CreditScore": "@{body('Credit_check_API')?['CreditScore']}",
+                    "Email": "@{body('Get_response_details')?['responder']}"
+                },
+                "runAfter": {
+                    "Background_check_API": [
+                        "SUCCEEDED"
+                    ],
+                    "Credit_check_API": [
+                        "SUCCEEDED"
+                    ],
+                    "Employment_Verification_API": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Loan_post_processing_steps": {
+                "type": "Workflow",
+                "inputs": {
+                    "host": {
+                        "workflow": {
+                            "id": "LoanPostProcessing"
+                        }
+                    },
+                    "body": "@outputs('Loan_Agent')?['lastAssistantMessage']"
+                },
+                "runAfter": {
+                    "Loan_Agent": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "When_a_new_response_is_submitted": {
+                "type": "ApiConnectionWebhook",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "microsoftforms-1"
+                        }
+                    },
+                    "body": {
+                        "eventType": "responseAdded",
+                        "notificationUrl": "@listCallbackUrl()",
+                        "source": "ms-connector"
+                    },
+                    "path": "/formapi/api/forms/@{encodeURIComponent('v4j5cvGGr0GRqy180BHbR8D0BGsaCb1KnkS_n2PEmQ9UOFhKMFlHM0hIMkpaQ05IUlRCOUpVM0lKQy4u')}/webhooks"
+                },
+                "splitOn": "@triggerBody()?['value']"
+            }
+        }
+    },
+    "kind": "Agentic"
+}

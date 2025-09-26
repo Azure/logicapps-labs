@@ -1,0 +1,77 @@
+{
+  "name": "integratedvectorindex-skillset",
+  "description": "Skillset to chunk documents and generate embeddings",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "name": "split-documents",
+      "description": "Split skill to chunk documents",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "textSplitMode": "pages",
+      "maximumPageLength": 2000,
+      "pageOverlapLength": 500,
+      "maximumPagesToTake": 0,
+      "unit": "characters",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "pages"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+      "name": "create-embeddings",
+      "context": "/document/pages/*",
+      "resourceUri": "{OpenAI Resource URI}",
+      "apiKey": "{OpenAI Api Key}",
+      "deploymentId": "text-embedding",
+      "dimensions": 1536,
+      "modelName": "text-embedding-ada-002",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/pages/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "embedding",
+          "targetName": "embeddings"
+        }
+      ]
+    }
+  ],
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "enterprose-data",
+        "sourceContext": "/document/pages/*",
+        "mappings": [
+          {
+            "name": "embeddings",
+            "source": "/document/pages/*/embeddings",
+            "inputs": []
+          },
+          {
+            "name": "content",
+            "source": "/document/pages/*",
+            "inputs": []
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}

@@ -90,7 +90,7 @@ When users interact with your agent, Logic Apps applies security filters before 
 1. Create a new file named `get-documents.rest`.
 1. Paste in the following code in your file.
 
-```json
+```text
 @endpoint = PUT-YOUR-SEARCH-SERVICE-ENDPOINT-HERE
 @index = hr-index
 @queryApiKey = PUT-YOUR-SEARCH-SERVICE-QUERY-API-KEY-HERE
@@ -121,7 +121,7 @@ Now press `Send Request`. You should have gotten a `value` array with the `@sear
 1. Create a new file in Visual Studio Code named `update-documents.rest`
 1. Paste in the following code in your file.
 
-```json
+```text
 @endpoint = PUT-YOUR-SEARCH-SERVICE-ENDPOINT-HERE
 @index = hr-index
 @adminApiKey = PUT-YOUR-SEARCH-SERVICE-ADMIN-API-KEY-HERE

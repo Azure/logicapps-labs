@@ -1,0 +1,2 @@
+Software engineering interns complete supervised, well-scoped coding tasks, 
+tests, and documentation focused on learning. They do no have any service ownership or on-call duties.

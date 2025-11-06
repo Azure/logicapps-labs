@@ -1,0 +1,63 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Compose_DTI": {
+        "type": "Compose",
+        "inputs": "@div(mul(triggerBody()?['loanAmount'], 12), triggerBody()?['annualSalary'])",
+        "runAfter": {}
+      },
+      "Compose_RiskProfile": {
+        "type": "Compose",
+        "inputs": {
+          "dtiRatio": "@outputs('Compose_DTI')",
+          "riskScore": "@if(greater(outputs('Compose_DTI'), 0.43), 'High', if(greater(outputs('Compose_DTI'), 0.28), 'Medium', 'Low'))",
+          "employmentStability": "@if(greaterOrEquals(triggerBody()?['employmentYears'], 3), 'Stable', if(greaterOrEquals(triggerBody()?['employmentYears'], 1), 'Moderate', 'Limited'))"
+        },
+        "runAfter": {
+          "Compose_DTI": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Compose_RiskProfile')"
+        },
+        "runAfter": {
+          "Compose_RiskProfile": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "loanAmount": {
+                "type": "number"
+              },
+              "annualSalary": {
+                "type": "number"
+              },
+              "employmentYears": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}

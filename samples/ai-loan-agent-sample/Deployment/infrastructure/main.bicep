@@ -100,4 +100,3 @@ module openaiRbac 'modules/openai-rbac.bicep' = {
 // Outputs
 output logicAppName string = logicApp.outputs.name
 output openAIEndpoint string = openai.outputs.endpoint
-output quickTestUrl string = logicApp.outputs.quickTestUrl

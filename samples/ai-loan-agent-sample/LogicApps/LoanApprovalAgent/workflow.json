@@ -252,7 +252,7 @@
                 "type": "Compose",
                 "inputs": {
                     "applicationId": "@triggerBody().applicationId",
-                    "creditScore": "@if(equals(triggerBody().applicationId, 'APP-AUTO-APPROVE-001'), 780, if(equals(triggerBody().applicationId, 'APP-REVIEW-REQUIRED-002'), 680, if(equals(triggerBody().applicationId, 'APP-LUXURY-REVIEW-004'), 750, if(equals(triggerBody().applicationId, 'APP-AUTO-REJECT-003'), 580, 580))))"
+                    "creditScore": "@if(equals(triggerBody().applicationId, 'APP-AUTO-APPROVE-001'), 780, if(equals(triggerBody().applicationId, 'APP-REVIEW-REQUIRED-002'), 720, if(equals(triggerBody().applicationId, 'APP-LUXURY-REVIEW-004'), 750, if(equals(triggerBody().applicationId, 'APP-AUTO-REJECT-003'), 580, 580))))"
                 },
                 "runAfter": {}
             },

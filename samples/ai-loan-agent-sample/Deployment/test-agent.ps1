@@ -90,25 +90,25 @@ $payload1 = @{
 } | ConvertTo-Json
 
 try {
-    $Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload1 -ContentType "application/json"
+    Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload1 -ContentType "application/json"
     Write-Host "✓ Test Case 1 Submitted" -ForegroundColor Green
 } catch {
     Write-Host "✗ Test Case 1 Failed: $_" -ForegroundColor Red
 }
 Start-Sleep -Seconds 15
 
-# Test Case 2: Human Review Required (Lower credit score, exceeds limits)
+# Test Case 2: Human Review Required (Exceeds loan limit, good credit)
 Write-Host "\n--- Test Case 2: Human Review Scenario ---" -ForegroundColor Cyan
 $payload2 = @{
     applicationId = "APP-REVIEW-REQUIRED-002"
     name = "Applicant B"
     email = "applicant.b@example.com"
-    loanAmount = 75000
+    loanAmount = 55000
     vehicleMake = "BMW"
     vehicleModel = "X5"
     salary = 95000
     employmentYears = 3
-    creditScore = 680
+    creditScore = 720
     bankruptcies = 0
 } | ConvertTo-Json
 

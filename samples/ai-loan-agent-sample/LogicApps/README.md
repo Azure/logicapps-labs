@@ -26,19 +26,19 @@ Update the following values in your `local.settings.json` file:
 
 | Setting Key | Description | Where to Find | Example |
 |-------------|-------------|---------------|---------|
-| `WORKFLOWS_SUBSCRIPTION_ID` | Azure subscription ID | Azure Portal → Subscriptions | `12345678-1234-1234-1234-123456789012` |
-| `WORKFLOWS_LOCATION_NAME` | Azure region for deployment | Azure Portal → Resource location | `eastus` or `eastus2` |
-| `WORKFLOWS_RESOURCE_GROUP_NAME` | Target resource group | Azure Portal → Resource groups | `rg-ailoan` |
+| `WORKFLOWS_SUBSCRIPTION_ID` | Your Azure subscription ID | Azure Portal → Subscriptions | `12345678-1234-1234-1234-123456789012` |
+| `WORKFLOWS_LOCATION_NAME` | Azure region for your resources | Azure Portal → Resource location | `eastus2` |
+| `WORKFLOWS_RESOURCE_GROUP_NAME` | Resource group containing your Logic App | Azure Portal → Resource groups | `rg-ailoan` |
 | `agent_ResourceID` | Azure OpenAI resource ID | Azure Portal → OpenAI resource → Properties | `/subscriptions/.../resourceGroups/.../providers/Microsoft.CognitiveServices/accounts/myopenai` |
 | `agent_openAIEndpoint` | Azure OpenAI endpoint URL | Azure Portal → OpenAI → Keys and Endpoint | `https://myopenai.openai.azure.com/` |
 
 ### 3. Pre-configured Values (Do Not Modify)
 
 These values are already set correctly and should remain unchanged:
-- `AzureWebJobsStorage`: `"UseDevelopmentStorage=true"` (for local development with Azurite)
-- `APP_KIND`: `"workflowApp"`
-- `FUNCTIONS_WORKER_RUNTIME`: `"dotnet"`
-- `FUNCTIONS_INPROC_NET8_ENABLED`: `"1"`
+- `AzureWebJobsStorage` - Set to `UseDevelopmentStorage=true` for local development with Azurite
+- `APP_KIND` - Set to `workflowApp`
+- `FUNCTIONS_WORKER_RUNTIME` - Set to `dotnet`
+- `FUNCTIONS_INPROC_NET8_ENABLED` - Set to `1`
 
 ## Detailed Configuration Guide
 

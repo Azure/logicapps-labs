@@ -1,151 +1,158 @@
 # AI Loan Agent Sample
 
-This sample demonstrates an AI-powered loan approval system that automates the evaluation of vehicle loan applications using Azure Logic Apps Standard and Azure OpenAI. The AI agent autonomously calls tools to retrieve policy documents, customer history, risk profiles, and vehicle data to make loan decisions.
+This sample demonstrates how to build an AI agent in Azure Logic Apps Standard that autonomously analyzes loan applications, selects verification tools, and makes approval decisions. Deploy in 15 minutes using mock data—no external service integrations required.
 
-## Quick Start
+**What you'll learn:**
+- **Build AI agent workflows** - Create workflows where Azure OpenAI autonomously selects and executes verification tools based on application context
+- **Test agent behaviors** - Validate auto-approval, rejection, and escalation paths across multiple scenarios
+- **Extend with connectors** - Swap mocks with integrations to target APIs, data sources, and notification systems like Microsoft Teams and Office 365.
 
-Get the sample running in ~10 minutes:
+**[Watch Demo Video](https://youtu.be/rR1QjQTfCCg)** | **[Agent Workflow Blog](https://techcommunity.microsoft.com/blog/integrationsonazureblog/%F0%9F%A4%96-agent-loop-demos-%F0%9F%A4%96/4414770)**
 
+---
+
+## Prerequisites
+
+Before deploying this sample, ensure you have:
+
+- **Azure subscription** - With contributor access to create resources
+- **Azure OpenAI access approved** - Required for GPT model deployment ([Request access](https://aka.ms/oai/access))
+- **[PowerShell 7+](https://learn.microsoft.com/powershell/scripting/install/installing-powershell)** - For running deployment scripts
+- **[Azure PowerShell module](https://learn.microsoft.com/powershell/azure/install-azure-powershell)** - For Azure resource management
+- **[Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/install)** - Used by deployment script for infrastructure as code
+
+**What gets deployed:** The deployment script automatically creates App Service Plan (Workflow Standard SKU), Logic App Standard, Azure OpenAI (with GPT-4.1-mini model), Storage Account, and Managed Identity. See [Architecture](#architecture) for details.
+
+**Note:** This sample uses mock implementations (static data, simulated API responses) to provide a self-contained learning environment without requiring external service integrations. See [Mock Implementations](#mock-implementations) for details.
+
+---
+
+## Deployment Instructions
+
+### Quick Start
+
+**1. Get the Code**
 ```powershell
-# 1. Clone the repository
 git clone https://github.com/modularity/logicapps-labs.git
 cd logicapps-labs/samples/ai-loan-agent-sample
-
-# 2. Deploy infrastructure and workflows (~10-15 minutes)
-.\Deployment\deploy.ps1 -ProjectName "ailoan" -Location "eastus2"
-
-# 3. Test the deployment
-.\Deployment\test-agent.ps1 -ResourceGroupName "rg-ailoan" -LogicAppName "ailoan-logicapp"
-
-# 4. View results in Azure Portal (link provided in test output)
-
-# 5. Clean up when done
-.\Deployment\cleanup.ps1 -ResourceGroupName "rg-ailoan"
 ```
 
-**Prerequisites:** Azure subscription, Azure PowerShell module, PowerShell 7+. See [Prerequisites](#prerequisites) for details.
+**2. Login to Azure**
+```powershell
+Connect-AzAccount
+```
+*Select the target subscription if you have multiple subscriptions.*
 
-## What's Included
+**3. Deploy to Azure**
+```powershell
+.\Deployment\deploy.ps1 -ProjectName "ailoan" -Location "eastus2"
+```
+*Deployment takes approximately 10-15 minutes.*
 
-**Deployed Azure Resources:**
-- **Azure Logic Apps Standard** - Hosts the agentic workflows
-- **Azure OpenAI Service** - GPT-4.1-mini model for AI agent reasoning
-- **Azure Storage Account** - Workflow runtime storage (managed identity authentication)
-- **User-Assigned Managed Identity** - Secure RBAC-based authentication
+**4. Test Workflows**
+```powershell
+.\Deployment\test-agent.ps1 -ResourceGroupName "rg-ailoan" -LogicAppName "ailoan-logicapp"
+```
+*See [Testing & Validation](#testing--validation) for detailed results analysis.*
 
-**Mock Implementations (for demonstration):**
-- Credit check API (hardcoded responses in workflow)
-- Background check (hardcoded data)
-- Employment verification (hardcoded data)
-- Human approval (auto-simulated based on credit score)
-- Email notifications (logged but not sent)
-- Customer bank history (mock workflow with sample data)
-- Special vehicles database (mock workflow with sample data)
+**5. Clean Up**
+```powershell
+Remove-AzResourceGroup -Name "rg-ailoan" -Force
+```
 
-> **Note:** This is a demonstration sample. See [Replacing Mock Components](#replacing-mock-components) for guidance on connecting to services.
+### What Gets Deployed
+
+The deployment script (`deploy.ps1`) provisions these Azure resources using Bicep:
+
+- **App Service Plan** (Workflow Standard SKU) for hosting Logic App
+- **Logic App Standard** with all workflows
+- **Azure OpenAI** with GPT-4.1-mini model (2025-04-14)
+- **Storage Account** for workflow state
+- **Managed Identity** with RBAC permissions
+
+See [Architecture](#architecture) for detailed resource information and workflow diagrams.
+
+<details>
+<summary><b>Resource Naming Conventions</b></summary>
+
+All resources use your `ProjectName` as a prefix:
+
+| Resource | Naming Pattern | Example (ProjectName = "ailoan") |
+|----------|----------------|----------------------------------|
+| Resource Group | `rg-{projectName}` | `rg-ailoan` |
+| Logic App | `{projectName}-logicapp` | `ailoan-logicapp` |
+| App Service Plan | `{projectName}-logicapp-plan` | `ailoan-logicapp-plan` |
+| Azure OpenAI | `{projectName}-openai` | `ailoan-openai` |
+| Storage Account | `{projectName}{uniqueId}` | `ailoan01234` |
+| Managed Identity | `{projectName}-uami` | `ailoan-uami` |
+
+</details>
+
+<details>
+<summary><b>Supported Regions</b></summary>
+
+Deployment requires a region that supports both Azure OpenAI (GPT-4 models) and Azure Logic Apps Standard:
+- [Azure OpenAI model availability by region](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability)
+- [Azure Logic Apps Standard availability](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) (search for "Logic Apps")
+
+**Note:** Deployment uses Bicep's incremental mode and can be run multiple times.
+
+</details>
+
+---
 
 ## Architecture
 
-The Bicep deployment creates the following Azure resources:
+**Deployed Resources:**
 
-```mermaid
-graph TB
-    subgraph "Resource Group: rg-{projectName}"
-        direction TB
-        
-        subgraph "Compute"
-            LA[Logic App Standard<br/>ai-loan-agent-logicapp]
-        end
-        
-        subgraph "AI Services"
-            AOAI[Azure OpenAI<br/>ai-loan-agent-openai<br/>Model: gpt-4.1-mini]
-        end
-        
-        subgraph "Storage"
-            ST[Storage Account<br/>workflow state & files<br/>Managed Identity Auth]
-        end
-        
-        subgraph "Identity"
-            MI[User-Assigned<br/>Managed Identity<br/>ai-loan-agent-uami]
-        end
-        
-        LA -->|RBAC: Blob Contributor<br/>Queue Contributor<br/>Table Contributor| ST
-        LA -->|System Identity<br/>RBAC: Cognitive Services User| AOAI
-        MI -->|Assigned to| LA
-        MI -->|RBAC Roles| ST
-    end
-    
-    USER[Test Script<br/>HTTP Request] -->|Triggers| LA
-    
-    style LA fill:#0078d4,color:#fff
-    style AOAI fill:#00a4ef,color:#fff
-    style ST fill:#7fba00,color:#fff
-    style MI fill:#ffb900,color:#000
-```
+The deployment creates these Azure resources:
 
-**Resource Details:**
+| Resource | What It Does |
+|----------|-------------|
+| **Logic App Standard** | Hosts the AI agent workflows |
+| **Azure OpenAI** | Provides the GPT-4.1-mini AI model for decision-making |
+| **Storage Account** | Stores workflow data and state |
+| **Managed Identity** | Securely connects services without passwords |
+| **App Service Plan** | Hosts the Logic App |
 
-| Resource Type | Name Pattern | Purpose | Authentication |
-|---------------|--------------|---------|----------------|
-| Resource Group | `rg-{projectName}` | Container for all resources | N/A |
-| Logic App Standard | `{projectName}-logicapp` | Hosts all workflows | Managed Identity |
-| Azure OpenAI | `{projectName}-openai` | AI agent processing | System-assigned MI |
-| Storage Account | `{projectName}{uniqueId}` | Workflow runtime & state | User-assigned MI |
-| Managed Identity | `{projectName}-uami` | Service authentication | RBAC-based |
 
-**Authentication Approach:**
+<details>
+<summary><b>Security & Authentication</b></summary>
 
-This deployment uses Managed Identity exclusively for secure, keyless authentication with RBAC:
-- **User-Assigned Managed Identity:** Assigned to Logic App for storage access (Blob Data Contributor, Queue Data Contributor, Table Data Contributor roles)
-- **System-Assigned Managed Identity:** Automatically created with Logic App for Azure OpenAI access (Cognitive Services User role)
+This sample uses [Managed Identity](https://learn.microsoft.com/azure/logic-apps/create-managed-service-identity) with Azure [RBAC](https://learn.microsoft.com/azure/role-based-access-control/overview) for secure, passwordless authentication:
 
-### Infrastructure Details
+- **System-Assigned Identity** - Logic App → Azure OpenAI ([Cognitive Services OpenAI User](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control#azure-openai-roles) role)
+- **User-Assigned Identity** - Logic App → Storage Account ([Storage Blob Data Owner, Storage Queue Data Contributor, Storage Table Data Contributor](https://learn.microsoft.com/azure/logic-apps/authenticate-with-managed-identity#assign-role-based-access-to-a-managed-identity-using-the-azure-portal) roles)
 
-**Deployment Philosophy:**
+</details>
 
-The Bicep infrastructure follows Azure best practices:
-- **Identity:** Uses managed identities exclusively (no connection strings or API keys)
-- **RBAC:** All authentication via role assignments (least privilege)
-- **Modular Design:** Separate Bicep modules for each resource type
-- **IaC Pattern:** User-Assigned managed identity created before Logic App for RBAC setup
+<details>
+<summary><b>Mock Implementations</b></summary>
 
-**Why Two Managed Identities?**
+This sample includes mock implementations of external dependencies to provide a self-contained, cost-effective learning environment. 
 
-- **User-Assigned (for Storage):** Microsoft's recommended approach for Logic Apps Standard storage authentication. Can be created before the Logic App, allowing RBAC roles to be assigned before the app starts.
-- **System-Assigned (for OpenAI):** Required for workflow API connections because connections need the Logic App resource to exist first. Created automatically with the Logic App.
+| Component | Implementation | Purpose |
+|-----------|----------------|----------|
+| Credit/Background/Employment Checks | `Compose` actions with static JSON | Simulates verification API responses |
+| Human Approval | Conditional logic based on thresholds | Demonstrates approval workflow pattern |
+| Email Notifications | `Compose` action logging output | Simulates notification without SMTP setup |
+| Banking History | Workflow returning sample data | Demonstrates calling supporting workflows |
+| Vehicle Database | Static lookup data | Demonstrates specialized validation logic |
 
-**Deployment Timeline:**
-- Infrastructure provisioning: 5-10 minutes
-- RBAC propagation wait: 60 seconds (scripted)
-- Workflow deployment: 2-3 minutes
-- **Total:** ~10-15 minutes
+See [Extending the Sample](#extending-the-sample) for integration options with real services.
 
-**Region Selection:**
+</details>
 
-Only regions that support both Azure OpenAI (GPT-4o models) and Logic Apps Standard are allowed. Default region is `eastus2` for good availability and quota.
+### Workflows
 
-**Storage Configuration:**
+This project contains 5 workflows that work together to process loan applications autonomously.
 
-Uses Standard LRS (Locally Redundant Storage) for cost optimization, suitable for development and testing. For production deployments, consider:
-- **ZRS (Zone-Redundant):** For high availability within a region
-- **GRS (Geo-Redundant):** For disaster recovery across regions
+<details>
+<summary><b>LoanApprovalAgent</b></summary>
 
-**OpenAI Model Selection:**
+The main agent workflow that orchestrates the loan approval process. It receives loan applications, runs pre-checks (credit, background, employment), then hands control to the AI agent. The agent autonomously decides which tools to call, in what order, and makes the final approval decision.
 
-- **Model:** gpt-4.1-mini (version: 2025-04-14)
-- **Capacity:** 50K tokens/minute (sufficient for concurrent testing)
-- **Rationale:** Cost-effective for most loan decision scenarios
-- **Production:** Consider gpt-4o with higher capacity based on expected volume
-
-## Workflows
-
-### LoanApprovalAgent
-
-The main agent workflow that orchestrates loan approval decisions. The AI agent autonomously calls tools to gather information and make approval/rejection decisions based on loan policy.
-
-**Current Implementation:** Uses HTTP manual trigger with JSON payload (test via PowerShell script). Can be adapted to use another application trigger for production.
-
-#### Process Flow
+**Process Flow:**
 
 ```mermaid
 flowchart TD
@@ -180,190 +187,342 @@ flowchart TD
     style F fill:#00a4ef,color:#fff
 ```
 
-**Agent Behavior:**
-1. AI receives application summary with credit, background, and employment data
-2. AI calls "Get Loan Policy" tool to understand approval criteria
-3. AI calls "Get Customer Bank History" tool for financial patterns
-4. AI calls "Get Risk Profile" tool to calculate debt-to-income ratios
-5. If luxury vehicle detected, AI calls "Get Special Vehicles" tool
-6. If human review needed (borderline case), AI calls "Wait for Human Review" (currently simulated)
-7. AI calls "Send Customer Email" with approval/rejection notification
-8. Workflow calls post-processing for additional steps
-
-#### Required Connections
+**Required Connections:**
 
 |Connection Name|Connector Name|Connector Type|
 |---|---|---|
-|agent|Azure OpenAI Connection|Agent|
+|Azure OpenAI Connection|Azure OpenAI|Agent|
 
-**Optional Connections (for production):**
-- Microsoft Forms - Loan application intake (replace HTTP trigger)
-- Microsoft Teams - Human approval with Adaptive Cards (replace simulated approval)
-- Office 365 Outlook - Real email delivery (replace mock email action)
-- SQL Server - Customer/vehicle databases (replace mock workflows)
-- API Management - External API integrations (replace mock compose actions)
+**Workflow Connectivity & RBAC:**
 
-### GetCustomerHistory
-
-Mock workflow that returns sample customer banking history data.
-
-**Current Implementation:** Returns hardcoded JSON with sample transaction patterns.
-
-**Production Option:** Connect to SQL Database or banking API to retrieve real customer financial history.
-
-### GetRiskProfile
-
-Mock workflow that calculates applicant risk based on loan amount, salary, and employment.
-
-**Current Implementation:** Performs basic DTI calculations and returns risk assessment.
-
-**Production Option:** Connect to credit bureau APIs or internal risk scoring systems.
-
-### GetSpecialVehicles
-
-Mock workflow that checks if a vehicle is classified as luxury/exotic.
-
-**Current Implementation:** Returns hardcoded list of luxury vehicle makes (Ferrari, Lamborghini, etc.).
-
-**Production Option:** Connect to vehicle valuation database (Kelly Blue Book, NADA) or custom classification system.
-
-### LoanPostProcessing
-
-Supporting workflow for additional processing after loan decision.
-
-**Current Implementation:** Accepts decision data and returns success response (placeholder for future logic).
-
-**Production Option:** Add account setup, document generation, CRM updates, etc.
-
-## Deployment
-
-### Prerequisites
-
-- Azure subscription with permissions to create resources
-- Azure PowerShell module installed ([Install Guide](https://learn.microsoft.com/powershell/azure/install-azure-powershell))
-- PowerShell 7+ ([Install Guide](https://learn.microsoft.com/powershell/scripting/install/installing-powershell))
-- Azure OpenAI access with gpt-4.1-mini model available ([Request Access](https://aka.ms/oai/access))
-
-### Deploy Infrastructure and Workflows
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/your-org/logicapps-labs.git
-cd logicapps-labs/samples/ai-loan-agent-sample
+```mermaid
+graph TB
+    Client["Application/Test Script"] -->|HTTP POST<br/>Loan Application| LA["Logic App Standard"]
+    
+    LA -->|Hosts| Trigger["HTTP Trigger"]
+    Trigger --> Agent["AI Agent Workflow<br/>(LoanApprovalAgent)"]
+    Agent -.->|Calls| Tools["AI Tools<br/>(Get Policy, History,<br/>Risk Profile, etc.)"]
+    Tools -.->|Invoke| Support["Supporting Workflows<br/>(GetCustomerHistory,<br/>GetRiskProfile, etc.)"]
+    
+    Agent -->|System-Assigned<br/>Managed Identity| AOAI["Azure OpenAI<br/>gpt-4.1-mini<br/>RBAC: Cognitive Services User"]
+    LA -->|User-Assigned<br/>Managed Identity<br/>Runtime Storage| ST["Storage Account<br/>RBAC: Blob/Queue/Table<br/>Data Contributor"]
 ```
 
-2. Deploy using the PowerShell script:
+</details>
 
-```powershell
-# Basic deployment
-.\Deployment\deploy.ps1 -ProjectName "ailoan" -Location "eastus2"
+<details>
+<summary><b>GetCustomerHistory</b></summary>
 
-# Deployment with tags (recommended for tracking)
-.\Deployment\deploy.ps1 -ProjectName "ailoan" -Location "eastus2" -Tags @{
-    Environment = 'dev'
-    CostCenter = 'IT-Operations'
-    Project = 'AI-Loan-Agent'
-}
+Supporting workflow that retrieves mock customer banking history data. Called by the AI agent's "Get Customer Bank History" tool. Returns banking relationship information including years with bank, average balance, payment history, and account age based on the application ID.
+
+**Process Flow:**
+
+```mermaid
+flowchart TD
+    A[HTTP Trigger] --> B[Initialize ExcellentProfile]
+    B --> C[Initialize FairProfile]
+    C --> D[Initialize HighRiskProfile]
+    D --> E[Select Profile by Application ID]
+    E --> F[Response: Return Profile]
 ```
 
-The script will:
-- Deploy all Azure resources using Bicep (incremental mode)
-- Configure managed identities and RBAC permissions
-- Deploy Logic App workflows
-- Wait for RBAC propagation (60 seconds)
+**Required Connections:**
 
-**Incremental Updates:** The deployment uses incremental mode, allowing you to run it multiple times to update infrastructure. RBAC role assignments are idempotent—if they already exist, deployment will succeed without changes.
+|Connection Name|Connector Name|Connector Type|
+|---|---|---|
+|None|Built-in actions only|N/A|
 
-### Post-Deployment Configuration
+</details>
 
-After deployment completes, the Logic App is ready to test with the included test script. The current implementation uses mock data for external APIs:
+<details>
+<summary><b>GetRiskProfile</b></summary>
 
-**What's Deployed and Ready:**
-- ✅ Logic Apps Standard with all workflows
-- ✅ Azure OpenAI with GPT-4.1-mini deployment
-- ✅ Storage account with managed identity authentication
-- ✅ RBAC roles configured automatically
+Supporting workflow that calculates applicant risk profile based on loan amount, annual salary, and employment years. Computes debt-to-income (DTI) ratio and assigns risk scores (Low/Medium/High) and employment stability ratings.
 
-**What's Simulated (Mock Data):**
-- ⚠️ Credit check API responses (hardcoded in workflow)
-- ⚠️ Background check results (hardcoded in workflow)
-- ⚠️ Employment verification (hardcoded in workflow)
-- ⚠️ Human approval process (auto-simulated based on credit score)
-- ⚠️ Email notifications (logged but not sent)
+**Process Flow:**
 
-### Testing the Deployment
+```mermaid
+flowchart TD
+    A[HTTP Trigger] --> B[Calculate DTI Ratio]
+    B --> C[Compose Risk Profile]
+    C --> D[Response: Return Risk Profile]
+```
 
-Run the test script to validate all 4 scenarios:
+**Required Connections:**
+
+|Connection Name|Connector Name|Connector Type|
+|---|---|---|
+|None|Built-in actions only|N/A|
+
+</details>
+
+<details>
+<summary><b>GetSpecialVehicles</b></summary>
+
+Supporting workflow that checks if a vehicle is classified as luxury/special requiring additional review. Maintains a static database of vehicle makes with risk factors.
+
+**Process Flow:**
+
+```mermaid
+flowchart TD
+    A[HTTP Trigger] --> B[Initialize Vehicle Data]
+    B --> C[Parse JSON]
+    C --> D[Query for Vehicle]
+    D --> E{Found?}
+    E -->|Yes| F[Return Vehicle Data]
+    E -->|No| G[Return Default]
+```
+
+**Required Connections:**
+
+|Connection Name|Connector Name|Connector Type|
+|---|---|---|
+|None|Built-in actions only|N/A|
+
+</details>
+
+<details>
+<summary><b>LoanPostProcessing</b></summary>
+
+Supporting workflow for post-processing steps after loan decision. Currently returns a simple HTTP 200 response. Can be extended for database updates, notifications, or audit logging.
+
+**Process Flow:**
+
+```mermaid
+flowchart TD
+    A[HTTP Trigger] --> B[Response: HTTP 200]
+```
+
+**Required Connections:**
+
+|Connection Name|Connector Name|Connector Type|
+|---|---|---|
+|None|Built-in actions only|N/A|
+
+</details>
+
+---
+
+## Testing & Validation
+
+Run the test script to validate the AI agent with 4 different loan application scenarios:
 
 ```powershell
-# If you deployed with ProjectName "ailoan"
 .\Deployment\test-agent.ps1 -ResourceGroupName "rg-ailoan" -LogicAppName "ailoan-logicapp"
 ```
 
-The test script validates:
-1. **Auto-Approval** - High credit score, standard loan amount
-2. **Human Review Required** - Lower credit score triggers review
-3. **Auto-Rejection** - Credit score below threshold, bankruptcy record
-4. **Luxury Vehicle Review** - High-value vehicle requires additional review
+### Test Scenarios & Expected Results
 
-### Validation Checklist
+| Test | Application Details | Expected Behavior |
+|------|---------------------|-------------------|
+| **Test 1: Auto-Approval** | Credit: 780, Income: $75K, Car: Toyota Camry | Approve without human review |
+| **Test 2: Human Review** | Credit: 720, Income: $95K, Car: BMW X5 ($55K) | Invoke "Wait for Human Review" tool |
+| **Test 3: Auto-Rejection** | Credit: 580, Bankruptcy: Yes, Car: Honda Accord | Reject without further processing |
+| **Test 4: Luxury Vehicle** | Credit: 750, Income: $120K, Car: Ferrari F8 ($80K) | Invoke "Get Special Vehicles" tool and trigger review |
 
-After deployment and testing, verify:
-- [ ] Logic App is running (check Azure Portal)
-- [ ] Workflows are visible in Logic App
-- [ ] Azure OpenAI connection is authorized
-- [ ] Workflow run history shows successful executions
-- [ ] Test script successfully completes all 4 test cases
+<details>
+<summary><b>How to Verify Results</b></summary>
 
-### Cleanup
+**1. Access Run History**
 
-To delete all deployed resources:
+Navigate to: Azure Portal → Logic App → Workflow → **Tools** → **Run history** tab
 
-```powershell
-.\Deployment\cleanup.ps1 -ResourceGroupName "rg-ailoan"
+You should see four workflow runs (one for each test). [Learn more about reviewing run history](https://learn.microsoft.com/azure/logic-apps/view-workflow-status-run-history?tabs=standard#review-run-history).
+
+**2. Review Agent Performance**
+
+Open a run to review:
+- Execution time per action and tool
+- **Trigger** - Loan application data in the request body output
+- **Agent log** - Shows each tool call in execution order. 
+    - Click any tool to open its details blade and review inputs/outputs ([Learn more](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#review-tool-execution-data))
+
+</details>
+
+<details>
+<summary><b>Troubleshooting</b></summary>
+
+If tests fail:
+- Verify Logic App is in "Running" state (not "Stopped")
+- Check that Azure OpenAI connection is authorized in Logic App → API connections
+- Wait 2-3 minutes after deployment for RBAC permissions to fully propagate
+- Check the [run history](https://learn.microsoft.com/azure/logic-apps/view-workflow-status-run-history?tabs=standard#review-workflow-run-history) for specific error messages
+
+</details>
+
+---
+
+## Extending the Sample
+
+This loan agent sample demonstrates autonomous AI agent patterns using Azure Logic Apps. The architecture uses mock services for demonstration purposes. To adapt it, replace the mock implementations with preferred service integrations and tune the agent to the updated workflow.
+
+**Key Resources:** 
+- [Create autonomous agent workflows in Azure Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows)
+- [Best practices for Logic Apps agents and tools](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#best-practices-for-agents-and-tools)
+
+<details>
+<summary><b>Supported AI Models</b></summary>
+
+Azure Logic Apps agent workflows support these Azure OpenAI models:
+- GPT-4o (2024-05-13 and later)
+- GPT-4o mini (2024-07-18 and later)
+- GPT-4 Turbo (2024-04-09 and later)
+- GPT-4.1-mini (2025-04-14) - Used in this sample
+
+For current model availability, see [Supported models for agent workflows](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#supported-models-for-agent-workflows).
+
+</details>
+
+<details>
+<summary><b>Replacing Mock Services</b></summary>
+
+The following components use mock implementations. These can be replaced with preferred service integrations and connectors:
+
+| Component | Current Mock | Popular Integration Options |
+|-----------|--------------|---------------------------|
+| **Email Notifications** | Logged to console | Office 365 Outlook, SendGrid, Azure Communication Services, Mailchimp |
+| **Credit Checks** | Static scores | Experian, TransUnion, Equifax, regional credit bureaus |
+| **Background Checks** | Sample data | Checkr, GoodHire, Sterling, HireRight |
+| **Human Approval** | Auto-simulated | Microsoft Teams Adaptive Cards, Power Apps, ServiceNow, Slack |
+| **Banking History** | Static workflow data | SQL Database, Cosmos DB, Banking APIs, Core systems |
+| **Vehicle Database** | Hardcoded list | Kelly Blue Book, NADA, Edmunds, CarFax, AutoTrader |
+| **Application Intake** | Test script | Microsoft Forms, Power Apps, Dynamics 365, SharePoint |
+
+**Implementation Approach:** Replace one mock service at a time. This allows incremental testing and validation of each integration independently.
+
+</details>
+
+<details>
+<summary><b>Optimize Agent Performance</b></summary>
+
+Key optimization strategies:
+
+- **Manage Chat History Context** - Control conversation history length to balance context retention with token efficiency. Remove or summarize older messages to stay within model limits.
+- **Optimize Tools** - Design tools with clear, focused purposes. Use descriptive names and detailed descriptions to help the agent select the right tool. Minimize tool count when possible.
+- **Tune Agent Parameters** - Adjust system instructions to define behavior, business rules, and output format. Set appropriate temperature and token limits for your use case.
+- **Monitor Token Usage** - Track consumption patterns, use efficient prompts, and implement cost controls for production workloads
+
+**Learn More:**
+- [Best practices for Logic Apps agents and tools](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#best-practices-for-agents-and-tools)
+- [Create AI agent workflows in Azure Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-ai-agent-workflow)
+- [Best practices for Azure OpenAI prompts](https://learn.microsoft.com/azure/ai-services/openai/concepts/system-message)
+
+</details>
+
+<details>
+<summary><b>Modify Workflow Logic</b></summary>
+
+To customize or extend workflow behavior:
+
+1. Open `ai-loan-agent-sample.code-workspace` in VS Code
+2. Install **Azure Logic Apps (Standard)** extension
+3. Find a workflow folder (e.g., `LoanApprovalAgent`)
+4. Right-click → **Open Designer** to make changes visually
+5. Or edit `workflow.json` directly for code-based changes
+6. Right-click `LogicApps` folder → **Deploy to Logic App**
+
+For local development setup, see [`LogicApps/README.md`](LogicApps/README.md).
+
+</details>
+
+<details>
+<summary><b>Example: Replace Mock Email with Office 365</b></summary>
+
+1. Open Logic Apps Designer for `LoanApprovalAgent` workflow
+2. Locate the **"Send Customer Email"** tool definition
+3. Find the `Compose` action that logs the email
+4. Replace with **Office 365 Outlook - Send an email (V2)** connector
+5. Configure connection with appropriate permissions
+6. Map fields:
+   - **To:** `@{outputs('Get_customer_email')}` or from tool parameters
+   - **Subject:** Use tool parameter for subject
+   - **Body:** Use tool parameter for email body
+7. Save and redeploy workflow
+8. Test with a real email address
+
+</details>
+
+<details>
+<summary><b>Example: Add Teams Notification for Human Review</b></summary>
+
+Replace the mock "Wait for Human Review" tool with an interactive Teams approval:
+
+1. **Setup Teams connector:** Follow the [Teams connector documentation](https://learn.microsoft.com/azure/connectors/connectors-create-api-office365-outlook?tabs=standard) to configure authentication and get your Team/Channel IDs
+2. Open Logic Apps Designer for `LoanApprovalAgent` workflow
+3. Locate the **"Wait for Human Review"** tool definition
+4. Replace the `Compose` action with **Microsoft Teams - Post adaptive card and wait for a response** connector
+5. Configure the adaptive card with loan application details:
+
+```json
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "weight": "Bolder",
+      "text": "Loan Application Requires Review"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Applicant:",
+          "value": "@{triggerBody()?['applicantName']}"
+        },
+        {
+          "title": "Loan Amount:",
+          "value": "$@{triggerBody()?['loanAmount']}"
+        },
+        {
+          "title": "Credit Score:",
+          "value": "@{triggerBody()?['creditScore']}"
+        },
+        {
+          "title": "Vehicle:",
+          "value": "@{triggerBody()?['vehicleMake']} @{triggerBody()?['vehicleModel']}"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Approve",
+      "data": {
+        "decision": "approved"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Reject",
+      "data": {
+        "decision": "rejected"
+      }
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4"
+}
 ```
 
-This will delete the resource group and all resources within it, including the Logic App, Azure OpenAI service, Storage Account, and Managed Identity with associated RBAC assignments.
+6. Add a condition to check the response and return appropriate result to the agent
+7. Save and redeploy workflow
 
-## Modifying Workflows
+</details>
 
-To make changes to the Logic App workflows:
+---
 
-1. Open the sample workspace in VS Code:
-   - Open the `ai-loan-agent-sample.code-workspace` file in VS Code
-   - Install the Azure Logic Apps (Standard) extension if not already installed
+## Learn More
 
-2. Edit workflows using the designer:
-   - Navigate to the `LogicApps` folder
-   - Right-click on any workflow folder (e.g., `LoanApprovalAgent`)
-   - Select **"Open Designer"** to visually edit the workflow
+- [Azure Logic Apps Documentation](https://learn.microsoft.com/azure/logic-apps/)
+- [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/)
+- [Building AI Agents with Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-ai-agent-workflow)
+- [Managed Identity Authentication](https://learn.microsoft.com/azure/logic-apps/create-managed-service-identity)
+- [Azure RBAC Overview](https://learn.microsoft.com/azure/role-based-access-control/overview)
 
-3. Deploy changes to Azure:
-   - Right-click on the `LogicApps` folder
-   - Select **"Deploy to Logic App in Azure"**
-   - Choose your Logic App instance from the list
+---
 
-For local development and testing, see [LogicApps/README.md](LogicApps/README.md) for setup instructions.
+## Questions or Issues
 
-## Replacing Mock Components
-
-Each mock component in the sample can be replaced with real Azure connectors or APIs for production use:
-
-|Mock Component|Current Implementation|Production Connector Options|Notes|
-|---|---|---|---|
-|**Human Approval**|Simulated Wait_for_Human_Review tool (always approves)|Microsoft Teams with Adaptive Cards|Post approval request to Teams channel, wait for response|
-|**Customer Email**|Compose action logging email content|Office 365 Outlook, SendGrid, or Azure Communication Services|Send actual email notifications to applicants|
-|**Credit Check**|Hardcoded compose action with sample scores|API Management, HTTP connector to credit bureau API|Integrate with Experian, TransUnion, or Equifax APIs|
-|**Background Check**|Hardcoded compose action with sample results|API Management, HTTP connector to background service|Integrate with Checkr, GoodHire, or similar services|
-|**Employment Verification**|Hardcoded compose action with sample data|API Management, HTTP connector to HR systems|Integrate with Workday, ADP, or employment verification services|
-|**Customer Bank History**|GetCustomerHistory workflow with hardcoded JSON|SQL Server, Azure SQL Database connector|Query customer transaction history from banking database|
-|**Risk Profile Calculation**|GetRiskProfile workflow with simple calculations|SQL Server, Azure Functions, or API Management|Call internal risk scoring systems or credit bureau APIs|
-|**Special Vehicles Database**|GetSpecialVehicles workflow with hardcoded list|SQL Server, Azure SQL Database connector|Query vehicle classification database (KBB, NADA, custom)|
-
-**Migration Strategy:**
-1. Identify which mocks to replace based on requirements
-2. Provision necessary Azure resources (API Management, SQL Database, etc.)
-3. Create connector connections in Logic Apps with appropriate authentication
-4. Update workflow actions to replace compose/mock calls with connector calls
-5. Test each replacement individually before deploying complete solution
+Found a bug or have a question? [Open an issue](https://github.com/Azure/logicapps-labs/issues) on GitHub.

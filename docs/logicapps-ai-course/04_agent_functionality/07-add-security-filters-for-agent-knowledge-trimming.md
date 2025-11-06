@@ -118,6 +118,9 @@ Now press `Send Request`. You should have gotten a `value` array with the `@sear
 
 ### Step 4 - Populate User Ids for each document
 
+> :::note
+> This step demonstrates how to manually update documents with security metadata for testing purposes. In a production environment, you would typically incorporate this security metadata assignment into your automated data ingestion pipeline to ensure all documents are properly tagged with appropriate user access permissions during the indexing process.
+
 1. Create a new file in Visual Studio Code named `update-documents.rest`
 1. Paste in the following code in your file.
 

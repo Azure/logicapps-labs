@@ -284,4 +284,6 @@ The following table describes some common problems and troubleshooting suggestio
 
 - [Extend tool functionality with patterns](../04_agent_functionality/02-extend-tools-with-patterns.md)
 - [Connect your agents using A2A protocol](./05-connect-agents-a2a-protocol.md)
-- [Deploy agent clients](./06-deploy-agents-clients.md)
+## Related content
+
+- [Deploy agent clients](./06-deploy-agents-clients.mdx)

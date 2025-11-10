@@ -146,16 +146,34 @@ Push-Location $logicAppsPath
 Compress-Archive -Path $itemsToZip.Name -DestinationPath $zipPath -Force
 Pop-Location
 
-try {
-    # Use Azure PowerShell cmdlet for zip deploy
-    Publish-AzWebApp -ResourceGroupName $resourceGroupName -Name $logicAppName -ArchivePath $zipPath -Force -ErrorAction Stop | Out-Null
-    Write-Host "✓ Workflows deployed successfully" -ForegroundColor Green
-} catch {
-    Write-Host "Failed to deploy workflows: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "You can manually deploy from VS Code (right-click LogicApps folder)" -ForegroundColor Yellow
-} finally {
-    Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+# Check for Azure CLI
+$azCliAvailable = $null -ne (Get-Command az -ErrorAction SilentlyContinue)
+
+if (-not $azCliAvailable) {
+    Write-Host "`n✗ Azure CLI not found. Workflows not deployed." -ForegroundColor Yellow
+    Write-Host "Install: https://learn.microsoft.com/cli/azure/install-azure-cli" -ForegroundColor Yellow
+    Write-Host "Alternative: Open workspace in VS Code, right-click LogicApps folder → Deploy to Logic App`n" -ForegroundColor Cyan
+} else {
+    try {
+        az functionapp deployment source config-zip `
+            --resource-group $resourceGroupName `
+            --name $logicAppName `
+            --src $zipPath `
+            --output none `
+            2>&1 | Out-Null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✓ Workflows deployed successfully" -ForegroundColor Green
+        } else {
+            throw "Deployment returned exit code $LASTEXITCODE"
+        }
+    } catch {
+        Write-Host "✗ Workflow deployment failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Alternative: Open workspace in VS Code, right-click LogicApps folder → Deploy to Logic App" -ForegroundColor Cyan
+    }
 }
+
+Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
 
 # Restart Logic App to load workflows
 Write-Host "`nRestarting Logic App..."

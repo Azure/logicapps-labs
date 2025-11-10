@@ -18,7 +18,8 @@ Before deploying this sample, ensure you have:
 - **Azure subscription** - With contributor access to create resources
 - **Azure OpenAI access approved** - Required for GPT model deployment ([Request access](https://aka.ms/oai/access))
 - **[PowerShell 7+](https://learn.microsoft.com/powershell/scripting/install/installing-powershell)** - For running deployment scripts
-- **[Azure PowerShell module](https://learn.microsoft.com/powershell/azure/install-azure-powershell)** - For Azure resource management
+- **[Azure PowerShell module](https://learn.microsoft.com/powershell/azure/install-azure-powershell)** - For infrastructure deployment
+- **[Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)** - For workflow deployment (or use [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurelogicapps) alternative)
 - **[Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/install)** - Used by deployment script for infrastructure as code
 
 **What gets deployed:** The deployment script automatically creates App Service Plan (Workflow Standard SKU), Logic App Standard, Azure OpenAI (with GPT-4.1-mini model), Storage Account, and Managed Identity. See [Architecture](#architecture) for details.
@@ -39,7 +40,11 @@ cd logicapps-labs/samples/ai-loan-agent-sample
 
 **2. Login to Azure**
 ```powershell
+# Login for infrastructure deployment
 Connect-AzAccount
+
+# Login for workflow deployment
+az login
 ```
 *Select the target subscription if you have multiple subscriptions.*
 
@@ -48,6 +53,21 @@ Connect-AzAccount
 .\Deployment\deploy.ps1 -ProjectName "ailoan" -Location "eastus2"
 ```
 *Deployment takes approximately 10-15 minutes.*
+
+<details>
+<summary><b>Alternative: Deploy Workflows with VS Code</b></summary>
+
+If you prefer not to install Azure CLI, you can deploy workflows manually:
+
+1. Complete steps 1-3 above (infrastructure will deploy, workflows will be skipped)
+2. Open `ai-loan-agent-sample.code-workspace` in VS Code
+3. Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS)
+4. Type: **Azure: Sign In** and authenticate
+5. In Explorer, right-click the **LogicApps** folder
+6. Select **Deploy to Logic App...**
+7. Choose your subscription and select the deployed Logic App
+
+</details>
 
 **4. Test Workflows**
 ```powershell
@@ -313,12 +333,14 @@ Run the test script to validate the AI agent with 4 different loan application s
 
 ### Test Scenarios & Expected Results
 
-| Test | Application Details | Expected Behavior |
-|------|---------------------|-------------------|
-| **Test 1: Auto-Approval** | Credit: 780, Income: $75K, Car: Toyota Camry | Approve without human review |
-| **Test 2: Human Review** | Credit: 720, Income: $95K, Car: BMW X5 ($55K) | Invoke "Wait for Human Review" tool |
-| **Test 3: Auto-Rejection** | Credit: 580, Bankruptcy: Yes, Car: Honda Accord | Reject without further processing |
-| **Test 4: Luxury Vehicle** | Credit: 750, Income: $120K, Car: Ferrari F8 ($80K) | Invoke "Get Special Vehicles" tool and trigger review |
+The agent autonomously evaluates each application using the defined policy and available tools.
+
+| Test | Application Details | Agent Behavior |
+|------|---------------------|----------------|
+| **Test 1: Auto-Approval** | Credit: 780, Income: $75K, Car: Toyota Camry | Policy met: Credit ≥700, Loan ≤$50K, Employment ≥2yr, No bankruptcy. Agent approves without human review |
+| **Test 2: Edge Case** | Credit: 720, Income: $95K, Car: BMW X5 ($55K) | Policy specifies human review for loans >$50K, but doesn't address cases with compensating factors (strong credit/income). Agent makes autonomous decision based on overall risk profile |
+| **Test 3: Auto-Rejection** | Credit: 580, Bankruptcy: Yes, Car: Honda Accord | Policy met: Credit <600 with bankruptcy history. Agent rejects without further processing |
+| **Test 4: Human Review Required** | Credit: 750, Income: $120K, Car: Ferrari F8 Tributo, Loan: $80K | Policy requires human review for luxury vehicles. Agent identifies Ferrari as luxury vehicle and invokes "Wait for Human Review" tool to pause workflow for human decision |
 
 <details>
 <summary><b>How to Verify Results</b></summary>

@@ -48,6 +48,8 @@ Every module in this lab contains separate tabs wherever applicable, outlining t
 | **Chat interface authentication** | OAuth | EasyAuth |
 | **Billing** | Pay as you go. Based on the number of token usage for each agentic iteration.<br/><br/>Reference: TBD | Although agent workflows don't incur extra charges in Azure Logic Apps, model usage in Azure OpenAI Service and Azure AI Foundry projects incur charges.<br/><br/>Reference: [Agent workflows concepts - Billing](https://learn.microsoft.com/en-us/azure/logic-apps/agent-workflows-concepts#billing) |
 | **Throttling** | The Agent action would be throttled based on the number of token usage | No throttling for agent Action |
+| **Supported Regions** | West Europe and West US (More regions will be added soon). | Any region supported by AI foundry- [Azure AI Foundry feature availability across clouds regions - Azure AI Foundry](https://learn.microsoft.com/azure/ai-studio/reference/region-support) |
+| **Regional data residency** | No, the model can be picked from any region | Model is hosted in customer specified region and customer's subscription |
 | **Use cases** | Faster and cost effective scenarios | High performance and compliance scenarios |
 | **Local Development experience** | Not available | Available through VSCode |
 

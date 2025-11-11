@@ -88,7 +88,7 @@ This module teaches you how to create interactive agents that engage in back-and
 
 This module focuses on creating independent agents that can take actions without continuous user interaction. You'll learn to build autonomous agents that monitor events, make decisions, and execute tasks automatically. The module covers integrating with various triggers, connecting to Azure OpenAI or Azure Foundry models, and implementing tools that enable agents to interact with external systems while maintaining proper governance and error handling for long-running operations.
 
-[Start with: Build your first autonomous agent](03_build_autonomous_agents/01-create-first-autonomous-agent.md)
+[Start with: Build your first autonomous agent](03_build_autonomous_agents/01-create-first-autonomous-agent.mdx)
 
 ### Extend Agents functionality
 

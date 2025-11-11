@@ -10,22 +10,18 @@ targetScope = 'resourceGroup'
 param baseName string
 
 @allowed([
+  'australiaeast'
+  'westeurope'
+  'germanywestcentral'
+  'italynorth'
+  'swedencentral'
+  'uksouth'
   'eastus'
   'eastus2'
   'southcentralus'
-  'swedencentral'
-  'francecentral'
-  'switzerlandnorth'
-  'uksouth'
-  'northeurope'
-  'westeurope'
-  'australiaeast'
-  'japaneast'
-  'eastasia'
-  'canadaeast'
-  'uaenorth'
+  'westus3'
 ])
-@description('Azure region (must support both OpenAI GPT-4o and Logic Apps Standard)')
+@description('Azure region (must support both GPT-4.1-mini and Logic Apps Standard)')
 param location string = 'eastus2'
 
 // Variables

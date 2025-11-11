@@ -111,7 +111,21 @@ All resources use your `ProjectName` as a prefix:
 <details>
 <summary><b>Supported Regions</b></summary>
 
-Deployment requires a region that supports both Azure OpenAI (GPT-4 models) and Azure Logic Apps Standard:
+Deployment requires a region that supports both GPT-4.1-mini in Azure OpenAI and Azure Logic Apps Standard.
+
+**Supported regions:**
+- australiaeast
+- eastus
+- eastus2
+- germanywestcentral
+- italynorth
+- southcentralus
+- swedencentral
+- uksouth
+- westeurope
+- westus3
+
+For the latest regional availability:
 - [Azure OpenAI model availability by region](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability)
 - [Azure Logic Apps Standard availability](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) (search for "Logic Apps")
 
@@ -363,6 +377,17 @@ Open a run to review:
 
 <details>
 <summary><b>Troubleshooting</b></summary>
+
+**Deployment Issues**
+
+If deployment fails with quota error:
+```
+Operation cannot be completed without additional quota.
+Current Limit (WorkflowStandard VMs): 0
+```
+This indicates Logic Apps Standard is not available in the selected region. Choose a different region that supports both Azure OpenAI and Logic Apps Standard. See [Supported Regions](#supported-regions) for guidance on selecting compatible regions.
+
+**Test Failures**
 
 If tests fail:
 - Verify Logic App is in "Running" state (not "Stopped")

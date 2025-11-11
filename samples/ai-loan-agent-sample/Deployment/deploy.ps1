@@ -25,9 +25,6 @@ param(
     [string]$ProjectName,
     
     [Parameter(Mandatory=$false)]
-    [ValidateSet('eastus', 'eastus2', 'southcentralus', 'swedencentral', 'francecentral', 
-                 'switzerlandnorth', 'uksouth', 'northeurope', 'westeurope', 'australiaeast', 
-                 'japaneast', 'eastasia', 'canadaeast', 'uaenorth')]
     [string]$Location = 'eastus2',
     
     [Parameter(Mandatory=$false)]
@@ -35,6 +32,20 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# Normalize location to lowercase
+$Location = $Location.ToLower()
+
+# Validate location - must support both gpt-4.1-mini and Logic Apps Standard
+$validLocations = @('australiaeast', 'westeurope', 'germanywestcentral', 'italynorth', 
+                    'swedencentral', 'uksouth', 'eastus', 'eastus2', 'southcentralus', 'westus3')
+
+if ($Location -notin $validLocations) {
+    Write-Host "Error: Invalid location '$Location'" -ForegroundColor Red
+    Write-Host "Valid locations (support both gpt-4.1-mini and Logic Apps Standard):" -ForegroundColor Yellow
+    Write-Host "$($validLocations -join ', ')" -ForegroundColor Yellow
+    exit 1
+}
 
 Write-Host "`n=== AI Loan Agent Deployment ===" -ForegroundColor Cyan
 Write-Host "Project: $ProjectName | Location: $Location`n"
@@ -186,4 +197,8 @@ Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan
 Write-Host "Resource Group: $resourceGroupName"
 Write-Host "Logic App: $logicAppName"
 Write-Host "OpenAI Endpoint: $openAIEndpoint"
-Write-Host "`nLogic App URL: https://$logicAppName.azurewebsites.net"
+Write-Host "Logic App URL: https://$logicAppName.azurewebsites.net"
+
+Write-Host "`n--- Next: Quick Start Step 4 - Test & Validate ---" -ForegroundColor Yellow
+Write-Host "Run test script, then verify agent workflows following README 'Testing & Validation' section"
+Write-Host "  .\test-agent.ps1 -ResourceGroupName '$resourceGroupName' -LogicAppName '$logicAppName'" -ForegroundColor Cyan

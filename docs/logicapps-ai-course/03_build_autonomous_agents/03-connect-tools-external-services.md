@@ -198,4 +198,5 @@ Here's a recap for the pattern to use:
 ## Related Content
 
 - [Add parameters to your tools (accept dynamic inputs from the agent)](../04_agent_functionality/01-add-parameters-to-tools.md)
+- [Add MCP tools to your agent](../04_agent_functionality/03-add-mcp-tools.mdx)
 

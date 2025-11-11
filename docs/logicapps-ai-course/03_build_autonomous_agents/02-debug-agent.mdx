@@ -7,6 +7,8 @@ ms.date: 08/19/2025
 author: absaafan
 ms.author: absaafan
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 In this module you will learn how to observe, inspect, and debug the agent built in Module 01. You will distinguish model (reasoning) issues from workflow or integration issues, view the chat transcript, inspect tool executions, and capture deeper telemetry for ongoing monitoring.
 
@@ -21,7 +23,7 @@ You continue using the same Severe Weather Advisory Agent workflow created earli
 ---
 
 ## Prerequisites
-- Completed agent created on [01 - Create your first autonomous agent in Azure Logic Apps](./01-create-first-autonomous-agent.md) module.
+- Completed agent created on [01 - Create your first autonomous agent in Azure Logic Apps](./01-create-first-autonomous-agent.mdx) module.
 
 ---
 
@@ -45,12 +47,25 @@ It also shows when tools were executed by the agent. The tool names are hyperlin
 ---
 
 ### Step 1 - Open run history
+
+<Tabs groupId="environment">
+<TabItem value="standard" label="Standard" default>
+
 1. In the Logic Apps resource, select Workflows.
 1. Select the Severe Weather Advisory Agent workflow.
 1. Open the run history.
 
     ![Screenshot shows the run history for the workflow](media/02-debug-agent/logicapp-run-history.png)
+</TabItem>
+<TabItem value="consumption" label="Consumption">
 
+1. In the left pane, under Development Tools, select Run history.
+1. On the Run history page, in the runs table, select the latest workflow run.
+
+    ![Screenshot shows the run history for the workflow](media/02-debug-agent/logicapp-run-history-consumption.png)
+
+</TabItem>
+</Tabs>
 ### Step 2 - Review the agent log
 1. Once the run history loads, you will see the agent log on the right side for review.
 

@@ -37,8 +37,6 @@ The workflow you create is itself an A2A compliant agent - a Logic Apps workflow
 <TabItem value="consumption" label="Consumption">
 
 - An Azure account and subscription. If you don't have a subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F).
-- Existing Logic Apps Consumption workflow app (or create one): [Create a multi-tenant workflow app](https://learn.microsoft.com/azure/logic-apps/quickstart-create-first-logic-app-workflow).
-
 
 </TabItem>
 </Tabs>
@@ -74,6 +72,7 @@ The agent connection is now ready; configure its inputs next.
 
 ### Step 3 - Configure agent loop inputs
 1. Rename the agent loop action to `TourGuideAgent`.
+1. Select the deployment model name (or create a new deployment if needed).
 1. Enter the System Instructions (system prompt). Use a concise, structured prompt that guides tool use and resilience:
 
 ````text
@@ -144,7 +143,6 @@ The agent loop now needs a tool to fetch the museum object.
 ### Step 2 - Configure agent loop inputs
 1. Once the Logic App resource is created, Select **Logic app designer** from the left menu.
 1. Rename the agent loop action to `TourGuideAgent`.
-1. Select the deployment model name (or create a new deployment if needed).
 1. Enter the System Instructions (system prompt). Use a concise, structured prompt that guides tool use and resilience:
 
 ````text

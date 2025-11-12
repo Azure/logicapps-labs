@@ -106,4 +106,4 @@ This module teaches you to orchestrate multiple specialized agents working toget
 
 This module expands your agents with MCP tool capabilities. You'll learn to configure MCP servers for your agent to use including bringing your own (BYO) external MCP servers, managed MCP servers, and custom MCP servers. This will allow you to expand the set of tools that your agent can use with minimal configuration.
 
-[Start with: MCP Overview](./06_extend_agent_functionality_mcp/01-overview.mdx)
+[Start with: MCP Overview](06_extend_agent_functionality_mcp/01-mcp-overview.mdx)

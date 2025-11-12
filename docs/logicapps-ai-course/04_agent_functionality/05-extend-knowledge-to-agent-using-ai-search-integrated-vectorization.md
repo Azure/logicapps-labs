@@ -29,7 +29,7 @@ Using the supplied index JSON file we will create your index in Azure AI Search.
 1. In the [Azure portal](https://portal.azure.com), create or open your Azure AI Search resource.
 1. On the top menu select **(+ Add index)**, then select **Add index (JSON)**
 ![Screenshot of Add index button.](media/05-extend-knowledge-to-agent-using-ai-search-integrated-vectorization/index_add.png)
-1. Copy the context of the file: [index_schema](files/integrated_vectorizer_schema.json and paste it into the dialog box. The JSON contects contains placeholders for your OpenAI resource values for the following: \{OpenAI resource URI\}, \{deployment ID\}, \{API key\}, and \{model name\}. Follow below steps to find these values in your OpenAI resource.
+1. Copy the context of the file: [index_schema](/logicapps-ai-course/integrated_vectorizer_schema.json) and paste it into the dialog box. The JSON contects contains placeholders for your OpenAI resource values for the following: \{OpenAI resource URI\}, \{deployment ID\}, \{API key\}, and \{model name\}. Follow below steps to find these values in your OpenAI resource.
    1. In a new browser tab on the [Azure portal](https://portal.azure.com), create or open your Azure OpenAI resource.
    1. On the **Overview** tab, click the **Click here to view endpoints** link.
    ![Screenshot of Overview page of OpenAI resource](media/05-extend-knowledge-to-agent-using-ai-search-integrated-vectorization/openai_resource_main.png)
@@ -70,7 +70,7 @@ Using the supplied index JSON file we will create your index in Azure AI Search.
 1. Click the **+ Add skillset** button.
 1. This will take you to a default skillset JSON page.
 ![Screenshot showing default skillset JSON page.](media/05-extend-knowledge-to-agent-using-ai-search-integrated-vectorization/default_skillset.png)
-1. Copy the cotents of the skillset JSON [here](files/05-extend-knowledge-to-agent-using-ai-search-integrated-vectorization/skillset.JSON). This file defines two "skills" that will execute when your document is ingested.
+1. Copy the cotents of the skillset JSON [here](/logicapps-ai-course/skillset.json). This file defines two "skills" that will execute when your document is ingested.
     1. The **split-documents** skill will chunk your document into section that are small enough to be sent to OpenAI for generating embeddings,
     1. The **create-embeddings** skill will send your text chunks to your OpenAI text embeddings deployment and return their embeddings.
     1. Replace the value **resourceUri** with your OpenAI resource endpoint.

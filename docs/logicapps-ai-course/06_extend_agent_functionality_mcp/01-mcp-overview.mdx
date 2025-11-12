@@ -1,0 +1,69 @@
+---
+title: MCP Overview
+description: An overview of the lesson that helps you build and deploy Agents with MCP capabilities in Azure Logic Apps.
+ms.service: logic-apps
+ms.topic: tutorial
+ms.date: 11/11/2025
+author: absaafan
+ms.author: absaafan
+---
+
+In this module, you learn how Azure Logic Apps agents integrate with the **Model Context Protocol (MCP)** using three models:
+
+- **Bring your own (BYO) MCP connector**: You supply the MCP server URL and auth details; Logic Apps consumes the external MCP tool catalog directly.
+- **Managed MCP connector**: Azure-hosted MCP servers surfaced through the standard managed connector experience; you select the MCP server similar to choosing any managed API action and reuse existing connections.
+- **Custom MCP connector**: A user-built connector (OpenAPI/definition) that implements MCP endpoints; available only within your subscription/tenant for controlled distribution.
+
+You map these into agent tools with different authentication patterns (application and on-behalf-of / user context) and observe tool calls in run history.
+
+When you finish this module, you'll achieve the goals and complete the tasks in the following list:
+
+- Understand MCP concepts as used by Logic Apps (tool listing at session start, structured tool calls, result streaming & monitoring).
+- Use a Managed MCP connector tool inside a conversational agent workflow.
+- Configure a BYO MCP connector and observe its published tools.
+- Surface managed connector actions via Managed MCP connector with optional on-behalf-of (OBO) authorization.
+- Add and use a Custom MCP connector for private MCP server functionality.
+- Monitor and compare MCP tool calls across connector types.
+
+> :::note
+> This module focuses on surfacing tools to agents via MCP. For adding dynamic inputs, see [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md). For extending tool behavior, see [Extend your tool functionality with patterns](../04_agent_functionality/02-extend-tools-with-patterns.md). For user-delegated (OBO) authorization concepts, see [Add user context to tools](../02_build_conversational_agents/04-add-user-context-to-tools.md).
+
+## Prerequisites
+
+The lessons in this module will assume you are familiar with Azure Logic Apps agent workflows. It is recommended that you complete the following modules before starting this one:
+
+- [Build your first conversational agent](../02_build_conversational_agents/01-create-first-conversational-agent.mdx)
+- [Build your first autonomous agent](../03_build_autonomous_agents/01-create-first-autonomous-agent.mdx)
+- [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md)
+
+## Overview: MCP in Logic Apps
+
+| Concept | Logic Apps Implementation |
+|---------|---------------------------|
+| MCP protocol | Open source standard for tool discovery (listing) and invocation that Logic Apps agents adopt internally. Learn more about the standard [here](https://modelcontextprotocol.io/docs/getting-started/intro). |
+| Tool listing | At conversation or agent loop start, Logic Apps enumerates configured tools including listing MCP server tools for those servers configured on the agent. |
+| Allowed tools | An “Allowed tools” configuration constrains the subset of tools surfaced to the model for a given session, improving safety & determinism. |
+| Monitoring | Run history shows each MCP tool call similarly to how other tool executions are shown. |
+
+### Lifecycle
+1. Session starts (chat or autonomous loop trigger).
+1. Logic Apps builds tool catalog (respecting “Allowed tools” if configured).
+    - During the workflow run starting, we will connect to the MCP servers configured and list the tools they provide.
+    - The tools provided will be filtered with "Allowed tools" if set.
+    - These MCP tools will included in the tool metadata passed to the agent along with other tools configured in the workflow.
+1. Model receives system instructions + tool metadata.
+1. Model returns either a user-facing message or an MCP tool call.
+1. Logic Apps executes mapped action(s).
+    - If the agent wants to execute a tool from an MCP server, we will connect to the MCP server and execute the tool with any arguments the agent provides.
+1. Tool result returned to model; reasoning continues until completion criteria met.
+1. Run history captures full chain (prompt, tool call directive, action inputs, result).
+
+## MCP Connector Types
+
+| Connector Type | When to use | Characteristics | Auth Options |
+|----------|------------|-----------------|--------------|
+| BYO MCP connector (external MCP server) | You already operate or consume an external MCP server and want direct catalog ingestion. | User supplies base MCP URL + credentials; dynamic tool listing fetched from external host; minimal Azure abstraction. | None, Basic, Client certificate, Active Directory OAuth, Raw, Key, Managed identity. |
+| Managed MCP connector (Azure-hosted) | Fastest path to MCP tools backed by Azure-managed infrastructure and existing managed connectors. | Selection UX mirrors managed API operations; shared connection model; automatic catalog & schema maintenance. | App-only (managed identity), per-user (OBO), API key (where supported). |
+| Custom MCP connector (user-created) | Need private/tenant-scoped MCP server with custom schema/policies not globally available. | OpenAPI/definition you author; only accessible in your subscription; full control over versioning & throttling. | OAuth 2.0 (scoped), API key, Basic, managed identity (internal). |
+
+The agent MCP feature is compatible with both autonomous and conversational workflows. The only distinction is that OBO authentication can only be used in conversational workflows, to learn more about OBO, go through the [lesson on adding user context to tools.](../02_build_conversational_agents/04-add-user-context-to-tools.md)

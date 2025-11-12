@@ -3,9 +3,9 @@ title: 07 - Create your agent loop workflow
 description: Build a conversational Agent Loop workflow and configure model, system instructions, channels, and first tool.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 In this module we will create and configure a conversational Agent Loop workflow that will allow the user an interactive chat experience when resolving operational issues.
@@ -28,7 +28,7 @@ In this module we will create and configure a conversational Agent Loop workflow
 
 1. Create an **Agent Workflow**:
     - **Workflow Name:** `demo-conversational-agent`
-    - Select `Agent (Preview)`
+    - Select `Conversational Agents (Preview)`
     - Click `Create`
 
     ![Create Agent Workflow](./images/07_04_create_new_agent_workflow.png "create agent workflow")
@@ -39,67 +39,11 @@ In this module we will create and configure a conversational Agent Loop workflow
 
 
 ## Configure Agent Workflow
-1. Configure the Trigger Activity. Since we are building a conversational agent, we need to use a Request trigger that allows the agent to be called from a chat surface/application.
-    - Click the `Add a trigger` activity 
-    
-        ![Add a Trigger](./images/07_06_add_a_trigger.png ("add a trigger"))
 
-    - Under the Built-in tools group, select `Request`
+1. In this step we will configure the **Agent** settings to connect to our Azure OpenAI instance created in [Module 3 - Enable OpenAI Model](03_enable_open_ai_model.md)
+    - Click on the **Agent**
 
-         ![Trigger Activity Request](./images/07_07_trigger_activity_request.png "trigger activity request")
-
-    -  Select the `When a HTTP request is received`
-
-        ![Trigger Activity When a HTTP request is received](./images/07_08_trigger_activity_when_a_http_request_is_received.png "trigger activity when a http request is received")
-
-    - Configure the activity:
-        - **Request Body JSON Schema**
-            ```JSON
-            {
-                "type": "object",
-                "properties": {
-                    "prompt": {
-                        "type": "string"
-                    }
-                }
-            }
-            ```
-        
-            ![Configure When a HTTP request is received](./images/07_09_when_a_http_request_is_received_configuration.png ("configure when a http trigger is received"))
-1. Add a Compose activity to parse out the prompt from the input request
-    - Add a new action
-    
-    ![Add an action](./images/07_10_add_an_action.png ("add an action"))
-    
-    - Search for and select the **Compose** activity
-
-    ![Add Compose action](./images/07_11_add_an_action_compose.png ("add compose action"))
-
-    - configure the activity as follows:
-        - Rename the activity to `Compose-Prompt`
-        - Inputs:
-            - When you click into the **input** text box, click on the lightening bolt
-
-            ![Compose Input Option](./images/07_12_configure_compose_input_option.png ("compose input options"))
-
-            - Under "When a HTTP request is received" select `Prompt`
-            
-            ![Compose Select Input](./images/07_13_configure_compose_select_file.png "compose select input")
-
-            after you have completed your configuration, the **Compose-Prompt** activity should look like this
-
-            ![Compose-Prompt Activity](./images/07_14_compose_after_configuraiton.png "compose prompt activity")
-
-1. In this step we will configure the **Default Agent** settings to connect to our Azure OpenAI instance created in [Module 3 - Enable OpenAI Model](03_enable_open_ai_model.md)
-    - Click on the **Default Agent**
-
-    ![Default Agent](./images/07_15_deafult_agent.png ("default agent"))
-
-    - Configure the Deployment Model
-        - **Deployment Model Name:** `gpt-4.1`
-        - Click `Connect`
-
-        ![Deployment Model Name](./images/07_16_deafult_agent_deployment_name.png "deployment model name")
+        ![Select Agent](./images/07_15_select_agent.png ("select agent"))
 
     - Configure Connection to Azure OpenAI as follows
         - **Connection Name:** `conn-open-ai`
@@ -107,7 +51,13 @@ In this module we will create and configure a conversational Agent Loop workflow
         - **Azure OpenAI Resource:** `select the instance created in [Module 3 - Enable OpenAI Model](03_enable_open_ai_model.md)
         - Click `Create New`
 
-        ![Azure OpenAI Connection Configuration](./images/07_17_deafult_agent_open_ai_connection.png (azure openai connection configuration"))
+        ![Azure OpenAI Connection Configuration](./images/07_17_agent_open_ai_connection.png (azure openai connection configuration"))
+
+    - Configure the Deployment Model
+        - **Deployment Model Name:** `gpt-4.1` (select from dropdown)
+        - Click `Connect`
+
+        ![Deployment Model Name](./images/07_16_agent_deployment_name.png "deployment model name")
 
 1. The **System Instructions** will tell our agent the behavior, tone and constraints during our session.  
     - Configure the **System Instructions** as follows
@@ -118,11 +68,7 @@ In this module we will create and configure a conversational Agent Loop workflow
 
         Please share your plan for addressing the issue by listing out step by step, include the severity and operational group noted in the operational runbook. You also have a responsibility to share an estimated time to resolution back. Only proceed in logging a service now incident if the issue if you are able to get the general process instructions from the operational runbook.  
         ```
-1. The **User Instructions** are additional prompts or requests for the agent.
-    - Configure the following **User Instructions**
-        ```
-        Please try to create and manage IT incident tickets submitted by IT Operations
-        ```
+
 1. Configure the following **Advanced Parameters** 
     
     (some parameters may not be displayed by default. Click on the dropdown to enable the missing advanced parameters)
@@ -132,13 +78,7 @@ In this module we will create and configure a conversational Agent Loop workflow
     - **Model Format:** `OpenAI`
     - **Model Version:** `2025-04-14`
 
-    ![Default Agent Parameter Config](./images/07_18_deafult_agent_parameter_config.png "default agent parameter config")
-
-1. The **Channels** settings allows you to control how the workflow's behaviour when interacting with users. For conversational agentic workflows, we will allow both input and output channels.
-    - Click on the `Channels` tab in the Default Agent configuration
-    - Select `Allow both input and output channels`
-
-    ![Default Agent Channels Config](./images/07_19_deafult_agent_channels_config.png "deafult agent channels config")
+    ![Agent Parameter Config](./images/07_18_agent_parameter_config.png "agent parameter config")
 
 ## Add Tool - Get Operational Runbook
 In this section we will add the first tool to retrieve and parse the operational runbook. This tool use Logic App Connectors to read the file from our Azure Storage Account and then use the Parse a Document action from the AI Operations connector to retrieve the text from the Microsoft Word document. By parsing the Word document, we can reduce the amount of information that is sent to our model and focus on just sending the text.
@@ -184,7 +124,7 @@ This will enable to Agent to use the operational runbook when responding to our 
 1. Click on the Tool action to configure the settings as follows:
     The Name and Description of the tool will assist the agent in matching the action to be performed with the available tools.
 
-    - Rename the activity to `Get Operational Run book`
+    - Rename the action to `Get Operational Run book`
     - **Description:** 
         ```
         This tool will retrieve the Integration Team's operational runbook that includes troubleshooting documentation and steps to resolve those issues.
@@ -203,38 +143,28 @@ This will enable to Agent to use the operational runbook when responding to our 
 ## Testing your Workflow
 Now that we've connect workflow to OpenAI and created our first tool, lets test our workflow and see how it works.
 
-1. Click the `Run` dropdown and select the `Run` options
+1. Click the `Chat` button
 
-    ![Run Workflow](./images/07_30_run_workflow.png "run workflow")
+    ![Workflow Chat ](./images/07_30_workflow_chat.png "workflow chat")
 
-    you will receive a notification once your workflow has started
+    this will launch the chat console enabling you to interact with the workflow and agent.
 
-    ![Workflow Triggered](./images/07_31_run_workflow_triggered.png "workflow triggered")
+    ![Workflow Chat Playground](./images/07_31_workflow_chat_playground.png  "workflow chat playground")
 
-1. Navigate to the `Run history` for you workflow
-
-    ![Workflow Run History](./images/07_32_workflow_run_history.png "workflow run history")
-
-1. Locate the running instance and click on the identifier to open the execution and start the interactive chat session
-
-    ![Workflow Run History Executions](./images/07_33_workflow_run_history_exeuctions.png "run history executions")
-
-
-1. The initial chat will display the **System Instructions** as well as the **User Instructions** configured in the Agent Loop. The Agent will attempt to process the initial instructions and has responded with additional guidance.
-
-    ![Chat Initial Response](./images/07_34_workflow_chat_initial.png "chat initial response")
 
 1. Enter the first prompt describing the issue:
     ```
-    my database appears to be offline   
+    my database is offline   
     ```
     Note the response from the agent is requesting additional information that was specified in the system instructions. Also note the the Agent is sharing the next steps that will perform once the required information is provided.
 
     ![Agent Chat - Prompt 1 Issue Description](./images/07_35_workflow_chat_prompt1_error_description.png "agent chat prompt 1 Issue Description")
 
+    **Note** You maybe asked for specify the error before proceeding. If so, you can enter `Database Offline`
+
 1. Enter the next prompt detailing who the assigned team will be:
     ```
-    database
+    database team
     ```
     Note that now the agent has also successfully executed the **Get Operational Run book** tool and was able to use the information from the operational run book to locate the corresponding issue and retrieve the resolution steps, severity and the estimated time to resolution. 
     The agent also continues to communicate the next steps and prompts the user if they wish to create the Service Now incident

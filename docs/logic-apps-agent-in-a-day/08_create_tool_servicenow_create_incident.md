@@ -3,9 +3,9 @@ title: 08 - Create the 'ServiceNow Create Incident' tool
 description: Build a stateful workflow tool that creates ServiceNow incidents for agent-driven automation.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 In this module we will create a stateful workflow to create a ServiceNow incident. Our Agent Loop will leverage this workflow as a tool when processing user requests.
@@ -78,7 +78,7 @@ In this module we will create a stateful workflow to create a ServiceNow inciden
 
         ![Select Action ServiceNow List Records](./images/08_08_action_servicenow_list_records.png "servicenow list records")
 
-1. Configure the `ServiceNow - List Records` activity. 
+1. Configure the `ServiceNow - List Records` action. 
 
     - Configure the Connection:
         - **Connection Name:** `connServiceNowDev`
@@ -122,12 +122,12 @@ In this module we will create a stateful workflow to create a ServiceNow inciden
 
     ![Service Now Grant Permissions](./images/08_12_servicenow_connection_all_permissions.png "service now grant permissions")
 
-1. Configure the List Records Activity as follows
+1. Configure the List Records Action as follows
     - **Record Type:** `Group`
     - **Advanced Parameters** (click `Show all`)
     - **Query:** `name=@{triggerBody()?['AssignmentGroup']}`
 
-    ![ServiceNow List Activity Configuration](./images/08_14_servicenow_list_records_configuraiton.png "servicenow list records configuration")
+    ![ServiceNow List Action Configuration](./images/08_14_servicenow_list_records_configuraiton.png "servicenow list records configuration")
 
 1. Add a new action
 
@@ -136,7 +136,6 @@ In this module we will create a stateful workflow to create a ServiceNow inciden
     ![Service Now - Create Record Action](./images/08_15_add_an_action_servicenow_create_item.png "servicenow create record action")
 
 1. Configure the Create Record action as follows:
-    - Rename action to: `Create Record-Incident`
     - **Record Type:** `Incident`
     - **Advanced Parameters:**
         - you can show selected advanced parameters by clicking on the dropdown and select each parameter individually
@@ -146,7 +145,7 @@ In this module we will create a stateful workflow to create a ServiceNow inciden
             ```
         - **Assignment Group:** 
             ```
-            @{first(body('List_Records-AssignmentGroups')?['result'])['sys_id']}
+            @{first(body('List_Records')?['result'])['sys_id']}
             ```
         - **Description:** 
             ```
@@ -173,7 +172,7 @@ In this module we will create a stateful workflow to create a ServiceNow inciden
     - **Body:**
         ```JSON
         {
-            "TicketNumber": "@{body('Create_Record-Incident')?['result']?['number']}"
+            "TicketNumber": "@{body('Create_Record')?['result']?['number']}"
         }
         ```
     - **Response Body JSON Schema**

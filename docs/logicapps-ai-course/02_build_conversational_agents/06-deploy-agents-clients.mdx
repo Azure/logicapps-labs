@@ -7,6 +7,8 @@ ms.date: 09/03/2025
 author: krmitta
 ms.author: krmitta
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 In this module, you learn how to deploy your Azure Logic Apps conversational agent, use the built-in chat client, configure authentication or use the developer identity for development purposes.
 
@@ -25,7 +27,7 @@ When you finish this module, you'll achieve the goals and complete the tasks in 
 
 - A Standard logic app resource and a conversational agent workflow with the model that you set up in previous modules.
 
-  If you don't have this workflow, see [Module 01 - Create your first conversational agent](01-create-first-conversational-agent.md).
+  If you don't have this workflow, see [Module 01 - Create your first conversational agent](01-create-first-conversational-agent.mdx).
 
 ## Chatting with your agent
 
@@ -43,6 +45,8 @@ Conversational agent workflows provide you with an in-built chat client in Azure
 
 ### Step 2 - Using the chat client as an iframe or directly as a standalone application
 
+<Tabs>
+<TabItem value="standard" label="Standard" default>
 
 ### Step 2a - Setup Easy Auth (previously known as App Service authentication)
 This is required for the standalone chat client application
@@ -75,10 +79,26 @@ This authentication method is used in the in-built chat client hosted in the Azu
 - **App Service authentication (EasyAuth)**: If EasyAuth is configured on the logic app, it takes precedence over API key-based authentication. This method is typically used when OAuth flows or on-behalf-of (OBO) scenarios are required, such as interacting with connectors that require user context (explained in the extension modules - [Add user context to your tools](./04-add-user-context-to-tools.md)).
 This is a secure by-default authentication method which is used in the chat client(explained in Step 2) provided as an iframe that can be used directly or embedded in your client application.
 
+</TabItem>
+<TabItem value="consumption" label="Consumption">
 
+### Step 2a - Setup OAuth Authentication
+This is required for the standalone chat client application.
+1. Go to Authorization tab, from the left blade.
+1. Check the **Agent rule** checkbox and provide the list of Object IDs to be allowed to access the agent.
+![Screenshot shows Authentication blade entry point.](./media/06-deploy-agents-clients/authblade-consumption.png)
+
+### Step 2b - Using the standalone chat client
+1. Make sure your workflow is running, if not, hit run from the designer or the Run history blade.
+1. Go to chat blade and follow the chat client uri to open the standalone experience.
+![Screenshot shows App registration.](./media/06-deploy-agents-clients/agent-chat-consumption.png)
+1. The Chat client here is using OAuth authentication you configured in Step 2a and can be used directly for production scenarios.
+
+</TabItem>
+</Tabs>
 ## Related content
 
-- [Create First Conversational Agent](./01-create-first-conversational-agent.md)
+- [Create First Conversational Agent](./01-create-first-conversational-agent.mdx)
 - [Connect your tools to external services](./03-connect-tools-external-services.md)
 - [Connect your agents with A2A protocol](./05-connect-agents-a2a-protocol.md)
 

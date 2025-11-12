@@ -3,9 +3,9 @@ title: 09 - Add the 'ServiceNow Create Incident' tool to your agent
 description: Add the ServiceNow Create Incident workflow as a callable tool in the Agent Loop.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 In this module we will take the ServiceNow Create Incident workflow and add it as a tool in our Agent Loop workflow.
@@ -33,7 +33,7 @@ In this module we will take the ServiceNow Create Incident workflow and add it a
 
     ![Configure Call Workflow](./images/09_06_configure_call_workflow.png "configure call workflow")
 
-1. Configure the Tool activity.
+1. Configure the Tool action.
     - **NOTE** The way you name your tool and provide a description has a significant impact on your Agent Loop (and LLM) will discover and call your particular tool. Provide unique and descriptive terms to improve accuracy during runtime. 
     - Rename the tool to `Create Service Now Incident`
     - **Description:** `This tool will log a ServiceNow Incident`
@@ -89,16 +89,15 @@ In this module we will take the ServiceNow Create Incident workflow and add it a
 
 ## Test your agent
 
-1. Click `Run` to start your workflow and initiate the agent session.
+1. Click `Chat` to start your workflow and initiate the agent session.
 
-    ![Run Workflow](./images/09_12_run_workflow.png "run workflow")
+    ![Chat Workflow](./images/09_12_run_workflow.png "chat workflow")
 
-    You will receive a notification when the workflow has successfully started  
-    ![Workflow Started](./images/09_13_workflow_started.png "workflow started")
+    This will open the chat interface where you will see list of all your previous conversations with this agent.
 
-1. Navigate to your **Run History** and locate your **Running** instance. Click on the identifier to view the executed steps and agent chat session.
+    Let's create a new chat and start the process over again:
+    Click `+ New Chat`
 
-    ![Workflow Run History](./images/09_14_workflow_run_history.png "workflow run history")
 
 1. Enter your issue for the agent to take action on:
 
@@ -130,8 +129,6 @@ In this module we will take the ServiceNow Create Incident workflow and add it a
   - Navigate to your ServiceNow developer portal
   - Use the Incident Ticket Number from the Agent's response to search for the incident in ServiceNow
 
-    ![ServiceNow Incident Details](./images/09_17_servnicenow_incident_detailspng.png "servicenow incident details")
-
-> **Note:** When you are done testing, go to your workflow run in Logic Apps and click **Cancel run** to stop the workflow instance.
+    ![ServiceNow Incident Details](./images/09_17_servnicenow_incident_details.png "servicenow incident details")
 
 > **Tip:** If you do not see the **Description** field in your ServiceNow incident, you may need to configure the Incident Properties in your ServiceNow instance to display it. 

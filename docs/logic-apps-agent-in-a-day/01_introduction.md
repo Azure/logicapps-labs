@@ -3,9 +3,9 @@ title: 01 - Introduction
 description: Learn how to build a conversational agent in Azure Logic Apps (Standard), connect it to an Azure OpenAI model, and add its first tool.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 ## Harnessing the Power of Agent Loop Capabilities in Modern Automation
@@ -69,7 +69,7 @@ Agent Loop empowers Logic Apps to execute repetitive or recursive operations int
 
 - Foundational understanding of Logic Apps and cloud automation.
 - Architecture and core concepts of Agent Loop.
-- Hands-on workflows using Agent Loop (e.g., bots, escalation loops, dynamic approvals).
+- Hands-on workflows using Agent Loop (e.g., agent, human in the loop inteactions, dynamic approvals).
 - Integration with AI, ServiceNow, and Azure storage.
 - Best practices for error handling, state management, and governance.
 - Collaboration and reusable pattern development.

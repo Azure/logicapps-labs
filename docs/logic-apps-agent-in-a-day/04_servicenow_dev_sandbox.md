@@ -3,9 +3,9 @@ title: 04 - Setup your ServiceNow developer Sandbox
 description: Set up a ServiceNow developer instance and configure OAuth for Logic Apps integration.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 A ServiceNow environment will be required to enable our integration to create and interact with incident tickets.
@@ -40,29 +40,30 @@ A ServiceNow environment will be required to enable our integration to create an
 ## Configure OAuth Authentication 
 We will need to configure an OAuth API endpoint to enable our logic apps to authenticate to our ServiceNow instance
 
-1. Navigate to the `OAuth -> Application Registry` section
+1. Navigate to the `OAuth -> Inbound Integrations` section
     - Using the top navigation menu
       - Select `All`
       - Enter `OAuth` in the search box
-      - Select `Application Registry`
+      - Select `Inbound Integrations`
 
-      ![Menu OAuth Application Registry](./images/02_05_menu_application_registry.png "menu oauth application registry")
+      ![Menu OAuth Inbound Integrations](./images/02_05_menu_inbound_integrations.png "menu oauth inbound integrations")
 
-1. Select `New`
+1. Select `New Integration`
 
-    ![New Application Registry](./images/02_06_application_registry_new_button.png "new application registry")
+    ![New Integration](./images/02_06_inbound_integrations_new_integration.png "new integration")
 
-1. Select `Create an OAuth API endpoint for external clients`
+
+1. Select `OAuth - Authorization code grant`
   
-    ![Create OAuth API Endpoint](./images/02_07_create_oauth_api_endpoint_external_clients.png "create oauth api endpoint")
+    ![Create OAuth Authorization Grant](./images/02_07_create_oauth_authorization_grant.png "create oauth api endpoint")
 
 1. Configure the OAuth API endpoint as follows:
     - **Name:** `logic-apps-client`
-    - **Client Secret:** [leave blank]
-      - this will be auto generated on save
     - **Redirect URL:** https://logic-apis-northcentralus.consent.azure-apim.net/redirect
+     
+       (**note:** your redirect URL will depend on the region you are deployment your Azure Logic Apps Instance. If you deployed to a different region, you will need to update your **Redirect URL:  https://logic-apis-{azure-region}.consent.azure-apim.net/redirect**)
      - Click `Submit`
 
-    ![Configure OAuth API Endpoint](./images/02_08_oauth_client_config.png "configure oauth api endpoint")
+    ![Configure OAuth API Endpoint](./images/02_08_oauth_authorization_code_grant_config.png "configure oauth api endpoint")
 
 1. Save the `Client ID`, `Client Secret` and the `Instance Name` created in this module for later steps when configuring the Logic Apps connection to ServiceNow

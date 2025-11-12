@@ -3,9 +3,9 @@ title: 13 - Add the 'ServiceNow Close Incident' tool to your agent
 description: Add the ServiceNow Close Incident workflow as a tool for automated closure with resolution notes.
 ms.service: logic-apps
 ms.topic: tutorial
-ms.date: 08/19/2025
-author: absaafan
-ms.author: absaafan
+ms.date: 10/12/2025
+author: leonglaz
+ms.author: leonglaz
 ---
 
 In this module we will take the ServiceNow Close Incident workflow and add it as a tool in our Agent Loop workflow.
@@ -28,12 +28,13 @@ In this module we will take the ServiceNow Close Incident workflow and add it as
     ![Add Call workflow](./images/13_05_add_action_call_workflow_in_this_logic_app.png "add call workflow")
 
 1. Configure the **Call workflow in this logic app** action
-    - Rename activity to `tool-close-servicenow-incident`
+    - Rename action to `tool-close-servicenow-incident`
     - **Workflow Name** - `tool-ServiceNow-CloseIncident`
+    - Click **Show all**
 
     ![Configure Call Workflow](./images/11_06_configure_call_workflow.png "configure call workflow")
 
-1. Configure the Tool activity
+1. Configure the Tool action
     - Rename the tool to `Close Service Now Incident`
     - **Description:** `This tool will close a ServiceNow Incident`
     - **Agent Parameters**
@@ -55,7 +56,7 @@ In this module we will take the ServiceNow Close Incident workflow and add it as
           ![Configure Tool](./images/13_07_configure_tool.png "configure tool")
 
 1. Configure the inputs parameters for the call to the logic app.
-    - Rename the activity to `tool-ServiceNow-CloseIncident`
+    - Rename the action to `tool-ServiceNow-CloseIncident`
     - **TicketNumber:** `@{agentParameters('Ticket Number')}`
     - **Notes:** `@{agentParameters('Resolution Notes')}`
 
@@ -67,16 +68,14 @@ In this module we will take the ServiceNow Close Incident workflow and add it as
 
 ## Test your agent
 
-1. Click `Run` to start your workflow and initiate the agent session.
+1. Click `Chat` to launch the Agent Chat component.
 
-    ![Run Workflow](./images/13_12_run_workflow.png "run workflow")
+    ![Chat Workflow](./images/13_12_run_workflow.png "chat workflow")
 
-    You will receive a notification when the workflow has successfully started  
-    ![Workflow Started](./images/13_13_workflow_started.png "workflow started")
+1. The Agent Chat component will appear. This will display a hsitory of your previous chat sessions with the last chat session being displayed.
+Start a  new chat session by clicking `+ New Chat`
 
-1. Navigate to your **Run History** and locate your **Running** instance. Click on the identifier to view the executed steps and agent chat session.
-
-    ![Workflow Run History](./images/13_14_workflow_run_history.png "workflow run history")
+    ![Chat History](./images/13_14_workflow_chat_history.png "chat history")
 
 1. Enter the your issue for the agent to action:
 

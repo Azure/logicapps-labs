@@ -44,8 +44,6 @@ Many solutions use mixed authorization methods. For example, a solution might re
 
 ## Limitations
 
-In conversational agent workflows, support for OBO authorization currently applies only to managed connectors that connect to Microsoft-owned services. Support for 3rd party connectors and custom connectors is coming soon. Please reach out with your scenario if there are particular connectors you would like us to prioritize.
-
 > :::note
 >
 > For debugging purposes, administrators can view user chat history in monitoring view. 
@@ -60,7 +58,7 @@ In conversational agent workflows, support for OBO authorization currently appli
 
 - A Standard logic app resource and conversational agent workflow from previous modules.
 
-  - The conversational agent workflow requires a connector operation that works with a Microsoft service or system. The connection must also support delegated, per-user connections, for example, Microsoft 365, SharePoint, or Microsoft Graph. If required, the connection might also need tenant administrator consent.
+  - The conversational agent workflow for this demo works best with a connector operation that interacts with a Microsoft service or system. The connection must also support delegated, per-user connections, for example, Microsoft 365, SharePoint, or Microsoft Graph. If required, the connection might also need tenant administrator consent.
 
     > :::tip
     > 
@@ -109,6 +107,114 @@ For more information, see the following articles:
 ### Alternative: Default authentication and authorization through developer key
 
 For testing and other non-production scenarios, the portal provides a developer key that can be used instead of Easy Auth. The developer key is linked to a particular user and tenant based solely on the ARM bearer token. The usage of the developer key is automatically handled in the portal to execute actions on the user's behalf.
+
+### In preview: Easy Auth with Okta identity provider
+
+The UI support for enabling Okta identity provider in the portal is coming soon. Meanwhile please use the following instructions:
+
+#### Prerequisites
+- An **Okta Admin account** with permissions to create applications.
+
+#### Configure Okta App
+1. **Log in to Okta Admin Console**.
+1. Navigate to **Applications → Create App Integration**.
+1. Select **OIDC - OpenID Connect** and **Web Application**.
+1. Provide:
+ - **App Name**: e.g., `AzureAppService-EasyAuth`
+ - **Sign-in Redirect URI**: The ```<okta-provider-name>``` can just be 'okta'.
+   ```
+   https://<your-app-service>.azurewebsites.net/.auth/login/<okta-provider-name>/callback
+   ```
+ - **Sign-out Redirect URI**:  
+   ```
+   https://<your-app-service>.azurewebsites.net
+   ```
+5. Assign the app to the required user groups.
+5. Assign permissions for the app to read the user's profile and email.
+5. Save and note:
+ - **Client ID**
+ - **Client Secret**
+ - **Issuer URL** (e.g., `https://<your-okta-domain>`)
+
+#### Configure Easy Auth
+Send a `PUT` request to the following endpoint with ARM Bearer Token for authorization, replacing placeholders with your values. It is recommended to first do a `GET` request and modify the existing values by adding Okta related fields:
+
+```
+https://management.azure.com/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Web/sites/<app-name>/config/authsettingsV2?api-version=2018-11-01
+```
+
+**Sample Payload:**
+
+```json
+{
+  "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Web/sites/<app-name>/config/authsettingsV2",
+  "name": "authsettingsV2",
+  "type": "Microsoft.Web/sites/config",
+  "location": "<location>",
+  "tags": {},
+  "properties": {
+    "platform": {
+      "enabled": false
+    },
+    "globalValidation": {
+      "requireAuthentication": true,
+      "unauthenticatedClientAction": "RedirectToLoginPage",
+      "redirectToProvider": "<okta-provider-name>",
+      "excludedPaths": ["/runtime/*"]
+    },
+    "identityProviders": {
+      "customOpenIdConnectProviders": {
+        "<okta-provider-name>": {
+          "registration": {
+            "clientId": "<okta-client-id>",
+            "clientCredential": {
+              "clientSecretSettingName": "OKTA_CLIENT_SECRET"
+            },
+            "openIdConnectConfiguration": {
+              "authorizationEndpoint": "https://<your-okta-domain>/oauth2/v1/authorize",
+              "tokenEndpoint": "https://<your-okta-domain>/oauth2/v1/token",
+              "issuer": "https://<your-okta-domain>",
+              "certificationUri": "https://<your-okta-domain>/oauth2/v1/keys"
+            }
+          },
+          "login": {
+            "nameClaimType": "sub",
+            "scopes": ["openid", "profile", "email"]
+          }
+        }
+      }
+    },
+    "login": {
+      "tokenStore": {
+        "enabled": true,
+        "tokenRefreshExtensionHours": 72.0
+      },
+      "cookieExpiration": {
+        "convention": "FixedTime",
+        "timeToExpiration": "08:00:00"
+      },
+      "nonce": {
+        "validateNonce": true,
+        "nonceExpirationInterval": "00:05:00"
+      }
+    },
+    "httpSettings": {
+      "requireHttps": true,
+      "routes": {
+        "apiPrefix": "/.auth"
+      }
+    }
+  }
+}
+```
+
+#### Configure App
+- Verify that Okta identity provider is present in Azure Portal -> Logic App -> Settings -> Authentication.
+- Select `Enable Authentication` on the banner of the same page.
+- Add app setting `OKTA_CLIENT_SECRET` with the client secret from your Okta app.
+
+#### Testing
+The external chat client should now prompt for a Okta sign-in the first time it is opened.
 
 ## Part 1 - Choose the identity model for each tool action
 

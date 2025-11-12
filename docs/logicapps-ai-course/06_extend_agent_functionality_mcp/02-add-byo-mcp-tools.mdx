@@ -1,0 +1,105 @@
+---
+title: 02 - Add BYO MCP tools to your agent
+description: Learn how to add MCP (Model Context Protocol) tools to Azure Logic Apps agents with BYO MCP connectors (external MCP servers) including authentication patterns and monitoring.
+ms.service: azure-logic-apps
+ms.topic: tutorial
+ms.date: 11/11/2025
+author: absaafan
+ms.author: absaafan
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Prerequisites 
+
+<Tabs groupId="environment">
+<TabItem value="standard" label="Standard" default>
+
+- An Azure account and subscription. If you don't have a subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F).
+- Existing Logic Apps Standard workflow app (or create one): [Create a single-tenant workflow app](https://learn.microsoft.com/azure/logic-apps/create-single-tenant-workflows-azure-portal).
+- Deployed Azure OpenAI model (for example a GPT -family chat/completions model): [Azure OpenAI models](https://learn.microsoft.com/azure/ai-services/openai/concepts/models).
+
+</TabItem>
+<TabItem value="consumption" label="Consumption">
+
+- An Azure account and subscription. If you don't have a subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F).
+- Existing Logic Apps Consumption workflow app (or create one): [Create a multi-tenant workflow app](https://learn.microsoft.com/azure/logic-apps/quickstart-create-first-logic-app-workflow).
+
+
+</TabItem>
+</Tabs>
+
+## Part 1 - Use a Managed MCP Connector Tool in a Conversational Agent
+
+### Step 1 - Open existing conversational agent workflow
+
+### Step 2 - Add managed MCP connector tool
+
+### Step 3 - OBO Auth
+
+### Step 4 - Test & Monitor
+
+## Part 2 - Configure a BYO MCP Connector (External MCP Server)
+
+If you want to consume an MCP server that is hosted externally, you can use the BYO MCP connector feature in your agent workflows. This can be used in both autonomous and conversational workflows and the configuration steps are the same.
+
+In the following example, we will update the conversational workflow created in the [01-create-first-conversational-agent module](..\02_build_conversational_agents\01-create-first-conversational-agent.mdx)
+
+### Step 1 - Use a Logic Apps MCP server (Link to other lab)
+
+### Step 2 - Use MCP server in agent
+
+### Step 3 - Monitor & Debug
+
+## Part 3 - Use a Custom MCP Connector (OAuth / Advanced)
+
+### Step 1 - Design connector schema
+
+### Step 2 - Build connector (high-level)
+
+### Step 3 - Use connector in agent
+
+### Step 4 - Manage OAuth for BYO MCP
+
+### Step 5 - Test & Monitor
+
+
+## Run History & Monitoring for MCP Tools
+
+| Pane Element | Description |
+|--------------|-------------|
+| Chat transcript | Shows assistant messages and tool call directives (functionName + arguments). |
+| Tool call detail | Contains raw LLM completion that requested the MCP tool; review for argument fidelity. |
+| Action result | Underlying connector/custom action output; expand only necessary fields. |
+| Error propagation | Non-2xx responses surfaced; model can self-correct if prompted (“If tool fails, summarize error and ask clarifying question”). |
+
+### Common Troubleshooting
+| Issue | Resolution |
+|-------|------------|
+| Tool not invoked | Refine description; ensure no overlapping semantics with other tools; check Allowed tools filter. |
+| Wrong parameters | Add agent parameters with clearer names & descriptions; show expected examples in system instructions. |
+| Auth failure (401/403) | Recreate per-user connection; verify scopes; confirm Easy Auth or developer key for chat client. |
+| Throttling (429) | Add retry (built-in), instruct model to narrow request, or consolidate batch operations. |
+
+## Best Practices Recap
+- Keep tool descriptions unique; avoid overlapping verbs (“Get” for multiple similar sources).
+- Use Allowed tools for sensitive sessions or evaluation.
+- Monitor early runs to refine parameter names (clarity directly influences argument extraction quality).
+
+## Clean Up Resources
+- Remove unused per-user connections; rotate app secrets (custom connector) per policy.
+- Decommission experimental BYO MCP endpoints if no longer required.
+- Archive run history exports if used for prompt tuning and then purge per retention standards.
+
+## Related content
+- [Connect tools to external services (conversational)](../02_build_conversational_agents/03-connect-tools-external-services.md)
+- [Connect tools to external services (autonomous)](../03_build_autonomous_agents/03-connect-tools-external-services.md)
+- [Add parameters to your tools](./01-add-parameters-to-tools.md)
+- [Extend your tool functionality with patterns](./02-extend-tools-with-patterns.md)
+- [Add user context to tools](../02_build_conversational_agents/04-add-user-context-to-tools.md)
+- [Connect your agents using A2A protocol](../02_build_conversational_agents/05-connect-agents-a2a-protocol.md)
+
+## Next steps
+Proceed to the next module to integrate agent-to-agent protocol scenarios or revisit earlier modules to parameterize newly added MCP tools for dynamic argument generation.
+

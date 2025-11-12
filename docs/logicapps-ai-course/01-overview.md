@@ -101,3 +101,9 @@ This module expands your agents' capabilities by teaching advanced tool configur
 This module teaches you to orchestrate multiple specialized agents working together to handle complex scenarios. You'll learn various coordination patterns including prompt chaining, parallelization, routing, evaluator-optimizer loops, orchestrator-worker architectures, and handoff patterns. The module emphasizes reliability, maintainability, and scalability advantages of distributed agent systems over monolithic approaches, with practical implementations using Azure Logic Apps.
 
 [Start with: Multi-agent workflow patterns overview](05_build_multi_agent_systems/01-build-multi-agent-sysystem.md)
+
+### Extend Agents functionality with MCP capabilities
+
+This module expands your agents with MCP tool capabilities. You'll learn to configure MCP servers for your agent to use including bringing your own (BYO) external MCP servers, managed MCP servers, and custom MCP servers. This will allow you to expand the set of tools that your agent can use with minimal configuration.
+
+[Start with: MCP Overview](./06_extend_agent_functionality_mcp/01-overview.mdx)

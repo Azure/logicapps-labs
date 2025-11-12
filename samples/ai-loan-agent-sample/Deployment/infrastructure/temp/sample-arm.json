@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.177.2456",
-      "templateHash": "12456081379758143073"
+      "templateHash": "16419642297498245130"
     }
   },
   "parameters": {
@@ -46,6 +46,47 @@
       "apiVersion": "2023-01-31",
       "name": "[format('{0}-uami', parameters('baseName'))]",
       "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2023-08-01",
+      "name": "[format('{0}-deploy-workflows', parameters('baseName'))]",
+      "location": "[parameters('location')]",
+      "kind": "AzureCLI",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName'))))]": {}
+        }
+      },
+      "properties": {
+        "azCliVersion": "2.59.0",
+        "retentionInterval": "PT1H",
+        "timeout": "PT30M",
+        "cleanupPreference": "OnSuccess",
+        "environmentVariables": [
+          {
+            "name": "LOGIC_APP_NAME",
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'logicapp-deployment'), '2022-09-01').outputs.name.value]"
+          },
+          {
+            "name": "RESOURCE_GROUP",
+            "value": "[resourceGroup().name]"
+          },
+          {
+            "name": "WORKFLOWS_ZIP_URL",
+            "value": "https://github.com/petehauge/logicapps-labs/raw/refs/heads/one-click-deploy/samples/ai-loan-agent-sample/Deployment/infrastructure/temp/workflows.zip"
+          }
+        ],
+        "scriptContent": "      #!/bin/bash\r\n      set -e\r\n      \r\n      echo \"Downloading workflows.zip...\"\r\n      wget -O workflows.zip \"$WORKFLOWS_ZIP_URL\"\r\n      \r\n      echo \"Deploying workflows to Logic App: $LOGIC_APP_NAME\"\r\n      az functionapp deployment source config-zip \\\r\n        --resource-group \"$RESOURCE_GROUP\" \\\r\n        --name \"$LOGIC_APP_NAME\" \\\r\n        --src workflows.zip\r\n      \r\n      echo \"Deployment completed successfully\"\r\n    "
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deployment-identity-rbac')]",
+        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'openai-rbac-deployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'storage-rbac-deployment')]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -581,6 +622,57 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
         "[resourceId('Microsoft.Resources/deployments', 'openai-deployment')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "deployment-identity-rbac",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deploymentIdentityPrincipalId": {
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName'))), '2023-01-31').principalId]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.36.177.2456",
+              "templateHash": "4899868084557389132"
+            }
+          },
+          "parameters": {
+            "deploymentIdentityPrincipalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Principal ID of the user-assigned managed identity used for deployment"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceGroup().id, parameters('deploymentIdentityPrincipalId'), 'de139f84-1756-47ae-9be6-808fbbe84772')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'de139f84-1756-47ae-9be6-808fbbe84772')]",
+                "principalId": "[parameters('deploymentIdentityPrincipalId')]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
       ]
     }
   ],

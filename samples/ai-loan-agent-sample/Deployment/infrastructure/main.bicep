@@ -78,68 +78,23 @@ module openaiRbac 'modules/openai-rbac.bicep' = {
   ]
 }
 
-// RBAC: Deployment Identity → Logic App (Website Contributor role for deployment)
-module deploymentIdentityRbac 'modules/deployment-identity-rbac.bicep' = {
-  name: '${deployment().name}-deployment-identity-rbac'
+// Deploy workflows using deployment script with RBAC
+module workflowDeployment 'modules/deployment-script.bicep' = {
+  name: '${deployment().name}-workflow-deployment'
   params: {
+    deploymentScriptName: '${BaseName}-deploy-workflows'
+    location: resourceGroup().location
+    userAssignedIdentityId: userAssignedIdentity.id
     deploymentIdentityPrincipalId: userAssignedIdentity.properties.principalId
-  }
-  dependsOn: [
-    logicApp
-    userAssignedIdentity
-  ]
-}
-
-// Deploy workflows.zip to Logic App using Azure CLI
-resource workflowDeploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
-  name: '${BaseName}-deploy-workflows'
-  location: resourceGroup().location
-  kind: 'AzureCLI'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${userAssignedIdentity.id}': {}
-    }
-  }
-  properties: {
-    azCliVersion: '2.59.0'
-    retentionInterval: 'PT1H'
-    timeout: 'PT30M'
-    cleanupPreference: 'OnSuccess'
-    environmentVariables: [
-      {
-        name: 'LOGIC_APP_NAME'
-        value: logicApp.outputs.name
-      }
-      {
-        name: 'RESOURCE_GROUP'
-        value: resourceGroup().name
-      }
-      {
-        name: 'WORKFLOWS_ZIP_URL'
-        value: 'https://github.com/petehauge/logicapps-labs/raw/refs/heads/one-click-deploy/samples/ai-loan-agent-sample/Deployment/infrastructure/temp/workflows.zip'
-      }
-    ]
-    scriptContent: '''
-      #!/bin/bash
-      set -e
-      
-      echo "Downloading workflows.zip..."
-      wget -O workflows.zip "$WORKFLOWS_ZIP_URL"
-      
-      echo "Deploying workflows to Logic App: $LOGIC_APP_NAME"
-      az functionapp deployment source config-zip \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$LOGIC_APP_NAME" \
-        --src workflows.zip
-      
-      echo "Deployment completed successfully"
-    '''
+    logicAppName: logicApp.outputs.name
+    resourceGroupName: resourceGroup().name
+    workflowsZipUrl: 'https://github.com/petehauge/logicapps-labs/raw/refs/heads/one-click-deploy/samples/ai-loan-agent-sample/1ClickDeploy/workflows.zip'
   }
   dependsOn: [
     storageRbac
     openaiRbac
-    deploymentIdentityRbac
+    logicApp
+    userAssignedIdentity
   ]
 }
 

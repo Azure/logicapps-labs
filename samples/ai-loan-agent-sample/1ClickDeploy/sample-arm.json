@@ -5,14 +5,14 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.177.2456",
-      "templateHash": "14816204326701342107"
+      "templateHash": "13124683481182105688"
     }
   },
   "parameters": {
     "BaseName": {
       "type": "string",
       "minLength": 3,
-      "maxLength": 20,
+      "maxLength": 60,
       "metadata": {
         "description": "Base name used for the resources that will be deployed (alphanumerics and hyphens only)"
       }

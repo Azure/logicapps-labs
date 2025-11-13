@@ -59,16 +59,7 @@
                             }
                         },
                         "description": "Get customer banking history",
-                        "agentParameterSchema": {
-                            "type": "object",
-                            "properties": {
-                                "applicationId": {
-                                    "type": "string",
-                                    "description": "Application ID"
-                                }
-                            },
-                            "required": ["applicationId"]
-                        }
+                        "agentParameterSchema": "{\"type\":\"object\",\"properties\":{\"applicationId\":{\"type\":\"string\",\"description\":\"Application ID\"}},\"required\":[\"applicationId\"]}"
                     },
                     "Get_applicants_risk_profile": {
                         "actions": {
@@ -89,24 +80,7 @@
                             }
                         },
                         "description": "Get risk profile",
-                        "agentParameterSchema": {
-                            "type": "object",
-                            "properties": {
-                                "loanAmount": {
-                                    "type": "number",
-                                    "description": "Loan amount"
-                                },
-                                "annualSalary": {
-                                    "type": "number",
-                                    "description": "Annual salary"
-                                },
-                                "employmentYears": {
-                                    "type": "number",
-                                    "description": "Years employed"
-                                }
-                            },
-                            "required": ["loanAmount", "annualSalary", "employmentYears"]
-                        }
+                        "agentParameterSchema": "{\"type\":\"object\",\"properties\":{\"loanAmount\":{\"type\":\"number\",\"description\":\"Loan amount\"},\"annualSalary\":{\"type\":\"number\",\"description\":\"Annual salary\"},\"employmentYears\":{\"type\":\"number\",\"description\":\"Years employed\"}},\"required\":[\"loanAmount\",\"annualSalary\",\"employmentYears\"]}"
                     },
                     "Get_special_vehicles": {
                         "actions": {
@@ -125,16 +99,7 @@
                             }
                         },
                         "description": "Check if vehicle is luxury/special (requires human review)",
-                        "agentParameterSchema": {
-                            "type": "object",
-                            "properties": {
-                                "make": {
-                                    "type": "string",
-                                    "description": "Vehicle make"
-                                }
-                            },
-                            "required": ["make"]
-                        }
+                        "agentParameterSchema": "{\"type\":\"object\",\"properties\":{\"make\":{\"type\":\"string\",\"description\":\"Vehicle make\"}},\"required\":[\"make\"]}"
                     },
                     "Send_Customer_Email": {
                         "actions": {
@@ -161,46 +126,7 @@
                             }
                         },
                         "description": "Send loan decision email",
-                        "agentParameterSchema": {
-                            "type": "object",
-                            "properties": {
-                                "email": {
-                                    "type": "string",
-                                    "description": "Customer email"
-                                },
-                                "name": {
-                                    "type": "string",
-                                    "description": "Customer name"
-                                },
-                                "decision": {
-                                    "type": "string",
-                                    "enum": ["APPROVED", "REJECTED"],
-                                    "description": "Decision (APPROVED or REJECTED)"
-                                },
-                                "creditScore": {
-                                    "type": "number",
-                                    "description": "Credit score"
-                                },
-                                "loanAmount": {
-                                    "type": "number",
-                                    "description": "Loan amount (approvals only)"
-                                },
-                                "monthlyPayment": {
-                                    "type": "number",
-                                    "description": "Estimated monthly payment (approvals only)"
-                                },
-                                "reasons": {
-                                    "type": "string",
-                                    "description": "HTML list items with denial reasons: '<li>Insufficient credit history</li><li>High debt-to-income ratio</li>' (denials only, use vague language)"
-                                }
-                            },
-                            "required": [
-                                "email",
-                                "name",
-                                "decision",
-                                "creditScore"
-                            ]
-                        }
+                        "agentParameterSchema": "{\"type\":\"object\",\"properties\":{\"email\":{\"type\":\"string\",\"description\":\"Customer email\"},\"name\":{\"type\":\"string\",\"description\":\"Customer name\"},\"decision\":{\"type\":\"string\",\"description\":\"Decision (APPROVED or REJECTED)\"},\"creditScore\":{\"type\":\"number\",\"description\":\"Credit score\"},\"loanAmount\":{\"type\":\"number\",\"description\":\"Loan amount (approvals only)\"},\"monthlyPayment\":{\"type\":\"number\",\"description\":\"Estimated monthly payment (approvals only)\"},\"reasons\":{\"type\":\"string\",\"description\":\"HTML list items with denial reasons: '<li>Insufficient credit history</li><li>High debt-to-income ratio</li>' (denials only, use vague language)\"}},\"required\":[\"email\",\"name\",\"decision\",\"creditScore\"]}"
                     },
                     "Wait_for_Human_Review": {
                         "actions": {
@@ -215,28 +141,7 @@
                             }
                         },
                         "description": "Pause for human review and decision",
-                        "agentParameterSchema": {
-                            "type": "object",
-                            "properties": {
-                                "aireview": {
-                                    "type": "string",
-                                    "description": "AI summary and review reason"
-                                },
-                                "loanamount": {
-                                    "type": "string",
-                                    "description": "Loan amount"
-                                },
-                                "riskprofile": {
-                                    "type": "string",
-                                    "description": "Risk profile"
-                                }
-                            },
-                            "required": [
-                                "aireview",
-                                "loanamount",
-                                "riskprofile"
-                            ]
-                        }
+                        "agentParameterSchema": "{\"type\":\"object\",\"properties\":{\"aireview\":{\"type\":\"string\",\"description\":\"AI summary and review reason\"},\"loanamount\":{\"type\":\"string\",\"description\":\"Loan amount\"},\"riskprofile\":{\"type\":\"string\",\"description\":\"Risk profile\"}},\"required\":[\"aireview\",\"loanamount\",\"riskprofile\"]}"
                     }
                 },
                 "runAfter": {

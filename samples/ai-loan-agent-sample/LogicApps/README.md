@@ -1,8 +1,67 @@
-# Local Development Setup
+# Deployment with VS Code Extension for Logic Apps Standard
 
-This guide provides step-by-step instructions for setting up local development environment for this Logic Apps Standard project.
+This guide is for deploying workflows to an existing Logic App resource using the Azure Logic Apps extension for VS Code. If you haven't deployed the infrastructure yet, use the [Deploy to Azure button](.././README.md#deploy-sample) first.
 
-## Overview
+## When to Use This Approach
+
+**Use the Azure Portal workflow designer if:**
+- ✅ You want to edit workflows directly in the browser
+- ✅ You prefer a visual, low-code experience
+- ✅ You want immediate deployment and testing
+
+**Use VS Code extension if:**
+- ✅ You want to edit workflows in your local editor
+- ✅ You prefer working with JSON/code directly
+- ✅ You want to integrate with source control workflows
+- ✅ You want local testing capabilities
+
+---
+
+## Prerequisites for VS Code Approach
+
+In addition to the [main prerequisites](../README.md#prerequisites), you'll need:
+
+- **[VS Code](https://code.visualstudio.com/)** - Code editor
+- **[Azure Logic Apps extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurelogicapps)** - For workflow development
+- **[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)** - For local runtime
+- **[Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local)** - For local testing
+- **[Azurite](https://learn.microsoft.com/azure/storage/common/storage-use-azurite)** - For local storage emulation
+
+---
+
+## Deployment Steps
+
+### Step 1: Open Workspace in VS Code
+
+1. Open the `LogicApps` folder in VS Code:
+   ```bash
+   cd LogicApps
+   code .
+   ```
+
+2. Install the Azure Logic Apps extension if not already installed
+
+### Step 2: Connect to Your Logic App Resource
+
+1. Open the Azure extension panel in VS Code (Azure icon in sidebar)
+2. Sign in to your Azure account
+3. Expand your subscription and locate your Logic App resource
+4. Right-click on the Logic App resource
+
+### Step 3: Deploy Workflows
+
+1. In VS Code, right-click on the `LogicApps` folder
+2. Select **Deploy to Logic App**
+3. Choose your Logic App resource from the list
+4. Confirm the deployment
+
+The workflows will be deployed to your existing Logic App resource.
+
+> **📝 Note:** The infrastructure (Logic App resource, Azure OpenAI, Storage Account, RBAC assignments) must already exist. Use the [Deploy to Azure button](../README.md#deploy-sample) to create the infrastructure first.
+
+---
+
+## Local Development (Optional)
 
 The `local.settings.json` file contains configuration settings required for local development. This file should **never** be committed to source control as it contains sensitive connection strings and local-specific paths.
 
@@ -133,4 +192,12 @@ For additional support:
 - Review [Azure Logic Apps Standard documentation](https://learn.microsoft.com/azure/logic-apps/)
 - Check [Azure OpenAI service status](https://status.azure.com/)
 - Verify your Azure OpenAI model deployment status in Azure Portal
+
+---
+
+## Next Steps
+
+- **After deploying:** See [Explore Sample](../README.md#explore-sample) to test your workflows
+- **To extend:** Follow [Teams Connector Setup](../TEAMS-CONNECTOR.md) to add real approvals
+- **Need help?** See [Troubleshooting](../README.md#troubleshoot) in main README
 

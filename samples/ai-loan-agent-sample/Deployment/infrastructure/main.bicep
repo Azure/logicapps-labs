@@ -4,33 +4,16 @@
 
 targetScope = 'resourceGroup'
 
-@minLength(3)
-@maxLength(15)
-@description('Project name used for resource naming (alphanumeric and hyphens only)')
+@description('Base name used for the resources that will be deployed')
 param baseName string
 
-@allowed([
-  'australiaeast'
-  'westeurope'
-  'germanywestcentral'
-  'italynorth'
-  'swedencentral'
-  'uksouth'
-  'eastus'
-  'eastus2'
-  'southcentralus'
-  'westus3'
-])
-@description('Azure region (must support both GPT-4.1-mini and Logic Apps Standard)')
-param location string = 'eastus2'
-
-// Variables
+// uniqueSuffix for when we need unique values
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: '${baseName}-uami'
-  location: location
+  location: resourceGroup().location
 }
 
 // Storage Account for workflow runtime
@@ -38,7 +21,7 @@ module storage 'modules/storage.bicep' = {
   name: 'storage-deployment'
   params: {
     storageAccountName: toLower(take(replace('${baseName}${uniqueSuffix}', '-', ''), 24))
-    location: location
+    location: resourceGroup().location
   }
 }
 
@@ -47,7 +30,7 @@ module openai 'modules/openai.bicep' = {
   name: 'openai-deployment'
   params: {
     openAIName: '${baseName}-openai'
-    location: location
+    location: resourceGroup().location
   }
 }
 
@@ -56,7 +39,7 @@ module logicApp 'modules/logicapp.bicep' = {
   name: 'logicapp-deployment'
   params: {
     logicAppName: '${baseName}-logicapp'
-    location: location
+    location: resourceGroup().location
     storageAccountName: storage.outputs.storageAccountName
     openAIEndpoint: openai.outputs.endpoint
     openAIResourceId: openai.outputs.resourceId
@@ -108,7 +91,7 @@ module deploymentIdentityRbac 'modules/deployment-identity-rbac.bicep' = {
 // Deploy workflows.zip to Logic App using Azure CLI
 resource workflowDeploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   name: '${baseName}-deploy-workflows'
-  location: location
+  location: resourceGroup().location
   kind: 'AzureCLI'
   identity: {
     type: 'UserAssigned'

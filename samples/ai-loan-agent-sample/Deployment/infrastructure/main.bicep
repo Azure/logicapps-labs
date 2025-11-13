@@ -6,7 +6,7 @@ targetScope = 'resourceGroup'
 
 @description('Base name used for the resources that will be deployed (alphanumerics and hyphens only)')
 @minLength(3)
-@maxLength(20)
+@maxLength(60)
 param BaseName string
 
 // uniqueSuffix for when we need unique values

@@ -14,7 +14,7 @@ var uniqueSuffix = uniqueString(resourceGroup().id)
 
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: '${take(BaseName, 124)}-id'
+  name: '${take(BaseName, 60)}-managedidentity'
   location: resourceGroup().location
 }
 
@@ -40,7 +40,7 @@ module openai 'modules/openai.bicep' = {
 module logicApp 'modules/logicapp.bicep' = {
   name: '${deployment().name}-logicapp-deployment'
   params: {
-    logicAppName: take(BaseName, 32)
+    logicAppName: '${take(BaseName, 22)}${uniqueSuffix}'
     location: resourceGroup().location
     storageAccountName: storage.outputs.storageAccountName
     openAIEndpoint: openai.outputs.endpoint

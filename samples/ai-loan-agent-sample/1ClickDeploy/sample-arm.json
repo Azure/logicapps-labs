@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.177.2456",
-      "templateHash": "13124683481182105688"
+      "templateHash": "11137080745239040937"
     }
   },
   "parameters": {
@@ -25,7 +25,7 @@
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "apiVersion": "2023-01-31",
-      "name": "[format('{0}-id', take(parameters('BaseName'), 124))]",
+      "name": "[format('{0}-managedidentity', take(parameters('BaseName'), 60))]",
       "location": "[resourceGroup().location]"
     },
     {
@@ -216,7 +216,7 @@
         "mode": "Incremental",
         "parameters": {
           "logicAppName": {
-            "value": "[take(parameters('BaseName'), 32)]"
+            "value": "[format('{0}{1}', take(parameters('BaseName'), 22), variables('uniqueSuffix'))]"
           },
           "location": {
             "value": "[resourceGroup().location]"
@@ -231,7 +231,7 @@
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name)), '2022-09-01').outputs.resourceId.value]"
           },
           "managedIdentityId": {
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60)))]"
           }
         },
         "template": {
@@ -407,7 +407,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name))]",
         "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60)))]"
       ]
     },
     {
@@ -424,7 +424,7 @@
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name)), '2022-09-01').outputs.storageAccountName.value]"
           },
           "logicAppPrincipalId": {
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124))), '2023-01-31').principalId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60))), '2023-01-31').principalId]"
           }
         },
         "template": {
@@ -491,7 +491,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
         "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60)))]"
       ]
     },
     {
@@ -581,10 +581,10 @@
             "value": "[resourceGroup().location]"
           },
           "userAssignedIdentityId": {
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60)))]"
           },
           "deploymentIdentityPrincipalId": {
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124))), '2023-01-31').principalId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60))), '2023-01-31').principalId]"
           },
           "logicAppName": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name)), '2022-09-01').outputs.name.value]"
@@ -705,7 +705,7 @@
         "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
         "[resourceId('Microsoft.Resources/deployments', format('{0}-openai-rbac-deployment', deployment().name))]",
         "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-rbac-deployment', deployment().name))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-managedidentity', take(parameters('BaseName'), 60)))]"
       ]
     }
   ],

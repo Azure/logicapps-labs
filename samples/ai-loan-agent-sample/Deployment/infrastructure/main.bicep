@@ -4,41 +4,43 @@
 
 targetScope = 'resourceGroup'
 
-@description('Base name used for the resources that will be deployed')
-param baseName string
+@description('Base name used for the resources that will be deployed (alphanumerics and hyphens only)')
+@minLength(3)
+@maxLength(20)
+param BaseName string
 
 // uniqueSuffix for when we need unique values
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: '${baseName}-uami'
+  name: '${take(BaseName, 124)}-id'
   location: resourceGroup().location
 }
 
 // Storage Account for workflow runtime
 module storage 'modules/storage.bicep' = {
-  name: 'storage-deployment'
+  name: '${deployment().name}-storage-deployment'
   params: {
-    storageAccountName: toLower(take(replace('${baseName}${uniqueSuffix}', '-', ''), 24))
+    storageAccountName: toLower(take(replace('${take(BaseName, 16)}${uniqueSuffix}', '-', ''), 24))
     location: resourceGroup().location
   }
 }
 
 // Azure OpenAI with gpt-4.1-mini model
 module openai 'modules/openai.bicep' = {
-  name: 'openai-deployment'
+  name: '${deployment().name}-openai-deployment'
   params: {
-    openAIName: '${baseName}-openai'
+    openAIName: '${take(BaseName, 54)}-openai'
     location: resourceGroup().location
   }
 }
 
 // Logic Apps Standard with dual managed identities
 module logicApp 'modules/logicapp.bicep' = {
-  name: 'logicapp-deployment'
+  name: '${deployment().name}-logicapp-deployment'
   params: {
-    logicAppName: '${baseName}-logicapp'
+    logicAppName: take(BaseName, 32)
     location: resourceGroup().location
     storageAccountName: storage.outputs.storageAccountName
     openAIEndpoint: openai.outputs.endpoint
@@ -50,7 +52,7 @@ module logicApp 'modules/logicapp.bicep' = {
 // RBAC: Logic App → Storage (Blob, Queue, Table Contributor roles)
 // dependsOn ensures RBAC is assigned after all resources exist (important for incremental deployments)
 module storageRbac 'modules/storage-rbac.bicep' = {
-  name: 'storage-rbac-deployment'
+  name: '${deployment().name}-storage-rbac-deployment'
   params: {
     storageAccountName: storage.outputs.storageAccountName
     logicAppPrincipalId: userAssignedIdentity.properties.principalId
@@ -65,7 +67,7 @@ module storageRbac 'modules/storage-rbac.bicep' = {
 // RBAC: Logic App → Azure OpenAI (Cognitive Services User role)
 // dependsOn ensures RBAC is assigned after all resources exist (important for incremental deployments)
 module openaiRbac 'modules/openai-rbac.bicep' = {
-  name: 'openai-rbac-deployment'
+  name: '${deployment().name}-openai-rbac-deployment'
   params: {
     openAIName: openai.outputs.name
     logicAppPrincipalId: logicApp.outputs.systemAssignedPrincipalId
@@ -78,7 +80,7 @@ module openaiRbac 'modules/openai-rbac.bicep' = {
 
 // RBAC: Deployment Identity → Logic App (Website Contributor role for deployment)
 module deploymentIdentityRbac 'modules/deployment-identity-rbac.bicep' = {
-  name: 'deployment-identity-rbac'
+  name: '${deployment().name}-deployment-identity-rbac'
   params: {
     deploymentIdentityPrincipalId: userAssignedIdentity.properties.principalId
   }
@@ -90,7 +92,7 @@ module deploymentIdentityRbac 'modules/deployment-identity-rbac.bicep' = {
 
 // Deploy workflows.zip to Logic App using Azure CLI
 resource workflowDeploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
-  name: '${baseName}-deploy-workflows'
+  name: '${BaseName}-deploy-workflows'
   location: resourceGroup().location
   kind: 'AzureCLI'
   identity: {

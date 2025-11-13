@@ -5,35 +5,16 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.177.2456",
-      "templateHash": "16419642297498245130"
+      "templateHash": "7477081944832492145"
     }
   },
   "parameters": {
-    "baseName": {
+    "BaseName": {
       "type": "string",
       "minLength": 3,
-      "maxLength": 15,
+      "maxLength": 20,
       "metadata": {
-        "description": "Project name used for resource naming (alphanumeric and hyphens only)"
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "eastus2",
-      "allowedValues": [
-        "australiaeast",
-        "westeurope",
-        "germanywestcentral",
-        "italynorth",
-        "swedencentral",
-        "uksouth",
-        "eastus",
-        "eastus2",
-        "southcentralus",
-        "westus3"
-      ],
-      "metadata": {
-        "description": "Azure region (must support both GPT-4.1-mini and Logic Apps Standard)"
+        "description": "Base name used for the resources that will be deployed (alphanumerics and hyphens only)"
       }
     }
   },
@@ -44,19 +25,19 @@
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "apiVersion": "2023-01-31",
-      "name": "[format('{0}-uami', parameters('baseName'))]",
-      "location": "[parameters('location')]"
+      "name": "[format('{0}-id', take(parameters('BaseName'), 124))]",
+      "location": "[resourceGroup().location]"
     },
     {
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2023-08-01",
-      "name": "[format('{0}-deploy-workflows', parameters('baseName'))]",
-      "location": "[parameters('location')]",
+      "name": "[format('{0}-deploy-workflows', parameters('BaseName'))]",
+      "location": "[resourceGroup().location]",
       "kind": "AzureCLI",
       "identity": {
         "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName'))))]": {}
+          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124))))]": {}
         }
       },
       "properties": {
@@ -67,7 +48,7 @@
         "environmentVariables": [
           {
             "name": "LOGIC_APP_NAME",
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'logicapp-deployment'), '2022-09-01').outputs.name.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name)), '2022-09-01').outputs.name.value]"
           },
           {
             "name": "RESOURCE_GROUP",
@@ -81,17 +62,17 @@
         "scriptContent": "      #!/bin/bash\r\n      set -e\r\n      \r\n      echo \"Downloading workflows.zip...\"\r\n      wget -O workflows.zip \"$WORKFLOWS_ZIP_URL\"\r\n      \r\n      echo \"Deploying workflows to Logic App: $LOGIC_APP_NAME\"\r\n      az functionapp deployment source config-zip \\\r\n        --resource-group \"$RESOURCE_GROUP\" \\\r\n        --name \"$LOGIC_APP_NAME\" \\\r\n        --src workflows.zip\r\n      \r\n      echo \"Deployment completed successfully\"\r\n    "
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deployment-identity-rbac')]",
-        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
-        "[resourceId('Microsoft.Resources/deployments', 'openai-rbac-deployment')]",
-        "[resourceId('Microsoft.Resources/deployments', 'storage-rbac-deployment')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-deployment-identity-rbac', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-openai-rbac-deployment', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-rbac-deployment', deployment().name))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "storage-deployment",
+      "name": "[format('{0}-storage-deployment', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -99,10 +80,10 @@
         "mode": "Incremental",
         "parameters": {
           "storageAccountName": {
-            "value": "[toLower(take(replace(format('{0}{1}', parameters('baseName'), variables('uniqueSuffix')), '-', ''), 24))]"
+            "value": "[toLower(take(replace(format('{0}{1}', take(parameters('BaseName'), 16), variables('uniqueSuffix')), '-', ''), 24))]"
           },
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[resourceGroup().location]"
           }
         },
         "template": {
@@ -175,7 +156,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "openai-deployment",
+      "name": "[format('{0}-openai-deployment', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -183,10 +164,10 @@
         "mode": "Incremental",
         "parameters": {
           "openAIName": {
-            "value": "[format('{0}-openai', parameters('baseName'))]"
+            "value": "[format('{0}-openai', take(parameters('BaseName'), 54))]"
           },
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[resourceGroup().location]"
           }
         },
         "template": {
@@ -268,7 +249,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "logicapp-deployment",
+      "name": "[format('{0}-logicapp-deployment', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -276,22 +257,22 @@
         "mode": "Incremental",
         "parameters": {
           "logicAppName": {
-            "value": "[format('{0}-logicapp', parameters('baseName'))]"
+            "value": "[take(parameters('BaseName'), 32)]"
           },
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[resourceGroup().location]"
           },
           "storageAccountName": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'storage-deployment'), '2022-09-01').outputs.storageAccountName.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name)), '2022-09-01').outputs.storageAccountName.value]"
           },
           "openAIEndpoint": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'openai-deployment'), '2022-09-01').outputs.endpoint.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name)), '2022-09-01').outputs.endpoint.value]"
           },
           "openAIResourceId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'openai-deployment'), '2022-09-01').outputs.resourceId.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name)), '2022-09-01').outputs.resourceId.value]"
           },
           "managedIdentityId": {
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
           }
         },
         "template": {
@@ -301,7 +282,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.36.177.2456",
-              "templateHash": "6393081182755064711"
+              "templateHash": "18159855870430212958"
             }
           },
           "parameters": {
@@ -360,7 +341,7 @@
             {
               "type": "Microsoft.Web/sites",
               "apiVersion": "2023-12-01",
-              "name": "[parameters('logicAppName')]",
+              "name": "[format('{0}-logicapp', parameters('logicAppName'))]",
               "location": "[parameters('location')]",
               "kind": "functionapp,workflowapp",
               "identity": {
@@ -451,29 +432,29 @@
           "outputs": {
             "name": {
               "type": "string",
-              "value": "[parameters('logicAppName')]"
+              "value": "[format('{0}-logicapp', parameters('logicAppName'))]"
             },
             "systemAssignedPrincipalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppName')), '2023-12-01', 'full').identity.principalId]"
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-logicapp', parameters('logicAppName'))), '2023-12-01', 'full').identity.principalId]"
             },
             "quickTestUrl": {
               "type": "string",
-              "value": "[format('https://{0}/api/QuickTest/triggers/When_a_HTTP_request_is_received/invoke?api-version=2022-05-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=', reference(resourceId('Microsoft.Web/sites', parameters('logicAppName')), '2023-12-01').defaultHostName)]"
+              "value": "[format('https://{0}/api/QuickTest/triggers/When_a_HTTP_request_is_received/invoke?api-version=2022-05-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=', reference(resourceId('Microsoft.Web/sites', format('{0}-logicapp', parameters('logicAppName'))), '2023-12-01').defaultHostName)]"
             }
           }
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'openai-deployment')]",
-        "[resourceId('Microsoft.Resources/deployments', 'storage-deployment')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "storage-rbac-deployment",
+      "name": "[format('{0}-storage-rbac-deployment', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -481,10 +462,10 @@
         "mode": "Incremental",
         "parameters": {
           "storageAccountName": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'storage-deployment'), '2022-09-01').outputs.storageAccountName.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name)), '2022-09-01').outputs.storageAccountName.value]"
           },
           "logicAppPrincipalId": {
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName'))), '2023-01-31').principalId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124))), '2023-01-31').principalId]"
           }
         },
         "template": {
@@ -549,15 +530,15 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
-        "[resourceId('Microsoft.Resources/deployments', 'storage-deployment')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-storage-deployment', deployment().name))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "openai-rbac-deployment",
+      "name": "[format('{0}-openai-rbac-deployment', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -565,10 +546,10 @@
         "mode": "Incremental",
         "parameters": {
           "openAIName": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'openai-deployment'), '2022-09-01').outputs.name.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name)), '2022-09-01').outputs.name.value]"
           },
           "logicAppPrincipalId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'logicapp-deployment'), '2022-09-01').outputs.systemAssignedPrincipalId.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name)), '2022-09-01').outputs.systemAssignedPrincipalId.value]"
           }
         },
         "template": {
@@ -620,14 +601,14 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
-        "[resourceId('Microsoft.Resources/deployments', 'openai-deployment')]"
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "deployment-identity-rbac",
+      "name": "[format('{0}-deployment-identity-rbac', deployment().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -635,7 +616,7 @@
         "mode": "Incremental",
         "parameters": {
           "deploymentIdentityPrincipalId": {
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName'))), '2023-01-31').principalId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124))), '2023-01-31').principalId]"
           }
         },
         "template": {
@@ -671,19 +652,19 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'logicapp-deployment')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-uami', parameters('baseName')))]"
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-id', take(parameters('BaseName'), 124)))]"
       ]
     }
   ],
   "outputs": {
     "logicAppName": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'logicapp-deployment'), '2022-09-01').outputs.name.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-logicapp-deployment', deployment().name)), '2022-09-01').outputs.name.value]"
     },
     "openAIEndpoint": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'openai-deployment'), '2022-09-01').outputs.endpoint.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('{0}-openai-deployment', deployment().name)), '2022-09-01').outputs.endpoint.value]"
     }
   }
 }

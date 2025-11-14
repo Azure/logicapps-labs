@@ -88,7 +88,7 @@ module workflowDeployment 'modules/deployment-script.bicep' = {
     deploymentIdentityPrincipalId: userAssignedIdentity.properties.principalId
     logicAppName: logicApp.outputs.name
     resourceGroupName: resourceGroup().name
-    workflowsZipUrl: 'https://github.com/petehauge/logicapps-labs/raw/refs/heads/one-click-deploy/samples/ai-loan-agent-sample/1ClickDeploy/workflows.zip'
+    workflowsZipUrl: 'https://github.com/modularity/logicapps-labs/raw/refs/heads/loan-agent-deployment/samples/ai-loan-agent-sample/1ClickDeploy/workflows.zip'
   }
   dependsOn: [
     storageRbac

@@ -59,16 +59,13 @@ Ensure you have a Team and Channel where approval cards will be posted. You'll s
 5. Search for: `post adaptive card`
 6. Select **Microsoft Teams** → **Post adaptive card and wait for a response**
 
-### 2.3 Create On-Behalf-Of Connection
+### 2.3 Create Teams Connection
 
 When prompted to create a new connection:
 
-1. Ensure **Per-user connection** toggle is **enabled**
+1. Ensure **Per-user connection** toggle is **disabled** (deselected)
 2. Click **Sign in**
 3. Authenticate with your Microsoft account
-4. Grant permissions when prompted - this delegates permission to the agent to post on your behalf
-
-**Learn more:** [Configure on-behalf-of authentication for agent connections](https://learn.microsoft.com/azure/logic-apps/enable-stateful-affinity-built-in-connectors#configure-on-behalf-of-authentication-for-agent-connections)
 
 ### 2.4 Configure the Teams Action
 
@@ -76,9 +73,9 @@ Fill in the action parameters:
 
 - **Post as:** Flow bot
 - **Post in:** Channel
-- **Message:** Paste the Adaptive Card JSON from the [card template section](#adaptive-card-template) below
 - **Team:** Select your target team from the dropdown list
 - **Channel:** Select your target channel from the dropdown list
+- **Message:** Paste the Adaptive Card JSON from the [card template section](#adaptive-card-template) below
 
 **Rename the action:**
 1. Click the action title at the top (next to the Teams icon)

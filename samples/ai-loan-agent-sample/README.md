@@ -2,26 +2,49 @@
 
 This sample demonstrates how to build an AI agent in Azure Logic Apps Standard that autonomously analyzes loan applications, selects verification tools, and makes approval decisions. Deploy with one click using mock data—no external service integrations required.
 
-**Agent Workflow Pattern:**
+**LoanApprovalAgent Workflow:**
 
 ```mermaid
-flowchart LR
-    Start[Loan Application] --> PreCheck["Pre-Checks<br/>─────────<br/>• Credit • Background • Employment"]
-    PreCheck --> Agent[AI Agent<br/>GPT-4.1-mini]
+flowchart TD
+    A[HTTP Trigger<br/>manual] --> B[Mock Credit Check]
+    A --> C[Mock Background Check]
+    A --> D[Mock Employment Verification]
+    B --> E[Application Summary]
+    C --> E
+    D --> E
+    E --> F["Loan Agent<br/>(AI Agent - GPT-4.1-mini)"]
     
-    Agent -->|Selects & Calls| Tools["Agent Tools<br/>──────────<br/>• Get Loan Policy<br/>• Get Customer History<br/>• Get Risk Profile<br/>• Get Special Vehicles<br/>• Wait for Human Review<br/>• Send Email"]
+    subgraph "Agent Tools"
+        direction TB
+        T1[Get loan approval policy]
+        T2[Get customers bank history]
+        T3[Get applicants risk profile]
+        T4[Get special vehicles]
+        T5[Send Customer Email]
+        T6[Wait for Human Review]
+    end
     
-    Tools --> Agent
-    Agent --> Final[Decision]
+    F -.selects & calls.-> T1
+    F -.selects & calls.-> T2
+    F -.selects & calls.-> T3
+    F -.selects & calls.-> T4
+    F -.selects & calls.-> T5
+    F -.selects & calls.-> T6
     
-    style Agent fill:#0078d4,color:#fff
-    style PreCheck fill:#5a9fd4,color:#fff
-    style Tools fill:#5a9fd4,color:#fff
+    F --> G[Loan post processing steps]
+    
+    style F fill:#0078d4,color:#fff
+    style T1 fill:#d3d3d3,color:#000
+    style T2 fill:#d3d3d3,color:#000
+    style T3 fill:#d3d3d3,color:#000
+    style T4 fill:#d3d3d3,color:#000
+    style T5 fill:#d3d3d3,color:#000
+    style T6 fill:#d3d3d3,color:#000
 ```
 
-**Key Concept:** The AI agent autonomously decides which tools to call, in what order, and when to stop—based on the loan application context and its reasoning about what information is needed to make a decision.
+**Key Concept:** The AI agent autonomously decides which tools to call, in what order, and when to stop—matching the workflow structure you'll see in the Azure Portal designer.
 
-*See [Architecture](#architecture) section for detailed workflow information.*
+*See [Architecture](#architecture) section for detailed technical information.*
 
 **What you'll learn:**
 - **Deploy AI agent workflows** - One-click deployment of Logic Apps with Azure OpenAI integration
@@ -40,7 +63,7 @@ Before deploying this sample, ensure you have:
 
 - **Azure subscription** - With contributor access to create resources
 
-**What gets deployed:** The Deploy to Azure button provisions sample resources (App Service Plan, Logic App Standard, Azure OpenAI with GPT-4.1-mini model, Storage Account, and Managed Identity), configures RBAC permissions, and deploys workflows using Bicep templates and deploymentScripts. No local tools required. See [Architecture](#architecture) for details.
+**What gets deployed:** The Deploy to Azure button provisions all required resources (App Service Plan, Logic App Standard, Azure OpenAI with GPT-4.1-mini model, Storage Account, and Managed Identity), configures RBAC permissions, and deploys the agent workflows. No local tools or configuration required. See [Architecture](#architecture) for details.
 
 **Note:** This sample uses mock implementations (static data, simulated API responses) to provide a self-contained learning environment without requiring external service integrations. See [Mock Implementations](#mock-implementations) for details.
 
@@ -59,9 +82,9 @@ Click the button below to deploy this sample to your Azure subscription:
    - Resource Group (create new recommended: `rg-ailoan`)
    - Region (must support both Azure OpenAI GPT-4.1-mini and Logic Apps Standard - see [Region Selection](#region-selection))
    - Project Name (default: `ailoan`)
-3. Provisions resources
-4. Configures RBAC with deploymentScripts resource
-5. Deploys all workflows automatically
+3. Provisions Azure resources
+4. Configures RBAC permissions
+5. Deploys all workflows
 
 **After deployment completes:**
 - Navigate to your resource group to see all resources
@@ -77,16 +100,22 @@ Click the button below to deploy this sample to your Azure subscription:
 <details>
 <summary><b>Resource Naming Conventions</b></summary>
 
-All resources use your `ProjectName` as a prefix:
+All resources use your `ProjectName` as the base, with different patterns depending on whether they require global uniqueness:
+
+**Pattern Overview:**
+- **Subscription-scoped resources** (Resource Group, Managed Identity, Azure OpenAI): Use `{projectName}` only
+- **Globally-scoped resources** (Logic App, App Service Plan, Storage): Add a random `{uniqueId}` to prevent naming collisions across all Azure deployments worldwide
 
 | Resource | Naming Pattern | Example (ProjectName = "ailoan") |
 |----------|----------------|----------------------------------|
 | Resource Group | `rg-{projectName}` | `rg-ailoan` |
-| Logic App | `{projectName}-logicapp` | `ailoan-logicapp` |
-| App Service Plan | `{projectName}-logicapp-plan` | `ailoan-logicapp-plan` |
+| Managed Identity | `{projectName}-managedidentity` | `ailoan-managedidentity` |
 | Azure OpenAI | `{projectName}-openai` | `ailoan-openai` |
-| Storage Account | `{projectName}{uniqueId}` | `ailoan01234` |
-| Managed Identity | `{projectName}-uami` | `ailoan-uami` |
+| Logic App | `{projectName}{uniqueId}-logicapp` | `ailoanxyz123abc-logicapp` |
+| App Service Plan | `{projectName}{uniqueId}-plan` | `ailoanxyz123abc-plan` |
+| Storage Account | `{projectName}{uniqueId}` (no hyphens) | `ailoanxyz123abc` |
+
+**Note:** The `{uniqueId}` is a 12-character random string (e.g., `xyz123abc`) automatically generated during deployment to ensure globally unique names.
 
 </details>
 
@@ -95,7 +124,9 @@ All resources use your `ProjectName` as a prefix:
 
 The deployment requires a region that supports both GPT-4.1-mini in Azure OpenAI and Azure Logic Apps Standard.
 
-For the latest regional availability:
+**Recommended regions:** East US 2, West US, West US 3, North Central US, South Central US, West Europe, North Europe
+
+For the complete list of regional availability:
 - [Azure OpenAI model availability by region](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability)
 - [Azure Logic Apps Standard availability](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) (search for "Logic Apps")
 

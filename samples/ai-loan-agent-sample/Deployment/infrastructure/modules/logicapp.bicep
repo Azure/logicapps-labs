@@ -32,7 +32,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 }
 
 resource logicApp 'Microsoft.Web/sites@2023-12-01' = {
-  name: logicAppName
+  name: '${logicAppName}-logicapp'
   location: location
   kind: 'functionapp,workflowapp'
   identity: {

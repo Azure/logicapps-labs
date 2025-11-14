@@ -1,8 +1,10 @@
 # AI Loan Agent Sample
 
-This sample demonstrates how to build an AI agent in Azure Logic Apps Standard that autonomously analyzes loan applications, selects verification tools, and makes approval decisions. Deploy with one click using mock data—no external service integrations required.
+This sample demonstrates how to build an AI agent in Azure Logic Apps Standard that autonomously analyzes loan applications, selects verification tools, and determines approval decisions.
 
-**LoanApprovalAgent Workflow:**
+- **[Deploy](#deploy-sample)** with one click using built-in test scenarios
+- **[Explore](#explore-sample)** agent behaviors across approval, rejection, and escalation cases
+- **[Extend](#extending-the-sample)** with Teams, email, and service integrations
 
 ```mermaid
 flowchart TD
@@ -42,7 +44,7 @@ flowchart TD
     style T6 fill:#d3d3d3,color:#000
 ```
 
-**Key Concept:** The AI agent autonomously decides which tools to call, in what order, and when to stop—matching the workflow structure you'll see in the Azure Portal designer.
+**Key Concept:** The AI agent in the LoanApprovalAgent workflow autonomously decides which tools to call, in what order, and when to stop.
 
 *See [Architecture](#architecture) section for detailed technical information.*
 
@@ -63,9 +65,17 @@ Before deploying this sample, ensure you have:
 
 - **Azure subscription** - With contributor access to create resources
 
-**What gets deployed:** The Deploy to Azure button provisions all required resources (App Service Plan, Logic App Standard, Azure OpenAI with GPT-4.1-mini model, Storage Account, and Managed Identity), configures RBAC permissions, and deploys the agent workflows. No local tools or configuration required. See [Architecture](#architecture) for details.
+**What gets deployed:** The Deploy to Azure button provisions all required resources, configures RBAC permissions, and deploys agent workflows with built-in test scenarios. No local tools, API keys, or external service configuration required.
 
-**Note:** This sample uses mock implementations (static data, simulated API responses) to provide a self-contained learning environment without requiring external service integrations. See [Mock Implementations](#mock-implementations) for details.
+| Resource | Purpose |
+|----------|----------|
+| **Logic App Standard** | Hosts AI agent workflows with autonomous decision-making capabilities |
+| **Azure OpenAI** | Provides GPT-4.1-mini model for agent reasoning. Selected for cost efficiency, low latency, and multi-step tool selection in this agent workflow |
+| **Storage Account** | Stores workflow state, run history, and runtime data |
+| **App Service Plan** | Provides compute resources for Logic App hosting |
+| **Managed Identity** | Enables passwordless authentication (System-Assigned → OpenAI access, User-Assigned → Storage & deployment automation) |
+
+**Note:** This sample includes **pre-configured test scenarios** with built-in data sources for credit checks, employment verification, and banking history. This eliminates external service dependencies required to deploy and explore the sample. See [Extending the Sample](#extending-the-sample) to replace with service integrations.
 
 ---
 
@@ -76,15 +86,14 @@ Click the button below to deploy this sample to your Azure subscription:
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmodularity%2Flogicapps-labs%2Frefs%2Fheads%2Floan-agent-deployment%2Fsamples%2Fai-loan-agent-sample%2F1ClickDeploy%2Fsample-arm.json)
 
 **What happens when you click:**
-1. Opens Azure Portal in your browser
-2. Prompts for:
+1. Opens Azure Portal in your browser and prompts for:
    - Subscription
    - Resource Group (create new recommended: `rg-ailoan`)
    - Region (must support both Azure OpenAI GPT-4.1-mini and Logic Apps Standard - see [Region Selection](#region-selection))
    - Project Name (default: `ailoan`)
-3. Provisions Azure resources
-4. Configures RBAC permissions
-5. Deploys all workflows
+2. Provisions Azure resources
+3. Configures RBAC permissions
+4. Deploys Logic Apps workflows
 
 **After deployment completes:**
 - Navigate to your resource group to see all resources
@@ -94,7 +103,7 @@ Click the button below to deploy this sample to your Azure subscription:
 
 ---
 
-**Deployment time:** Approximately 10-15 minutes.
+**Deployment time:** Approximately 5-10 minutes.
 
 **Having issues?** See the [Troubleshoot](#troubleshoot) section for solutions to common deployment problems.
 
@@ -127,7 +136,7 @@ All resources use your `ProjectName` as the base, with different patterns depend
 
 The deployment requires a region that supports both GPT-4.1-mini in Azure OpenAI and Azure Logic Apps Standard.
 
-**Recommended regions:** East US 2, West US, West US 3, North Central US, South Central US, West Europe, North Europe
+**Recommended regions:** East US 2, West Europe, Italy North, Australia East
 
 For the complete list of regional availability:
 - [Azure OpenAI model availability by region](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability)
@@ -185,7 +194,7 @@ You'll test 4 scenarios that demonstrate different agent behaviors: auto-approva
 ```
 
 **Expected Behavior:**
-- Credit score: 780 (excellent)
+- Credit score: 780 (excellent) - from built-in test data
 - Loan amount: $25K (under $50K threshold)
 - Employment: 5 years (stable, ≥2 years required)
 - No bankruptcy history
@@ -262,7 +271,7 @@ This test shows the agent's ability to handle edge cases with nuanced decision-m
 ```
 
 **Expected Behavior:**
-- Credit score: 580 (below 600 threshold)
+- Credit score: 580 (below 600 threshold) - from built-in test data
 - Bankruptcy: 1 (policy violation)
 - Employment: 0.5 years (below 1 year minimum)
 - Result: **Auto-rejected without extensive verification**
@@ -305,11 +314,11 @@ This demonstrates the agent's efficiency in handling clear-cut rejections withou
 
 **What to Observe:**
 1. **Special Vehicle Detection:** Agent calls "Get special vehicles" tool to check if Ferrari is in luxury vehicle database
-2. **Human Review Tool:** Agent calls "Wait for Human Review" tool (currently mock implementation)
+2. **Human Review Tool:** Agent calls "Wait for Human Review" tool (currently built-in approval logic)
 3. **Complete Verification:** Agent performs full verification (policy, bank history, risk profile) before escalation
 4. **Policy Override:** Even with excellent credit/income, luxury vehicle policy requires human approval
 
-This shows how the agent handles mandatory escalation scenarios. In production, this would integrate with Microsoft Teams Adaptive Cards for real human approval. See [Extending the Sample](#extending-the-sample) to implement real Teams integration.
+This shows how the agent handles mandatory escalation scenarios. In production, this would integrate with Microsoft Teams Adaptive Cards for real human approval. See [Extending the Sample](#extending-the-sample) to implement Teams integration.
 
 [TODO: Screenshot showing Wait for Human Review tool execution in agent log]
 
@@ -333,26 +342,26 @@ Ready to make this sample production-ready? See [Extending the Sample](#extendin
 
 ## Extending the Sample
 
-This sample uses mock data and simulated services to demonstrate AI agent capabilities without external dependencies. To use it with real applications, replace the mock implementations with live integrations.
+This sample uses built-in test scenarios and pre-configured data sources to demonstrate AI agent capabilities without external dependencies. To use it with production applications, replace these built-in components with service integrations.
 
 ### Add Human-in-the-Loop with Teams
 
-Replace the simulated human review with Microsoft Teams Adaptive Cards. When the agent escalates a loan application, it posts an interactive card to your Teams channel where approvers can review details and make decisions.
+Replace the built-in approval logic with Microsoft Teams Adaptive Cards. When the agent escalates a loan application, it posts an interactive card to your Teams channel where approvers can review details and make decisions.
 
 **[→ Follow the Teams Integration Guide](TEAMS-CONNECTOR.md)**
 
 ### Other Integration Options
 
-Beyond human review, you might replace these mock components with:
+Beyond human review, you might replace these built-in components with:
 
-| Component | Current Mock | Integration Options |
+| Component | Current Implementation | Integration Options |
 |-----------|--------------|---------------------|
-| **Human Review** | Simulated decision | Microsoft Teams Adaptive Cards |
-| Email Notifications | Console logs | Office 365 Outlook, SendGrid, Azure Communication Services |
-| Credit Checks | Static scores | Experian, TransUnion, Equifax APIs |
-| Background Checks | Sample data | Checkr, GoodHire APIs |
-| Banking History | Static data | SQL Database, Cosmos DB, Banking APIs |
-| Vehicle Database | Hardcoded list | Kelly Blue Book, NADA, Edmunds APIs |
+| **Human Review** | Conditional approval logic | Microsoft Teams Adaptive Cards |
+| Email Notifications | Notification templates | Office 365 Outlook, SendGrid, Azure Communication Services |
+| Credit Checks | Pre-configured test scores | Experian, TransUnion, Equifax APIs |
+| Background Checks | Built-in test data | Checkr, GoodHire APIs |
+| Banking History | Scenario-based data | SQL Database, Cosmos DB, Banking APIs |
+| Vehicle Database | Static reference list | Kelly Blue Book, NADA, Edmunds APIs |
 
 ### Customize Workflows
 
@@ -462,16 +471,19 @@ Current Limit (WorkflowStandard VMs): 0
 
 ## Architecture
 
-### Deployed Resources
+### Deployment Automation
 
-| Resource | Purpose |
-|----------|---------|
-| **Logic App Standard** | Hosts AI agent workflows |
-| **Azure OpenAI** | GPT-4.1-mini model for autonomous decision-making |
-| **Storage Account** | Workflow state and runtime data |
-| **App Service Plan** | Compute hosting |
-| **Managed Identity** | Passwordless authentication (System-Assigned → OpenAI, User-Assigned → Storage & Deployment Script) |
-| **Deployment Script** | Automates RBAC configuration and workflow deployment (runs once during deployment) |
+The Deploy to Azure button uses a two-stage build and deployment process:
+
+**Build stage** (run manually via [`BundleAssets.ps1`](1ClickDeploy/BundleAssets.ps1)):
+- Compiles [Bicep infrastructure modules](Deployment/infrastructure/) into [`sample-arm.json`](1ClickDeploy/sample-arm.json)
+- Bundles all [workflow definitions](LogicApps/) into [`workflows.zip`](1ClickDeploy/workflows.zip)
+
+**Deployment stage** (triggered by Deploy to Azure button):
+- ARM template provisions Azure resources (Logic App, OpenAI, Storage, etc.)
+- Embedded `deploymentScript` resource assigns RBAC permissions and deploys workflows to Logic App
+
+[Learn more about deployment scripts](https://learn.microsoft.com/azure/azure-resource-manager/bicep/deployment-script-bicep)
 
 ---
 
@@ -557,33 +569,28 @@ flowchart TD
 
 </details>
 
-<details id="mock-implementations">
-<summary><b>Mock Implementations</b></summary>
+<details id="built-in-test-environment">
+<summary><b>Built-in Test Environment</b></summary>
 
-This sample includes mock implementations of external dependencies to provide a self-contained, cost-effective learning environment. 
+This sample provides a **self-contained learning environment** with pre-configured test data, eliminating external service dependencies and additional costs during exploration.
 
 | Component | Implementation | Purpose |
 |-----------|----------------|----------|
-| Credit/Background/Employment Checks | `Compose` actions with static JSON | Simulates verification API responses |
-| Human Approval | Conditional logic based on thresholds | Demonstrates approval workflow pattern |
-| Email Notifications | `Compose` action logging output | Simulates notification without SMTP setup |
-| Banking History | Workflow returning sample data | Demonstrates calling supporting workflows |
-| Vehicle Database | Static lookup data | Demonstrates specialized validation logic |
+| Credit/Background/Employment Checks | `Compose` actions with representative JSON responses | Demonstrates verification service integration patterns without third-party API costs |
+| Human Approval | Conditional logic with configurable thresholds | Shows approval workflow structure ready for Teams Adaptive Card replacement |
+| Email Notifications | `Compose` action with notification template | Illustrates email integration pattern without SMTP configuration |
+| Banking History | Workflow returning scenario-based customer data | Demonstrates modular workflow composition and tool calling |
+| Vehicle Database | Static reference data for luxury vehicle detection | Shows specialized validation logic patterns |
 
-See [Extending the Sample](#extending-the-sample) for integration options with real services.
+**Benefits:**
+- ✅ Zero external API costs during learning phase
+- ✅ Consistent, predictable test scenarios
+- ✅ Instant deployment without service account setup
+- ✅ Clear pathways to replace individual components
+
+See [Extending the Sample](#extending-the-sample) for service integration options.
 
 </details>
-
----
-
-### How Deployment Works
-
-The Deploy to Azure button uses Bicep templates with a `deploymentScripts` resource to automate:
-- Resource provisioning
-- RBAC role assignments for Managed Identity
-- Workflow deployment to Logic App
-
-No manual configuration needed. [Learn more about deploymentScripts](https://learn.microsoft.com/azure/azure-resource-manager/bicep/deployment-script-bicep)
 
 ---
 

@@ -46,14 +46,15 @@ Configure the AI model your agent will use and pass the following as the system 
 Your job is to help the user review online documentation content. Greet the user and ask them for a link to a documentation page. Then fetch the first 2000 characters of the page and pass it to the user.
 ```
 
-[Screenshot here]
+![Screenshot shows configured agent with system prompt.](media/02-add-byo-mcp-tools/configuredAgent.png)
 
 ### Step 2 - Add BYO MCP tool to your agent
 1. Click on the "+" icon and add an MCP tool. The MCP server pane will show up on the right side of your screen.
+![Screenshot shows the button to add an MCP server.](media/02-add-byo-mcp-tools/addMcp.png)
 1. Select "Add MCP Server" to bring your own MCP server to the agent.
-1. Name the connection something that represents this MCP server connection like "FetchMcpServer", select "None" for the authentication option and set the MCP server URL, "https://remote.mcpservers.org/fetch/mcp" and click add.
-
-[Screenshot here]
+![Screenshot shows the button to select a BYO MCP server.](media/02-add-byo-mcp-tools/addByoServerPane.png)
+1. Name the connection something that represents this MCP server connection like "FetchMcpServer", select "None" for the authentication option and set the MCP server URL, "https://remote.mcpservers.org/fetch/mcp" and click create new.
+![Screenshot shows configuring a BYO MCP server.](media/02-add-byo-mcp-tools/configureMcpConnection.png)
 
 ### Step 3 - Use MCP server in agent
 You have successfully added your first MCP server to your agent! Start a chat session with the agent to test out this new capabilities, you can use the following prompt as an example: 
@@ -67,6 +68,8 @@ You have successfully added your first MCP server to your agent! Start a chat se
 The agent might take a few seconds to reply as it fetches the content from the page. This is the reason for the character limit in the system prompt as well.
 Once the agent comes back with the content, we can check the run history to see the execution of the MCP tool.
 
+![Screenshot shows an example chat session.](media/02-add-byo-mcp-tools/chatsession.png)
+
 ### Step 4 - Monitor & Debug
 1. Navigate to the workflow's run history and select the latest run. This will load the run of the chat session you just had.
 
@@ -74,6 +77,8 @@ Once the agent comes back with the content, we can check the run history to see 
 
 1. You can now inspect the inputs of the MCP tool execution which includes the tool from the MCP server that the agent decided to use and the arguments that the agent passed into the tool.
     - The outputs of the tool are the ones returned by the MCP tool itself and should include the content from the documentation page above.
+
+![Screenshot shows the run history.](media/02-add-byo-mcp-tools/runhistory.png)
 
 ## Run History & Monitoring for MCP Tools
 | Pane Element | Description |

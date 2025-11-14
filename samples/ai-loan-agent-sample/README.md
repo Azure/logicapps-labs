@@ -73,7 +73,7 @@ Before deploying this sample, ensure you have:
 
 Click the button below to deploy this sample to your Azure subscription:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpetehauge%2Flogicapps-labs%2Frefs%2Fheads%2Fone-click-deploy%2Fsamples%2Fai-loan-agent-sample%2F1ClickDeploy%2Fsample-arm.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmodularity%2Flogicapps-labs%2Frefs%2Fheads%2Floan-agent-deployment%2Fsamples%2Fai-loan-agent-sample%2F1ClickDeploy%2Fsample-arm.json)
 
 **What happens when you click:**
 1. Opens Azure Portal in your browser
@@ -89,7 +89,10 @@ Click the button below to deploy this sample to your Azure subscription:
 **After deployment completes:**
 - Navigate to your resource group to see all resources
 - Find the Logic App resource: `{projectName}-logicapp`
-- You're ready to explore the agent workflow. See [Testing & Validation](#testing--validation) below.
+- Deployment completes successfully - all resources are provisioned and agent workflows are deployed
+- You're ready to explore the agent workflow. See [Test the AI Agent](#test-the-ai-agent) below.
+
+---
 
 **Deployment time:** Approximately 10-15 minutes.
 
@@ -354,7 +357,7 @@ Beyond human review, you might replace these mock components with:
 ### Customize Workflows
 
 To modify the workflow logic:
-- **Azure Portal:** [Edit workflows in the Azure portal](https://learn.microsoft.com/azure/logic-apps/edit-app-logic-app-designer)
+- **Azure Portal:** [Edit workflows in the Azure portal](https://learn.microsoft.com/azure/logic-apps/create-single-tenant-workflows-azure-portal)
 - **VS Code:** See [`LogicApps/README.md`](LogicApps/README.md) for local development setup
 
 ---
@@ -403,7 +406,7 @@ Current Limit (WorkflowStandard VMs): 0
 - DeploymentScripts resource may be running (provisions workflows + RBAC)
 - Allow up to 15 minutes
 - [View the Activity Log](https://learn.microsoft.com/azure/azure-monitor/essentials/activity-log?tabs=portal#view-and-retrieve-the-activity-log) for details
-- If stuck beyond 15 minutes, [redeploy from resource group deployments](https://learn.microsoft.com/azure/azure-resource-manager/templates/deployment-history?tabs=azure-portal#resource-group-deployments)
+- If stuck beyond 15 minutes, [view deployment history and redeploy](https://learn.microsoft.com/azure/azure-resource-manager/templates/deployment-history?tabs=azure-portal#resource-group-deployments): Go to your resource group → **Deployments** (left menu) → Select the deployment → Click **Redeploy** button
 
 **Missing resources after deployment:**
 - Verify all 5 resources are present: Logic App, OpenAI, Storage, App Service Plan, Managed Identity
@@ -424,7 +427,7 @@ Current Limit (WorkflowStandard VMs): 0
 
 **Workflow runs but no results:**
 - [Review run history](https://learn.microsoft.com/azure/logic-apps/view-workflow-status-run-history?tabs=standard#review-run-history) for specific action failures
-- [Review tool execution data in Agent log](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#review-tool-execution-data) for tool execution errors
+- Review Agent log for tool execution errors: Open workflow run → Expand **Agent loop** action → View **Agent log** output
 - Verify Azure OpenAI model deployment is active (gpt-4.1-mini)
 
 **Agent makes unexpected decisions:**
@@ -554,7 +557,7 @@ flowchart TD
 
 </details>
 
-<details>
+<details id="mock-implementations">
 <summary><b>Mock Implementations</b></summary>
 
 This sample includes mock implementations of external dependencies to provide a self-contained, cost-effective learning environment. 
@@ -588,6 +591,5 @@ No manual configuration needed. [Learn more about deploymentScripts](https://lea
 
 - [Create autonomous agent workflows in Azure Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows)
 - [Best practices for Logic Apps agents and tools](https://learn.microsoft.com/azure/logic-apps/create-autonomous-agent-workflows#best-practices-for-agents-and-tools)
-- [Create AI agent workflows in Azure Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-ai-agent-workflow)
 - [Best practices for Azure OpenAI prompts](https://learn.microsoft.com/azure/ai-services/openai/concepts/system-message)
 - [Managed Identity Authentication in Logic Apps](https://learn.microsoft.com/azure/logic-apps/create-managed-service-identity)

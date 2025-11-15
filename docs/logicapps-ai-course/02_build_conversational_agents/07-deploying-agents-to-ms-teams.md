@@ -8,8 +8,6 @@ author: brbenn
 ms.author: brbenn
 ---
 
-# Module 06 - Deploy your agents to Microsoft Teams
-
 This module demonstrates how to deploy Logic Apps conversational agents to Microsoft Teams, enabling users to interact with intelligent agents directly through Teams chat interface.
 
 When finished with this module, you'll have gained the following knowledge:
@@ -28,8 +26,8 @@ The integration between Microsoft Teams and Logic Apps involves three key compon
 2. **Azure Bot Service** - Intermediate service that handles authentication, schema validation, and message routing
 3. **Custom Proxy Application** - Web application that implements the bot activity protocol and communicates with Logic Apps via A2A (Application-to-Application)
 
-> [!NOTE]
-> Messages don't go directly from Teams to Logic Apps. Instead, they flow through Azure Bot Service, which then forwards them to your custom proxy application that communicates with Logic Apps.
+> :::note
+> Azure Bot Service acts as an intermediary between Microsoft Teams and Azure Logic Apps. It manages authentication, validates schemas, and routes messages. This ensures that communication flows through the service, with no direct interaction between Microsoft Teams and the agentic workflow..
 
 ## Prerequisites
 
@@ -41,30 +39,73 @@ The integration between Microsoft Teams and Logic Apps involves three key compon
 
 ## Step 1: Create Logic App Agent
 
-Ensure you have a Logic Apps agent configured with:
-- Agent workflow with conversation handling
-- OAuth connection configured (if authentication required)
-- A2A (Application-to-Application) endpoint enabled
+1. In the [Azure portal](https://portal.azure.com), find or create a Standard conversational agent workflow.
+   - Ensure you have a Logic Apps agent configured with an Agent workflow with conversation handling
+   - Open our workflow in the **Designer**, click on the **Chat session** trigger and make note of the **Agent URL** - this will be used later when configuring the Proxy app
+   ![Screenshot of standard workflow's agent URL page.](media/07-deploy-agents-to-ms-teams/workflow_agent_url.png)
+2. Configure your app's Easy Auth settings
+   - Go to the **Authentication** settings page under the *Settings** menu
+   ![Screenshot of standard workflow's authentication page.](media/07-deploy-agents-to-ms-teams/workflow_auth.png)
+   - Click **Add an Identity Provider**
+   - On the **Identity provider** drop down select **Microsoft**
+   - For **App registration type** select **Create new app registration**
+   - For **Name** use a name similar to your Logic App's name
+   - For **Client secret expriation** select **Recommended: 180 days**
+   - For **Supported account types** select **Current tenant - Single tenant**
+   - All items under **Additional checks** can be left as their default value
+   - All items under **App Service authentication settings** can be left as their default value
+   - Click **Add**  
+   ![Screenshot of standard workflow's authentication page after save.](media/07-deploy-agents-to-ms-teams/workflow_auth_final.png)
 
-> [!TIP]
-> Test your Logic Apps agent locally first using the Logic Apps designer before proceeding with Teams integration.
+3. Confiure the workflow's AAD App settings
+   - From the **Authentication** page, click the link to the AAD app (this will have the name you used in the **Add an Identity Provider** step)
+   - From the AAD App, click the **Authentication** page under the **Manage** menu group
+ ![Screenshot of AAD authentication page after save.](media/07-deploy-agents-to-ms-teams/aad_app_auth.png)
+   - Under **Web** click **Add URI**
+   - Add the value **https://token.botframework.com/.auth/web/redirect**
+ ![Screenshot of AAD authentication redirection url save.](media/07-deploy-agents-to-ms-teams/aad_auth_redirect.png)
+   - Click **Save**
+   - Go to the **Expose an API** page under the **Manage** menu group
+   - Note the **Scopes** value - this will be used later for the Bot service authentication
+   - Note the **App (client) ID**, and **Tenant ID** - these will be used later for the Bot service authentication 
+
+> :::tip
+> Test your Logic Apps agent in the portal first using the agent URL before proceeding with Teams integration.
 
 ## Step 2: Create Azure Bot Service
-
-1. **Navigate to Azure Portal**
-   - Create a new Azure Bot Service resource
-   - Configure basic settings (name, resource group, subscription)
+1. In the [Azure portal](https://portal.azure.com), create a new Azure Bot
+   ![Screenshot of Azure Bot service create page.](media/07-deploy-agents-to-ms-teams/bot_service_create.png)
+   - Add a **Bot handle**, **Subscription**, and **Resource group**, all other properties can remain set to their default values
+   ![Screenshot of Azure Bot service create with values page.](media/07-deploy-agents-to-ms-teams/bot_create_values.png)
 
 2. **Configure Bot Settings**
-   - Note the **Bot ID** (Microsoft App ID) - you'll need this for Teams manifest
-   - Configure the messaging endpoint (will be updated later with proxy URL)
-   - Set up authentication if required
+   - Once the Bot resource is create navigate to the **Configuration** page under the **Settings** 
+   - Click **Manage Password** next to **Microsoft App ID**
+      - Now on the **Certificates and secrets** page
+      - Click **+ New client secret**. Add a **Description** and keep **Expires** set to its default value.
+      - Click Add
+      ![Screenshot of Azure Bot service create page.](media/07-deploy-agents-to-ms-teams/bot_secret_create.png)
+     - Note the **Bot Secret** value. This will be used later during the Teams manifest update
+   - Back on the Bot resource **Configuration** page, note the **Bot ID** (Microsoft App ID), and **Tenant ID** - you'll need these for Teams manifest later
+   - Create the OAuth connection
+     - From the **Configuration** page click **Add OAuth Connection Settings**
+     - For **Name** use the value **logicapp**
+     - For **Provider** select **Azure Active Directory v2**
+     - For **Client ID** use the **App (client) ID** you noted from the Logic Apps AAD App
+     - For **Client secret**, use the secret value you noted from the Logic Appsw AAD App
+     - The **Token exchange URL** can be left blank
+     - For **Tenant ID**, use the **Tenant ID** value you noted from the Logic App AAD App
+     - For **Scopes**, use the **Scopes** value you noted frorm the Logic App AAD App
+      ![Screenshot of Azure Bot service OAuth create page.](media/07-deploy-agents-to-ms-teams/oauth_create.png)
+     - Click Save
+     - Test the connection
+        - Click the newly created OAuth connection link
+        - On the opened tab, click **Test Connection**
+        ![Screenshot of Azure Bot service OAuth test connection page.](media/07-deploy-agents-to-ms-teams/bot_test_oauth.png)
+        - This will open a page showing a successful connection was made. This the connection fails, review the OAuth connection setup instructions.
+        ![Screenshot of Azure Bot service OAuth test page.](media/07-deploy-agents-to-ms-teams/bot_oauth_test_succeed.png)
 
-3. **Enable Web Chat Channel**
-   - Test the bot service configuration using the built-in web chat
-   - Verify basic connectivity before proceeding to Teams integration
-
-## Step 3: Setup Custom Proxy App
+## Step 3: Setup Custom Proxy App and Deploy
 
 The proxy application bridges the gap between Azure Bot Service and Logic Apps since Logic Apps doesn't directly support the bot activity protocol.
 
@@ -84,165 +125,81 @@ The proxy application bridges the gap between Azure Bot Service and Logic Apps s
    - Enables stateless operation without requiring custom storage
    - Handles conversation lifecycle and error recovery
 
-### Sample Code Structure:
+The proxy app can be found here: ![link to custom proxy app](../../../samples/la-teams-integration)
 
-```csharp
-// Key handler for processing messages
-public async Task OnMessageAsync(ITurnContext<IMessageActivity> turnContext)
-{
-    // Get OAuth token for Logic Apps
-    var token = await GetTokenAsync(turnContext);
-    
-    // Map Teams conversation ID to Logic Apps context
-    var contextId = MapConversationId(turnContext.Activity.Conversation.Id);
-    
-    // Forward message to Logic Apps via A2A
-    var response = await CallLogicAppsAsync(turnContext.Activity.Text, contextId, token);
-    
-    // Send response back to Teams
-    await turnContext.SendActivityAsync(response);
-}
-```
 
-### Configuration Requirements:
+1. Clone the [link to custom proxy app](../../../samples/la-teams-integration) to your local machine
+1. Open the solution in Visual Studio
+1. Open the appsettings.json file
+1. Replace **{{BOT_CLIENT_ID}}** with the Bot ID you noted from the Bot setup section
+1. Replace **{{BOT_TENANT_ID}}** with the Tenant ID you noted from the Bot setup section
+1. Replace **{{BOT_SECRET}}** with Bot secret you noted from the Bot setup section
+1. Replace **{{LOGICAPP_AGENT_URL}}** with the agent URL you noted from the Logic App 
+1. Save the file
 
-- **Feature Flag**: Enable conversation ID mapping (for Ignite candidate branch)
-- **OAuth Configuration**: Configure authentication for Logic Apps access
-- **Endpoint Configuration**: Set up proper routing and error handling
-
-## Step 4: Deploy Proxy App to App Service
-
-### Local Development Setup:
-
-1. **Run Locally First**
-   ```bash
-   # Start the proxy application locally
-   dotnet run
-   ```
-
-2. **Use Dev Tunnels for Testing**
-   - Expose local service to cloud for testing
-   - Configure Azure Bot Service messaging endpoint to use dev tunnel URL
-   - Format: `https://your-dev-tunnel.devtunnels.ms/api/messages`
-
-3. **Test with Web Chat**
-   - Verify authentication flow (sign-in dialog should appear)
-   - Test message exchange and conversation continuity
-   - Check conversation ID mapping functionality
-
-### Production Deployment:
+### Deploy to Azure:
 
 1. **Deploy to Azure App Service**
    ```bash
    # Deploy using Azure CLI or Visual Studio publish
    az webapp deployment source config-zip --resource-group myResourceGroup --name myAppServiceName --src myapp.zip
    ```
+   To publish in Visual Stuio, right-click on the solution and select **Publish**. In the Publish dialog: Choose Azure as the target. Select the specific deployment target (Windows). Follwing the wizard to deploy the application to Azure App Service. 
+   
+   Once deployed, go to the [Azure portal](https://portal.azure.com) and navigate to your App Service resource. Find and note the **default domain** - this values will be used in the next section.
 
-2. **Update Bot Service Configuration**
-   - Update messaging endpoint in Azure Bot Service
-   - Use production App Service URL: `https://your-app-service.azurewebsites.net/api/messages`
+### Update the Bot Service:
 
-3. **Configure Environment Variables**
-   - Set Logic Apps endpoint URLs
-   - Configure OAuth client credentials
-   - Set feature flags for production
+1. **Update Bot Service Configuration**
+   - In the [Azure portal](https://portal.azure.com), navigate to your Bot service.
+   - Go to the **Configuration** page under the **Settings** menu
+   - Update the **Messaging endpoint** with the **default domain** values from the previous set and append the following to the URL: **"/api/messages"**
+   - The URL should have the following structure: `https://your-app-service.azurewebsites.net/api/messages`
+   - Click **Save**
+   - Navigate to the **Channels** page under the **Settings** menu group
+   - Click **Microsoft Teams** channel
+   - Accept terms of service
+   - Click **Apply**
+
 
 ## Step 5: Configure Teams Integration
-
-### Enable Teams Channel:
-
-1. **In Azure Bot Service**
-   - Navigate to Channels section
-   - Click "Microsoft Teams" channel
-   - Accept terms of service
-   - Configure channel settings
-
-### Create Teams App Manifest:
-
-1. **Manifest Structure** (`manifest.json`):
-   ```json
-   {
-     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
-     "manifestVersion": "1.16",
-     "version": "1.0.0",
-     "id": "YOUR_BOT_ID_HERE",
-     "packageName": "com.company.logicappsagent",
-     "developer": {
-       "name": "Your Company Name",
-       "websiteUrl": "https://yourcompany.com",
-       "privacyUrl": "https://yourcompany.com/privacy",
-       "termsOfUseUrl": "https://yourcompany.com/terms"
-     },
-     "name": {
-       "short": "Logic Apps Agent",
-       "full": "Logic Apps Conversational Agent"
-     },
-     "description": {
-       "short": "Intelligent agent powered by Logic Apps",
-       "full": "A conversational AI agent built with Azure Logic Apps that can help with various tasks"
-     },
-     "icons": {
-       "outline": "outline.png",
-       "color": "color.png"
-     },
-     "accentColor": "#FFFFFF",
-     "bots": [
-       {
-         "botId": "YOUR_BOT_ID_HERE",
-         "scopes": [
-           "personal"
-         ],
-         "supportsFiles": false,
-         "isNotificationOnly": false
-       }
-     ],
-     "permissions": [
-       "identity",
-       "messageTeamMembers"
-     ],
-     "validDomains": []
-   }
-   ```
+   
+### Upload Teams App Manifest:
 
 2. **Required Files**:
-   - `manifest.json` (configuration above)
+   - `manifest.json` (configuration file)
    - `color.png` (192x192 color icon)
    - `outline.png` (32x32 outline icon)
 
+3. Update files
+   - Go back to your Visual Studio solution
+   - Open the **manifest.json** file under the **appManifest** folder
+   - Replace **{{BOT_CLIENT_ID}}** with your Bot client ID
+   - Replace **{{BOT_TENANT_ID}}**
+   - Replace **{{AGENT_DISPLAY_NAME_SHORT}}** with **Test Logic App Agent**
+   - Replace **{{AGENT_DISPLAY_NAME_LONG}}** with **Test Logic App Agent**
+   - Save the file
+
 3. **Package Creation**:
-   - Compress all files into a ZIP archive
+   - Compress all files under **appManifest** into a ZIP archive
    - Ensure ZIP contains files at root level (not in subfolder)
 
 ### Sideload Teams App:
 
-1. **Upload to Teams Admin Center**
-   - Navigate to Teams Admin Center > Manage apps
-   - Click "Upload a custom app"
-   - Select your ZIP file
-
-2. **Alternative: Direct Upload in Teams**
+2. **Upload in Teams**
    - In Teams client: Apps > Manage your apps > Upload a custom app
-   - Select "Upload for [your organization]"
+   - Select **Upload for [your organization]**
    - Choose your ZIP file
-
-3. **Test Installation**
-   - Find your app in Teams app store
-   - Click "Add" to install
-   - Test in both personal chat and Copilot contexts
 
 ## Step 6: Testing and Validation
 
 ### Test Scenarios:
+A new chat will appear in you chat list with the name of your bot. Open this chat and type **hello** to being your chat session with your Logic Apps agent.
 
 1. **Basic Conversation**
    - Send simple messages and verify responses
    - Check authentication flow (OAuth sign-in)
    - Verify conversation continuity
-
-2. **Multiple Contexts**
-   - Test in personal chat with bot
-   - Test in Copilot interface (if enabled)
-   - Verify conversation isolation between different contexts
 
 3. **Error Handling**
    - Test with invalid inputs
@@ -255,51 +212,3 @@ public async Task OnMessageAsync(ITurnContext<IMessageActivity> turnContext)
 - **Message Delivery**: Verify Azure Bot Service messaging endpoint
 - **Conversation State**: Ensure conversation ID mapping is working correctly
 - **Teams Manifest**: Validate JSON schema and required fields
-
-## Advanced Configuration
-
-### Conversation Management:
-
-- **Context Isolation**: Each Teams conversation gets unique Logic Apps context ID
-- **State Reset**: Users can reset conversation by canceling Logic Apps runs
-- **Error Recovery**: Failed contexts automatically start new conversations
-
-### Scoping Options:
-
-```json
-"scopes": [
-  "personal",        // One-on-one chats
-  "team",           // Team channels
-  "groupChat"       // Group conversations
-]
-```
-
-### Copilot Integration:
-
-Enable your agent to appear in Microsoft Copilot by adding the `copilotAgents` extension:
-
-```json
-"extensions": [
-  {
-    "requirements": {
-      "copilotAgents": {}
-    }
-  }
-]
-```
-
-## Next Steps
-
-- **Monitor Usage**: Set up Application Insights for the proxy application
-- **Scale Considerations**: Plan for multiple concurrent conversations
-- **Security Review**: Implement proper authentication and authorization
-- **User Training**: Provide documentation for end users on agent capabilities
-
-## Sample Repository
-
-The complete sample code and configuration files are available in the GitHub repository:
-- **Main Branch**: Targets refresh bundle (legacy)
-- **Ignite Candidate Branch**: Latest features with simplified configuration
-
-> [!IMPORTANT]
-> Use the Ignite candidate branch for new implementations as it includes the latest conversation mapping features and simplified setup process.

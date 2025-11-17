@@ -200,7 +200,7 @@ Finally, you will need to replace the `@adminApiKey` with your own. To do this:
 ## Phase 2: Filtered Retrieval and Response Generation
 > :::note
 > Prerequisites for this module are the following:
-> - You have Easy Auth configured. For steps on setting up EasyAuth, follow the guide here [Setting up Easy Auth](../02_build_conversational_agents/04-add-user-context-to-tools.md).
+> - You have Easy Auth configured. For steps on setting up EasyAuth, follow the guide here [Setting up Easy Auth](../02_build_conversational_agents/04-add-user-context-to-tools.mdx).
 
 ### Step 1 - Create the Logic Apps Workflow
 

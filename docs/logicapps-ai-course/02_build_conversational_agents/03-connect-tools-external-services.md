@@ -239,5 +239,5 @@ Here's a recap for the pattern to use:
 ## Related content
 
 - [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md)
-- [Add user context to tools](./04-add-user-context-to-tools.md)
+- [Add user context to tools](./04-add-user-context-to-tools.mdx)
 - [Add MCP tools to your agent](../06_extend_agent_functionality_mcp/01-mcp-overview.mdx)

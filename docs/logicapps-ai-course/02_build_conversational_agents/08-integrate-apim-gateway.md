@@ -1,5 +1,5 @@
 --- 
-title: 08 - Bring Your Own Model
+title: 08 - Integrate Agent Loops with API Management AI Gateway
 description: Learn how to integrate external AI models and local models with Azure Logic Apps using APIM AI Gateway and VNET integration.
 ms.service: logic-apps
 ms.topic: tutorial
@@ -8,40 +8,23 @@ author: brbenn
 ms.author: brbenn
 ---
 
-# Module 08 - Bring Your Own Model
-
-This module explains how to integrate external AI models and local models with your Azure Logic Apps agents, providing flexibility to use models beyond Azure OpenAI Service.
+This module explains how to integrate the APIM Gateway services with your Azure Logic Apps agents, providing flexibility to use models beyond Azure OpenAI Service.
 
 When finished with this module, you'll have gained the following knowledge:
 
 - **APIM AI Gateway Integration**: How to use Azure API Management AI Gateway to connect to external AI models
-- **Local Model Integration**: How to connect to local models using VNET integration
 
 ## The Benefits of Model Flexibility in Enterprise AI Applications
 
 In enterprise AI applications, organizations often need flexibility in choosing AI models based on specific requirements such as compliance, cost optimization, specialized capabilities, or data residency requirements. Azure Logic Apps supports multiple approaches to integrate different AI models, ensuring you can choose the best model for your specific use case.
 
-## Model Integration Approaches
-
-Azure Logic Apps supports three primary approaches for integrating external and local AI models:
-
-### Approach 1: APIM AI Gateway for External Models
+## APIM AI Gateway Integration
 Use Azure API Management AI Gateway to create a unified interface for external AI providers:
 - **Centralized management** of multiple AI model endpoints
 - **Security and authentication** handling for external services
 - **Rate limiting and monitoring** capabilities
 - **Cost optimization** through intelligent routing
 
-### Approach 2: Direct External Model Integration
-Connect directly to external AI model APIs:
-
-### Approach 3: Local Model Integration via VNET
-Connect to on-premises or private cloud AI models using VNET integration:
-- **Private connectivity** to internal AI infrastructure
-- **Compliance and data residency** requirements
-- **Custom or fine-tuned models** hosted internally
-
-## Approach 1: APIM AI Gateway Integration
 
 ## Prerequisites:
 - An Azure account and subscription. If you don't have a subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F).
@@ -50,23 +33,19 @@ Connect to on-premises or private cloud AI models using VNET integration:
 - You have access to an Azure API Management service. For steps on setting this up, follow the guide here [Create an Azure API Management instance](https://learn.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 - You have imported an Azure AI Foundry API to your API Management Instance. For steps on importing Azure AI Foundry API, follow the guide here [Import an Azure AI Foundry API](Import an Azure AI Foundry API - Azure API Management | Microsoft Learn) and select Azure OpenAI under Client Compatibility on the Configure API tab
 
-### Create Connection
+## Create Connection
 
 In the Azure portal, open your Standard logic app resource. Add a new conversational agent workflow in the designer and name it `APIM-Agent`.
 
 Click on the Agent and create a connection or scroll down to Change connection. Configure the following settings:
 
-**Connection Name**: APIM
-
-**Agent Model Source**: APIM GenAI Gateway (Preview)
-
-**Authentication Type**: URL and key-based authentication
-
-**Subscription**: Select your subscription
-
-**Azure API Management Service**: Select your APIM instance
-
-**Azure API Management Service APIs**: Select your API Management API
+**Connection**
+- **Connection Name**: APIM
+- **Agent Model Source**: APIM GenAI Gateway (Preview)
+- **Authentication Type**: URL and key-based authentication
+- **Subscription**: Select your subscription
+- **Azure API Management Service**: Select your APIM instance
+- **Azure API Management Service APIs**: Select your API Management API
 
 **API Endpoint**:
 - Navigate to your APIM instance and click on `APIs` under `APIs` on the left navigation bar
@@ -76,21 +55,12 @@ Click on the Agent and create a connection or scroll down to Change connection. 
 - Switch to `Test` tab.
 - Scroll down to Request URL and copy and paste everything up till and not including /openai. The API Endpoint will look something like this https://NAMEOFAPIMINSTANCE.azure-api.net/NAMEOFAPI
 
-A screenshot of a computer
-
-AI-generated content may be incorrect.
-
 **API Key**:
 - On the Test Tab of your APIM Instance, scroll further down to the `HTTP Request` section
 - In the gray box under HTTP Request, press the eye icon and click elsewhere on the gray box
-
-A close-up of a number
-
-AI-generated content may be incorrect.
-
 - Copy the api-key that appears and paste it in
 
-### Test the Workflow
+## Test the Workflow
 
 Type in the deployment-model for your agent.
 
@@ -102,11 +72,7 @@ Click on the Chat icon and type in `hello`.
 
 The agent should successfully respond.
 
-## Approach 2: Direct External Model Integration
-
-## Approach 3: Local Model Integration via VNET
-
-### Step 3 - Configure Security and Monitoring
+## Configure Security and Monitoring
 
 1. **Network Security**: Ensure proper network security groups (NSGs) are configured to allow traffic only from your Logic Apps subnet.
 2. **Authentication**: Implement proper authentication mechanisms for your local model API.

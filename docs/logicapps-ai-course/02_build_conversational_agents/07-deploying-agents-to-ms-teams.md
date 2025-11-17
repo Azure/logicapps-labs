@@ -125,7 +125,7 @@ The proxy application bridges the gap between Azure Bot Service and Logic Apps s
    - Enables stateless operation without requiring custom storage
    - Handles conversation lifecycle and error recovery
 
-The proxy app can be found here: ![link to custom proxy app](../../../samples/la-teams-integration)
+The proxy app can be found here: [link to custom proxy app](../../../samples/la-teams-integration)
 
 
 1. Clone the [link to custom proxy app](../../../samples/la-teams-integration) to your local machine

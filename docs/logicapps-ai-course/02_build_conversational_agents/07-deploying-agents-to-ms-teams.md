@@ -131,10 +131,11 @@ The proxy app can be found here: [link to custom proxy app](../../../samples/la-
 1. Clone the [link to custom proxy app](../../../samples/la-teams-integration) to your local machine
 1. Open the solution in Visual Studio
 1. Open the appsettings.json file
-1. Replace **{{BOT_CLIENT_ID}}** with the Bot ID you noted from the Bot setup section
-1. Replace **{{BOT_TENANT_ID}}** with the Tenant ID you noted from the Bot setup section
-1. Replace **{{BOT_SECRET}}** with Bot secret you noted from the Bot setup section
-1. Replace **{{LOGICAPP_AGENT_URL}}** with the agent URL you noted from the Logic App 
+1. Replace **BOT_CLIENT_ID** with the Bot ID you noted from the Bot setup section
+1. Replace **BOT_TENANT_ID** with the Tenant ID you noted from the Bot setup section
+1. Replace **BOT_SECRET** with Bot secret you noted from the Bot setup section
+1. Replace **LOGICAPP_AGENT_URL** with the agent URL you noted from the Logic App 
+1. Be sure to replace the brackets "{}" as well
 1. Save the file
 
 ### Deploy to Azure:

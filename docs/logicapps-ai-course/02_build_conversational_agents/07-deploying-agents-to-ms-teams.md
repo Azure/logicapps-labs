@@ -175,10 +175,11 @@ The proxy app can be found here: [link to custom proxy app](../../../samples/la-
 3. Update files
    - Go back to your Visual Studio solution
    - Open the **manifest.json** file under the **appManifest** folder
-   - Replace **{{BOT_CLIENT_ID}}** with your Bot client ID
-   - Replace **{{BOT_TENANT_ID}}**
-   - Replace **{{AGENT_DISPLAY_NAME_SHORT}}** with **Test Logic App Agent**
-   - Replace **{{AGENT_DISPLAY_NAME_LONG}}** with **Test Logic App Agent**
+   - Replace **BOT_CLIENT_ID** with your Bot client ID
+   - Replace **BOT_TENANT_ID**
+   - Replace **AGENT_DISPLAY_NAME_SHORT** with **Test Logic App Agent**
+   - Replace **AGENT_DISPLAY_NAME_LONG** with **Test Logic App Agent**
+   - Be sure to replace the brackets "{}" as well
    - Save the file
 
 3. **Package Creation**:

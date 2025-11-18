@@ -1,5 +1,5 @@
 ---
-title: MCP Overview
+title: 01 - MCP Overview
 description: An overview of the lesson that helps you build and deploy Agents with MCP capabilities in Azure Logic Apps.
 ms.service: logic-apps
 ms.topic: tutorial
@@ -26,7 +26,7 @@ When you finish this module, you'll achieve the goals and complete the tasks in 
 - Monitor and compare MCP tool calls across connector types.
 
 > :::note
-> This module focuses on surfacing tools to agents via MCP. For adding dynamic inputs, see [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md). For extending tool behavior, see [Extend your tool functionality with patterns](../04_agent_functionality/02-extend-tools-with-patterns.md). For user-delegated (OBO) authorization concepts, see [Add user context to tools](../02_build_conversational_agents/04-add-user-context-to-tools.md).
+> This module focuses on surfacing tools to agents via MCP. For adding dynamic inputs, see [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md). For extending tool behavior, see [Extend your tool functionality with patterns](../04_agent_functionality/02-extend-tools-with-patterns.md). For user-delegated (OBO) authorization concepts, see [Add user context to tools](../02_build_conversational_agents/04-add-user-context-to-tools.mdx).
 
 ## Prerequisites
 
@@ -63,7 +63,10 @@ The lessons in this module will assume you are familiar with Azure Logic Apps ag
 | Connector Type | When to use | Characteristics | Auth Options |
 |----------|------------|-----------------|--------------|
 | BYO MCP connector (external MCP server) | You already operate or consume an external MCP server and want direct catalog ingestion. | User supplies base MCP URL + credentials; dynamic tool listing fetched from external host; minimal Azure abstraction. | None, Basic, Client certificate, Active Directory OAuth, Raw, Key, Managed identity. |
-| Managed MCP connector (Azure-hosted) | Fastest path to MCP tools backed by Azure-managed infrastructure and existing managed connectors. | Selection UX mirrors managed API operations; shared connection model; automatic catalog & schema maintenance. | App-only (managed identity), per-user (OBO), API key (where supported). |
-| Custom MCP connector (user-created) | Need private/tenant-scoped MCP server with custom schema/policies not globally available. | OpenAPI/definition you author; only accessible in your subscription; full control over versioning & throttling. | OAuth 2.0 (scoped), API key, Basic, managed identity (internal). |
+| Managed MCP connector (Azure-hosted) | Fastest path to MCP tools backed by Azure-managed infrastructure and existing managed connectors. | Selection UX mirrors managed API operations; shared connection model; automatic catalog & schema maintenance. | Managed identity, API key (where supported). |
+| Custom MCP connector (user-created) | Need private/tenant-scoped MCP server with custom schema/policies not globally available. | OpenAPI/definition you author; only accessible in your subscription; full control over versioning & throttling. | None, Basic, API Key, OAuth 2.0 (Generic, Azure Active Directory, etc..). |
 
-The agent MCP feature is compatible with both autonomous and conversational workflows. The only distinction is that OBO authentication can only be used in conversational workflows, to learn more about OBO, go through the [lesson on adding user context to tools.](../02_build_conversational_agents/04-add-user-context-to-tools.md)
+> :::note
+> The OAuth options on both the managed and custom connectors allow you to configure per-user/on-behalf-of for conversational workflows.
+
+The agent MCP feature is compatible with both autonomous and conversational workflows. The only distinction is that OBO authentication can only be used in conversational workflows, to learn more about OBO, go through the [lesson on adding user context to tools.]( ../02_build_conversational_agents/04-add-user-context-to-tools.mdx)

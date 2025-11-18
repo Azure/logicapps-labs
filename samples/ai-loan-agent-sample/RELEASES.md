@@ -4,23 +4,21 @@ This sample uses GitHub Releases to host `workflows.zip` for 1-click deployment.
 
 ## Release Process
 
-1. **Make local changes**
-   - Run `Deployment/infrastructure/BundleAssets.ps1` to regenerate `workflows.zip`
-   - Update `workflowsZipUrl` in `Deployment/infrastructure/main.bicep` with new version tag:
-     ```bicep
-     workflowsZipUrl: 'https://github.com/modularity/logicapps-labs/releases/download/v1.1.0/workflows.zip'
-     ```
+1. **Make local changes and bundle**
+   - Make changes to workflow files in `LogicApps/` directory
+   - Run `1ClickDeploy/BundleAssets.ps1` to regenerate `workflows.zip` and `sample-arm.json`
+   - Commit and push all changes
 
-2. **Push changes**
-   - Commit and push workflow source files and updated Bicep file to git
-
-3. **Publish release**
+2. **Publish release**
    - Go to https://github.com/modularity/logicapps-labs/releases
    - Click "Draft a new release"
-   - Create tag matching Bicep URL (e.g., `v1.1.0`)
+   - Create version tag (e.g., `v1.0.2`)
    - Add release title and notes documenting changes
+   - **Check "Set as the latest release"** (required - Bicep points to `/releases/latest/`)
    - Attach `1ClickDeploy/workflows.zip` to the release
    - Click "Publish release"
+
+**Note:** `main.bicep` uses `/releases/latest/download/workflows.zip`, so you don't need to update version numbers in the Bicep file. Just ensure your new release is marked as "latest".
 
 ## Why Attach workflows.zip to Releases?
 

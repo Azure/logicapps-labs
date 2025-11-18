@@ -97,7 +97,7 @@ Click the button below to deploy this sample to your Azure subscription:
 
 **After deployment completes:**
 - Navigate to your resource group to see all resources
-- Find the Logic App resource: `{projectName}-logicapp`
+- Find the Logic App resource: `{projectName}{uniqueId}-logicapp`
 - Deployment completes successfully - all resources are provisioned and agent workflows are deployed
 - You're ready to explore the agent workflow. See [Test the AI Agent](#test-the-ai-agent) below.
 
@@ -154,11 +154,11 @@ Now that your sample is deployed, let's explore how the AI agent makes loan deci
 
 1. Navigate to [Azure Portal](https://portal.azure.com)
 2. Go to your resource group (e.g., `rg-ailoan`)
-3. Open your Logic App resource (e.g., `ailoan-logicapp`)
+3. Open your Logic App resource (e.g., `ailoanxyz123abc-logicapp`)
 4. In the left menu: **Workflows** → Click **LoanApprovalAgent**
 5. Click **Designer** in the left sidebar to open the workflow designer
 
-[TODO: Screenshot showing workflow designer navigation]
+![Workflow Designer Navigation](./images/navigate-to-designer.png)
 
 ### Test the AI Agent
 
@@ -173,6 +173,8 @@ You'll test 4 scenarios that demonstrate different agent behaviors: auto-approva
 5. Click **Run history** in the left sidebar under **Tools** section
 6. The **Run history** tab shows recent runs - click the most recent **Identifier** to open details
 7. Review the **Agent log** and individual action inputs/outputs
+
+![Agent Log Tool Execution Sequence](./images/agent-log-history.png)
 
 <details>
 <summary><b>Test 1: Auto-Approval</b></summary>
@@ -210,8 +212,6 @@ You'll test 4 scenarios that demonstrate different agent behaviors: auto-approva
    - No "Wait for Human Review" tool called (policy criteria met)
 3. **Workflow Actions:** Click through the Loan Agent action iterations to see each tool execution
 4. **Policy Match:** Agent identifies this meets auto-approval policy: Credit≥700, Loan≤$50K, Employment≥2yr, No bankruptcy
-
-[TODO: Screenshot showing agent log with tool execution sequence for auto-approval]
 
 </details>
 
@@ -319,8 +319,6 @@ This demonstrates the agent's efficiency in handling clear-cut rejections withou
 4. **Policy Override:** Even with excellent credit/income, luxury vehicle policy requires human approval
 
 This shows how the agent handles mandatory escalation scenarios. In production, this would integrate with Microsoft Teams Adaptive Cards for real human approval. See [Extending the Sample](#extending-the-sample) to implement Teams integration.
-
-[TODO: Screenshot showing Wait for Human Review tool execution in agent log]
 
 </details>
 
@@ -433,6 +431,12 @@ Current Limit (WorkflowStandard VMs): 0
 - [Assign role-based access to Managed Identity](https://learn.microsoft.com/azure/logic-apps/authenticate-with-managed-identity?tabs=standard#assign-role-based-access-to-a-managed-identity-using-the-azure-portal):
   - System-Assigned Identity → OpenAI: "Cognitive Services OpenAI User"
   - User-Assigned Identity → Storage: "Storage Blob Data Owner", "Storage Queue Data Contributor", "Storage Table Data Contributor"
+
+**"ajaxExtended call failed" error when running workflow:**
+- This error can occur with the workflow trigger after deployment
+- Solution: Rename the trigger action (e.g., from "manual" to "manual2"), save the workflow, then rename it back to the original name "manual" and save again
+- After this workaround, run the workflow with payload - the error should be resolved
+- [Learn more about this issue](https://learn.microsoft.com/en-us/answers/questions/2046895/ajaxextended-call-failed-run-with-payload)
 
 **Workflow runs but no results:**
 - [Review run history](https://learn.microsoft.com/azure/logic-apps/view-workflow-status-run-history?tabs=standard#review-run-history) for specific action failures

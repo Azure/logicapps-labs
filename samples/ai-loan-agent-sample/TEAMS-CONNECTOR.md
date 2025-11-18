@@ -69,19 +69,21 @@ When prompted to create a new connection:
 
 ### 2.4 Configure the Teams Action
 
-Fill in the action parameters:
+First, rename the action to help the AI agent understand its purpose:
+
+1. Click the action title at the top (next to the Teams icon)
+2. Change it to: `WaitForHumanReview_TeamsChannel`
+3. **Note:** This name follows Logic Apps naming conventions (verb-first, task-focused) and helps the AI agent understand when to call this tool during workflow execution
+
+Next, configure where and how the approval card will be posted:
 
 - **Post as:** Flow bot
 - **Post in:** Channel
+- **Message:** Paste the Adaptive Card JSON from the [card template section](#adaptive-card-template) below
 - **Team:** Select your target team from the dropdown list
 - **Channel:** Select your target channel from the dropdown list
-- **Message:** Paste the Adaptive Card JSON from the [card template section](#adaptive-card-template) below
 
-**Rename the action:**
-1. Click the action title at the top (next to the Teams icon)
-2. Change it to: `Teams channel`
-
-**Important:** The Teams action will return an output with a `data` object containing the `decision` field. When the user clicks a button, the value will be either `"APPROVED"` or `"REJECTED"`. You can access this in subsequent actions using `@{outputs('Wait for human review from Teams channel')?['body']?['data']?['decision']}`
+**Important:** The Teams action will return an output with a `data` object containing the `decision` field. When the user clicks a button, the value will be either `"APPROVED"` or `"REJECTED"`. You can access this in subsequent actions using `@{outputs('WaitForHumanReview_TeamsChannel')?['body']?['data']?['decision']}`
 
 ### 2.5 Save Workflow
 

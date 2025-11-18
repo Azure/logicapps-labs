@@ -125,12 +125,12 @@ The proxy application bridges the gap between Azure Bot Service and Logic Apps s
    - Enables stateless operation without requiring custom storage
    - Handles conversation lifecycle and error recovery
 
-The .NET proxy app can be found here: [link to custom dotnet proxy app](../../../samples/teams-agent-integration-dotnet/)
-The TypeScript app can be found here: [link to custom typescript proxy app](../../../samples/teams-agent-integration-ts/)
+The .NET proxy app can be found here: [link to custom dotnet proxy app](https://github.com/Azure/logicapps-labs/tree/main/samples/teams-agent-integration-dotnet/)
+The TypeScript app can be found here: [link to custom typescript proxy app](https://github.com/Azure/logicapps-labs/tree/main/samples/teams-agent-integration-ts/)
 This guide will use the dotnet app.
 
 
-1. Clone the [link to custom proxy app](../../../samples/la-teams-integration) to your local machine
+1. Clone the [link to custom proxy app](https://github.com/Azure/logicapps-labs/tree/main/samples/teams-agent-integration-dotnet/) to your local machine
 1. Open the solution in Visual Studio
 1. Open the appsettings.json file
 1. Replace **BOT_CLIENT_ID** with the Bot ID you noted from the Bot setup section

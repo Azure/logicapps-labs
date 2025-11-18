@@ -14,7 +14,7 @@ contacts:
 ---
 
  **Authors:**
-[Carl Andrews - Microsoft](www.linkedin.com), [John Smith - Contoso](www.linkedin.com)
+[Carl Andrews - Microsoft](https://www.linkedin.com), [John Smith - Contoso](https://www.linkedin.com)
 
 ## High-level architecture
 

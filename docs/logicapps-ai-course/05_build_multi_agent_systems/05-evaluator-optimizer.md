@@ -57,7 +57,7 @@ We'll build a workflow that uses the evaluator-optimizer pattern to iteratively 
 - A Standard logic app resource with agent capabilities enabled.
 - Completion of previous modules in the conversational agents and autonomous agents series.
 
-If you don't have this setup, see [Module 1 - Create your first conversational agent](../02_build_conversational_agents/01-create-first-conversational-agent.md) and [Module 1 - Create your first autonomous agent](../03_build_autonomous_agents/01-create-first-autonomous-agent.md)
+If you don't have this setup, see [Module 1 - Create your first conversational agent](../02_build_conversational_agents/01-create-first-conversational-agent.mdx) and [Module 1 - Create your first autonomous agent](../03_build_autonomous_agents/01-create-first-autonomous-agent.mdx)
 
 ## Build a Basic Evaluator-Optimizer Workflow
 

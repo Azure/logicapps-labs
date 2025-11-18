@@ -39,7 +39,7 @@ When users interact with your agent, Logic Apps applies security filters before 
 > Prerequisites for this phase are the following:
 > - You have access to an Azure Storage Account resource. For steps on setting this resource up, follow the guide here [Create an Azure storage account](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal).
 > - You have created a new container in your Azure Storage Account resource. For steps on creating a container, follow the guide here [Manage blob containers using the Azure portal](https://learn.microsoft.com/en-us/azure/storage/blobs/blob-containers-portal?source=recommendations)
-> - You have uploaded interns and employees folder to the container in your Azure Storage Account resource. The folders used in this module can be downloaded here: [employees folder](media/07-add-security-filters-for-agent-knowledge-trimming/employees) and [interns folder](media/07-add-security-filters-for-agent-knowledge-trimming/interns) in the container in your Azure Storage Account resource.
+> - You have uploaded interns and employees folder to the container in your Azure Storage Account resource. The folders used in this module can be downloaded here: [employees folder in zip format](/files/employees.zip) and [interns folder](/files/interns.zip) in the container in your Azure Storage Account resource.
 > - You have access to an Azure OpenAI Service with a deployed text embeddings model. For more on creating this service, visit [Explore Azure OpenAI in Azure AI Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/tutorials/embeddings?source=recommendations&tabs=command-line%2Cpython-new&pivots=programming-language-python).
 > - You have access to an Azure AI Search service. For more on creating this resource visit here [Create an Azure AI Search service](https://learn.microsoft.com/en-us/azure/search/tutorial-optimize-indexing-push-api#create-an-azure-ai-search-service).
 > - You have configured an Azure AI Search service connection to the Azure Storage account using a managed identity : [Connect to Azure Storage using a managed identity (Azure AI Search)](https://learn.microsoft.com/en-us/azure/search/search-howto-managed-identities-storage)
@@ -200,7 +200,7 @@ Finally, you will need to replace the `@adminApiKey` with your own. To do this:
 ## Phase 2: Filtered Retrieval and Response Generation
 > :::note
 > Prerequisites for this module are the following:
-> - You have Easy Auth configured. For steps on setting up EasyAuth, follow the guide here [Setting up Easy Auth](../02_build_conversational_agents/04-add-user-context-to-tools.md).
+> - You have Easy Auth configured. For steps on setting up EasyAuth, follow the guide here [Setting up Easy Auth](../02_build_conversational_agents/04-add-user-context-to-tools.mdx).
 
 ### Step 1 - Create the Logic Apps Workflow
 

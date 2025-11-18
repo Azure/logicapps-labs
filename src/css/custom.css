@@ -53,6 +53,10 @@
   --ms-warning-bg: #fff4ce;   /* M365 warning background */
   --ms-warning-border: #ffb900;
 
+  --ms-tab-group-bg: var(--ms-surface);
+  --ms-tab-hover-bg: var(--ms-surface);
+  --ms-tab-active-bg: var(--ms-surface);
+
   /* Admonitions / Docusaurus alerts styling mapped to MS variables */
 
 /* base alert/admonition look */
@@ -131,6 +135,20 @@
   --ms-code-border: #2a2a2a;
   --ms-table-header-bg: #161616;
   --ms-table-row-alt: #141414;
+}
+
+@supports (color-mix(in srgb, red 50%, white 50%)) {
+  :root {
+    --ms-tab-group-bg: color-mix(in srgb, var(--ms-surface) 96%, var(--ifm-color-primary) 4%);
+    --ms-tab-hover-bg: color-mix(in srgb, var(--ms-surface) 92%, var(--ifm-color-primary) 8%);
+    --ms-tab-active-bg: color-mix(in srgb, var(--ms-surface) 85%, var(--ifm-color-primary) 15%);
+  }
+
+  :root[data-theme='dark'] {
+    --ms-tab-group-bg: color-mix(in srgb, var(--ms-surface) 94%, var(--ifm-color-primary) 6%);
+    --ms-tab-hover-bg: color-mix(in srgb, var(--ms-surface) 90%, var(--ifm-color-primary) 10%);
+    --ms-tab-active-bg: color-mix(in srgb, var(--ms-surface) 82%, var(--ifm-color-primary) 18%);
+  }
 }
 
 /* Global base font size */
@@ -389,4 +407,64 @@ button[aria-label="Close navigation bar"] {
 button[aria-label="Close navigation bar"] svg {
   width: 16px; /* Smaller icon size */
   height: 16px;
+}
+
+/* Tabs styled to align with Microsoft Learn look */
+.tabs-container {
+  border: 1px solid var(--ms-border);
+  border-radius: 12px;
+  background: var(--ms-tab-group-bg);
+  box-shadow: 0 1px 2px rgba(15, 20, 25, 0.08);
+  overflow: hidden;
+}
+
+.tabs-container .tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0.6rem 1.25rem 0;
+  border-bottom: 1px solid var(--ms-border);
+  background: var(--ms-tab-group-bg);
+}
+
+.tabs-container .tabs__item {
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.4rem 0.9rem 0.6rem;
+  font-weight: 500;
+  color: var(--ms-text-muted);
+  background: transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tabs-container .tabs__item:hover {
+  color: var(--ms-text);
+}
+
+.tabs-container .tabs__item--active {
+  color: var(--ms-text);
+  border-bottom-color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+.tabs-container .tabs__item:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.tabs-container > :not(.tabs) {
+  margin: 0;
+  padding: 1.15rem 1.25rem 1.25rem;
+  background: var(--ms-surface);
+}
+
+.tabs-container > :not(.tabs):last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+.tabs-container > :not(.tabs) [class^="tabItem_"],
+.tabs-container > :not(.tabs) [class*=" tabItem_"] {
+  margin: 0;
 }

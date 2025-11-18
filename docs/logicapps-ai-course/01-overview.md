@@ -31,6 +31,28 @@ Here are the main reasons to choose Azure Logic Apps when you build agentic work
 
 An agent loop is the orchestration pattern where an agent receives input (user message or event), decides on an action (generate text, call a tool, ask a clarification), executes that action, and then repeats this loop while maintaining context. In Azure Logic Apps, you implement the loop as a combination of model prompts, workflow logic, and connector actions so the agent can safely interact with external systems and persist progress.
 
+The Agent loop functionality is supported across both Consumption and Standard Logic Apps. The following section provides a detailed comparison of the capabilities available in each SKU. 
+
+## Comparison of Agentic Capabilities between Consumption and Standard Logic Apps
+
+The table below presents a side-by-side comparison of the agentic features provided in Consumption Logic Apps versus those available in Standard Logic Apps. 
+Every module in this lab contains separate tabs wherever applicable, outlining the steps for both Consumption and Standard SKUs.
+
+
+| Feature | Consumption | Standard |
+|---------|-------------|----------|
+| **Prerequisites** | Azure subscription | Azure Subscription and Azure OpenAI Service resource |
+| **Model hosting** | HOBO (Hosted on behalf of) - Model is hosted on Microsoft's Subscription | BYOM (Bring your own model) - Customer brings the model hosted on their subscription |
+| **Supported Models** | Default model of the specific region | Any model hosted on customer's Foundry resource |
+| **VNET support** | No | Yes |
+| **Chat interface authentication** | OAuth | EasyAuth |
+| **Billing** | [Note – This feature is in Public Preview. During the preview, Pricing is subject to change]<br/><br/>Agent Loop billing is based on token consumption and uses the existing Enterprise Connector Unit meter. This means your Agent Loop usage will appear as Enterprise Units on your bill.<br/><br/>Pricing would be $1.75 per 1M input tokens, and $14 per 1M output tokens. | Although agent workflows don't incur extra charges in Azure Logic Apps, model usage in Azure OpenAI Service and Azure AI Foundry projects incur charges.<br/><br/>Reference: [Agent workflows concepts - Billing](https://learn.microsoft.com/en-us/azure/logic-apps/agent-workflows-concepts#billing) |
+| **Throttling** | The Agent action would be throttled based on the number of token usage | No throttling for agent Action |
+| **Supported Regions** | West Europe and West US (More regions will be added soon). | Any region supported by AI foundry- [Azure AI Foundry feature availability across clouds regions - Azure AI Foundry](https://learn.microsoft.com/azure/ai-studio/reference/region-support) |
+| **Regional data residency** | No, the model can be picked from any region | Model is hosted in customer specified region and customer's subscription |
+| **Use cases** | Faster and cost effective scenarios | High performance and compliance scenarios |
+| **Local Development experience** | Not available | Available through VSCode |
+
 ## Conversational vs autonomous agents
 
 This course provides a module for a conversational agents - systems that engage in back-and-forth interactions with a user (chat, help desk scenarios, guided workflows). It follows with a module discussing autonomous agents, which take independent action on behalf of a user or system. Both models share patterns that the Azure Logic Apps engine provides out-of-the-box:
@@ -60,13 +82,13 @@ This course will help you create your first conversational agent. Starting from 
 
 This module teaches you how to create interactive agents that engage in back-and-forth conversations with users. You'll learn to build your first conversational agent using Azure Logic Apps, connect it to Azure OpenAI models, add tools for external service integration, incorporate user context, and deploy complete chat solutions. The module focuses on session-based interactions, debugging techniques, and the agent-to-agent (A2A) protocol for seamless communication.
 
-[Start with: Build your first conversational agent](02_build_conversational_agents/01-create-first-conversational-agent.md)
+[Start with: Build your first conversational agent](02_build_conversational_agents/01-create-first-conversational-agent.mdx)
 
 ### Build Autonomous Agents
 
 This module focuses on creating independent agents that can take actions without continuous user interaction. You'll learn to build autonomous agents that monitor events, make decisions, and execute tasks automatically. The module covers integrating with various triggers, connecting to Azure OpenAI or Azure Foundry models, and implementing tools that enable agents to interact with external systems while maintaining proper governance and error handling for long-running operations.
 
-[Start with: Build your first autonomous agent](03_build_autonomous_agents/01-create-first-autonomous-agent.md)
+[Start with: Build your first autonomous agent](03_build_autonomous_agents/01-create-first-autonomous-agent.mdx)
 
 ### Extend Agents functionality
 
@@ -79,3 +101,9 @@ This module expands your agents' capabilities by teaching advanced tool configur
 This module teaches you to orchestrate multiple specialized agents working together to handle complex scenarios. You'll learn various coordination patterns including prompt chaining, parallelization, routing, evaluator-optimizer loops, orchestrator-worker architectures, and handoff patterns. The module emphasizes reliability, maintainability, and scalability advantages of distributed agent systems over monolithic approaches, with practical implementations using Azure Logic Apps.
 
 [Start with: Multi-agent workflow patterns overview](05_build_multi_agent_systems/01-build-multi-agent-sysystem.md)
+
+### Extend Agents functionality with MCP capabilities
+
+This module expands your agents with MCP tool capabilities. You'll learn to configure MCP servers for your agent to use including bringing your own (BYO) external MCP servers, managed MCP servers, and custom MCP servers. This will allow you to expand the set of tools that your agent can use with minimal configuration.
+
+[Start with: MCP Overview](06_extend_agent_functionality_mcp/01-mcp-overview.mdx)

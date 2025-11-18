@@ -180,7 +180,7 @@ Use minimal python libraries for completing the task. Print the result to the st
 
     ![Screenshot shows monitoring view with successful Python code execution](media/06-extend-tools-with-code/python_code_result.png)
 
-For more information, see [Module 2 - Debug your agent](../02_build_conversational_agents/02-debug-agent.md).
+For more information, see [Module 2 - Debug your agent](../02_build_conversational_agents/02-debug-agent.mdx).
 
 ## How to use other custom code actions in agent context
 The JavaScript, C#, and PowerShell actions can also be used within an agent workflow. The user can supply their own code or allow the LLM to generate it. 

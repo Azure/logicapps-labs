@@ -77,6 +77,9 @@ resource workflowDeploymentScript 'Microsoft.Resources/deploymentScripts@2023-08
         --name "$LOGIC_APP_NAME" \
         --src workflows.zip
       
+      echo "Waiting 60 seconds for workflow registration and RBAC propagation..."
+      sleep 60
+      
       echo "Deployment completed successfully"
     '''
   }

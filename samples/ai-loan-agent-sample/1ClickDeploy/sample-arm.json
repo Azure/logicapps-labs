@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.177.2456",
-      "templateHash": "8379086736973324448"
+      "templateHash": "2066435732091796499"
     }
   },
   "parameters": {
@@ -593,7 +593,7 @@
             "value": "[resourceGroup().name]"
           },
           "workflowsZipUrl": {
-            "value": "https://github.com/petehauge/logicapps-labs/raw/refs/heads/one-click-deploy/samples/ai-loan-agent-sample/1ClickDeploy/workflows.zip"
+            "value": "https://github.com/modularity/logicapps-labs/releases/latest/download/workflows.zip"
           }
         },
         "template": {

@@ -88,7 +88,7 @@ module workflowDeployment 'modules/deployment-script.bicep' = {
     deploymentIdentityPrincipalId: userAssignedIdentity.properties.principalId
     logicAppName: logicApp.outputs.name
     resourceGroupName: resourceGroup().name
-    workflowsZipUrl: 'https://github.com/modularity/logicapps-labs/releases/download/v1.0.0/workflows.zip'
+    workflowsZipUrl: 'https://github.com/modularity/logicapps-labs/releases/download/v1.0.1/workflows.zip'
   }
   dependsOn: [
     storageRbac

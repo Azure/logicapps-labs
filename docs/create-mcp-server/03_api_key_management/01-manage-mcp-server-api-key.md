@@ -12,6 +12,8 @@ In this module, you will learn how to manage the API Key for your MCP server in 
 
 We will use open source HTTP client [Bruno](https://www.usebruno.com/) for this lab.
 
+To call the APIs from Bruno, you will need Bearer token. You can get it from [ARMClient](https://github.com/projectkudu/ARMClient). Install it, login and get token by calling `armclient.exe token {subscriptionId}`
+
 ### 1. Retrieve API Key for MCP Server 🔑
 
 To obtain an API key, call the following endpoint with the query parameter `getApikey=true`
@@ -19,6 +21,12 @@ To obtain an API key, call the following endpoint with the query parameter `getA
 **REST** Endpoint: POST /listMcpServerUrl
 
 **POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServerUrl?api-version=2021-02-01&getApikey=true>
+
+If you have MCP Servers with name and description, then you can use this for getting correct MCP server url.
+
+**REST** Endpoint: POST /listMcpServers
+**POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01&getApikey=true>
+
 
 #### ✅ Request Body (JSON) - Optional
 
@@ -40,9 +48,9 @@ Request Body is optional and can take 2 properties
 
 ```json
 {
-  "value": "https://{LAName}.azurewebsites.net/api/mcp",
+  "value": "https://{LAName}.azurewebsites.net/api/mcpservers/{serverName}/mcp",
   "method": "POST",
-  "basePath": "https://{LAName}.azurewebsites.net/api/mcp",
+  "basePath": "https://{LAName}.azurewebsites.net/api/mcpservers/{serverName}/mcp",
   "headers": {
       "X-API-Key": "sanitized"
   }
@@ -92,4 +100,3 @@ Use the API Key Auth type when you try to add MCP Server to Agent Loop. Check ou
 
 **Command:**
 `claude mcp add --transport http MyKeybasedLogicAppMcpServer https://arjun-wcus-mcpserver.azurewebsites.net/api/mcp --header "X-API-Key:*sanitized*"`
-

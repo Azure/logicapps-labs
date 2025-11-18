@@ -24,7 +24,7 @@ When you finish this module, you'll achieve the goals and complete the tasks in 
 
 - A Standard logic app resource and a conversational agent workflow with the model that you set up in previous modules.
 
-  If you don't have this workflow, see [Create your first conversational agent](01-create-first-conversational-agent.md).
+  If you don't have this workflow, see [Create your first conversational agent](01-create-first-conversational-agent.mdx).
 
 ## Communicate between agents and clients with the A2A protocol
 
@@ -65,7 +65,7 @@ In this section we will review the trigger parameters and authentication methods
 Azure Logic Apps conversational agents support two authentication methods:
 
 - **API key-based authentication**: This is the default method. The API key (also referred to as the developer key) must be included in the X-API-Key header for any communication with the agent.
-- **App Service authentication (EasyAuth)**: If EasyAuth is configured on the logic app, it takes precedence over API key-based authentication. This method is typically used when OAuth flows or on-behalf-of (OBO) scenarios are required, such as interacting with connectors that require user context (explained in [Add user context to your tools](./04-add-user-context-to-tools.md).
+- **App Service authentication (EasyAuth)**: If EasyAuth is configured on the logic app, it takes precedence over API key-based authentication. This method is typically used when OAuth flows or on-behalf-of (OBO) scenarios are required, such as interacting with connectors that require user context (explained in [Add user context to your tools](./04-add-user-context-to-tools.mdx).
 
 ## Learn about agent discovery and agent cards
 
@@ -128,7 +128,7 @@ The [A2A specification](https://a2a-protocol.org/latest/specification/) dictates
 - [`message/stream`](https://a2a-protocol.org/latest/specification/#72-messagestream): Sends a message to an agent to initiate/continue a task AND subscribes the client to real-time updates for that task via Server-Sent Events (SSE). Azure Logic Apps conversational agents support streaming.
 
 > :::note
-> Our internal chat client (described in [Create your First Conversational Agent](./01-create-first-conversational-agent.md)) uses the message/stream API for communicating with the conversational agent.
+> Our internal chat client (described in [Create your First Conversational Agent](./01-create-first-conversational-agent.mdx)) uses the message/stream API for communicating with the conversational agent.
 > Chat clients prefer streaming over polling APIs for the following reasons:
 > - Faster feedback and reduced Wait time.
 > - Improved perception of transparency and trust.
@@ -476,7 +476,7 @@ We can see the agent returned the task object with the final assistant message: 
 
 ## Communicating with an Azure Logic Apps workflow that uses a OBO connections
 
-This section shows how to use the [A2A Python SDK](https://github.com/a2aproject/a2a-python) to connect to an Azure Logic Apps agent using dynamic connections (OBO) as described in - [Add user context to tools](./04-add-user-context-to-tools.md).
+This section shows how to use the [A2A Python SDK](https://github.com/a2aproject/a2a-python) to connect to an Azure Logic Apps agent using dynamic connections (OBO) as described in - [Add user context to tools](./04-add-user-context-to-tools.mdx).
 
 Use this POST call to get the developer key:
 
@@ -485,7 +485,7 @@ POST https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/
 ```
 
 > :::note
-> This developer key is recommended for development use only. Configure Easy Auth and use the chat client for production purposes as described in the extension module -  [Add user context to tools](./04-add-user-context-to-tools.md).
+> This developer key is recommended for development use only. Configure Easy Auth and use the chat client for production purposes as described in the extension module -  [Add user context to tools](./04-add-user-context-to-tools.mdx).
 
 In addition to the API key shown in the previous section, we need to pass in the developer key in the **x-ms-obo-userToken** header to communicate with dynamic connections.
 
@@ -663,5 +663,5 @@ Sample response:
 ## Related content
 - [Latest A2A protocol Specification](https://a2a-protocol.org/latest/specification/)
 - [A2A Python SDK reference](https://a2a-protocol.org/latest/sdk/python/api/)
-- [Module 01 — Create First Conversational Agent](./01-create-first-conversational-agent.md)
+- [Module 01 — Create First Conversational Agent](./01-create-first-conversational-agent.mdx)
 - [Module 03 - Connect your tools to external services](./03-connect-tools-external-services.md)

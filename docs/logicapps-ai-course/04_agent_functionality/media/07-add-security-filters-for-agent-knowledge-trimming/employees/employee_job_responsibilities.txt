@@ -1,3 +1,0 @@
-Senior software engineers own architecture and end-to-end features, 
-lead technical decisions, mentor others, and participate 
-in on-call incident response to drive long-term product and team outcomes.

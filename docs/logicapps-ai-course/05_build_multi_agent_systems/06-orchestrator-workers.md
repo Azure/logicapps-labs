@@ -69,7 +69,7 @@ This orchestrator agent coordinates three specialized worker agents:
 - A Standard logic app resource with agent capabilities enabled.
 - Completion of previous modules in the conversational agents series.
 
-If you don't have this setup, see [Module 1 - Create your first conversational agent](../02_build_conversational_agents/01-create-first-conversational-agent.md).
+If you don't have this setup, see [Module 1 - Create your first conversational agent](../02_build_conversational_agents/01-create-first-conversational-agent.mdx).
 
 ## Build a Basic Orchestrator-Workers Workflow
 

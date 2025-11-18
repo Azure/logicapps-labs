@@ -58,7 +58,7 @@ The following table helps map the relationship between connector operations and 
 
 - A Standard logic app resource and a conversational agent workflow with the model that you set up in previous modules.
 
-  If you don't have this workflow, see [Module 01 - Create your first conversational agent](01-create-first-conversational-agent.md).
+  If you don't have this workflow, see [Module 01 - Create your first conversational agent](01-create-first-conversational-agent.mdx).
 
   For the examples, this workflow can use the following options:
 
@@ -149,7 +149,7 @@ To more easily demonstrate the conversational agent pattern from end to end, thi
 
    ![Screenshot shows monitoring view with successful tool and action call.](media/03-connect-tools-external-services/weather-monitoring-view.png)
 
-For more information, see [Module 02 - Debug your agent](02-debug-agent.md).
+For more information, see [Module 02 - Debug your agent](02-debug-agent.mdx).
 
 ## Part 2 (optional): Expose an authenticated connector as a tool (GitHub)
 
@@ -239,4 +239,5 @@ Here's a recap for the pattern to use:
 ## Related content
 
 - [Add parameters to your tools](../04_agent_functionality/01-add-parameters-to-tools.md)
-- [Add user context to tools](./04-add-user-context-to-tools.md)
+- [Add user context to tools](./04-add-user-context-to-tools.mdx)
+- [Add MCP tools to your agent](../06_extend_agent_functionality_mcp/01-mcp-overview.mdx)

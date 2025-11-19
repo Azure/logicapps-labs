@@ -1,6 +1,6 @@
 ---
-title: 01 - Manage API key for your MCP Server in Azure Logic Apps
-description: Learn how to manage the API Key for your MCP server in Azure Logic Apps. Retrieve an expiring APIKey using primary or secondary access key and also learn how to rotate it.
+title: 01 - Create Custom Connector on MCP Server for Agent Loop.
+description: Learn how to Create Custom Connector on MCP Server for Agent Loop.
 ms.service: logic-apps
 ms.topic: tutorial
 ms.date: 11/17/2025
@@ -8,95 +8,13 @@ author: DevArjun23
 ms.author: archidda
 ---
 
-In this module, you will learn how to manage the API Key for your MCP server in Azure Logic Apps. Retrieve an expiring APIKey using primary or secondary access key and also learn how to rotate it.
+In this module, you will learn how to create a custom conenctor for an MCP server. With this, you can setup auth type like APIKey, OAuth (Generic, AAD, Github, and so on). You can use and reuse this connector to add MCP server in Agent Loop for multiple agents and connect via API Connection.
 
-We will use open source HTTP client [Bruno](https://www.usebruno.com/) for this lab.
+In this lab, we will use MCP server we created in Azure Logic App.
 
-To call the APIs from Bruno, you will need Bearer token. You can get it from [ARMClient](https://github.com/projectkudu/ARMClient). Install it, login and get token by calling `armclient.exe token {subscriptionId}`
+## Prerequisites
 
-### 1. Retrieve API Key for MCP Server 🔑
+- An Azure account and subscription. If you don't have a subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F).
+- Existing Logic Apps Standard workflow app (or create one): [Create a single-tenant workflow app](https://learn.microsoft.com/azure/logic-apps/create-single-tenant-workflows-azure-portal).
 
-To obtain an API key, call the following endpoint with the query parameter `getApikey=true`
-
-**REST** Endpoint: POST /listMcpServerUrl
-
-**POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServerUrl?api-version=2021-02-01&getApikey=true>
-
-If you have MCP Servers with name and description, then you can use this for getting correct MCP server url.
-
-**REST** Endpoint: POST /listMcpServers
-**POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01&getApikey=true>
-
-
-#### ✅ Request Body (JSON) - Optional
-
-Request Body is optional and can take 2 properties
-
-```json
-{
-    "keyType": "primary",
-    "notAfter": "2025-11-14T10:04:24Z"
-}
-```
-
-#### 📌 Notes:
-
-- **keyType:** Determines which access key (primary or secondary) is used to generate the API key. If not specified, primary is used as default.
-- **notAfter:** Sets the expiration time for the API key. If not specified, the API Key expires in 24 hours from the request.
-
-#### ✅ Response (JSON)
-
-```json
-{
-  "value": "https://{LAName}.azurewebsites.net/api/mcpservers/{serverName}/mcp",
-  "method": "POST",
-  "basePath": "https://{LAName}.azurewebsites.net/api/mcpservers/{serverName}/mcp",
-  "headers": {
-      "X-API-Key": "sanitized"
-  }
-}
-```
-
-### 2. Regenerating the Access Key 🔁
-
-To invalidate all API keys generated from a specific access key, regenerate the access key using:
-Endpoint: POST /regenerateMcpServerAccessKey
-**POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/regenerateMcpServerAccessKey?api-version=2021-02-01 
-
-#### ✅ Request Body (JSON)
-
-```json
-{
-    "keyType": "primary"
-}
-```
-
-#### ✅ Response : 200
-
-This returns empty JSON if operation is successful.
-
-#### 📌 Notes
-
-- **keyType:** Required property that determines which access key (primary or secondary) is to be rotated.
-- This action immediately invalidates all API keys derived from the specified access key.
--	Use this when rotating credentials or responding to a security event.
-
-### 3. Usage
-
-When you configure the MCP Server in hosts with MCP Clients like VS Code, you can provide the api key in the header `X-API-Key`. Here are some examples:
-
-#### Agent Loop
-
-Use the API Key Auth type when you try to add MCP Server to Agent Loop. Check out
-[02 - Add BYO MCP tools to your agent](../../logicapps-ai-course/06_extend_agent_functionality_mcp/02-add-byo-mcp-tools.mdx)
-
-#### VS Code: (mcp.json)
-
-![VS Code usage](media\VSCodeUsage.png)
-
-#### Claude Code
-
-- To read-	[Connect Claude Code to tools via MCP - Anthropic](https://code.claude.com/docs/en/mcp)
-
-**Command:**
-`claude mcp add --transport http MyKeybasedLogicAppMcpServer https://arjun-wcus-mcpserver.azurewebsites.net/api/mcp --header "X-API-Key:*sanitized*"`
+## Create Custom Connector with MCP Server

@@ -1,8 +1,8 @@
 {
-  "label": "Build MCP servers using Azure Logic Apps.",
-  "position": 1,
+  "label": "MCP servers",
+  "position": 5,
   "link": {
     "type": "generated-index",
-    "description": "Build MCP servers using Azure Logic Apps where qualified workflows are tools."
+    "description": "Build MCP servers using Azure Logic Apps, learn how to manage API Key, learn how to create custom connector on MCP server."
   }
 }

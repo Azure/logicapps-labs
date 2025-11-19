@@ -1,6 +1,6 @@
 ---
-title: 01 - Build your first MCP Server in Azure Logic Apps
-description: Learn how to enable logic app as MCP server and create your first tool.
+title: 01 - Build MCP Server in Azure Logic Apps
+description: Learn how to enable logic app as MCP server and create tools.
 ms.service: logic-apps
 ms.topic: tutorial
 ms.date: 11/17/2025
@@ -46,7 +46,7 @@ To get the MCP Server URL, there are 2 ways-
 
 1. Call the API manually from HTTP client like Bruno
    - **Http Method:** POST
-   - **URL:** <https://management.azure.com/subscriptions/{subId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01>
+   - **URL:** https://management.azure.com/subscriptions/{subId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01
    - Sample response
 
         ```json

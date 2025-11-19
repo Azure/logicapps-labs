@@ -1,5 +1,5 @@
 ---
-title: 01 - Manage API key for your MCP Server in Azure Logic Apps
+title: 02 - Manage API key for your MCP Server in Azure Logic Apps
 description: Learn how to manage the API Key for your MCP server in Azure Logic Apps. Retrieve an expiring APIKey using primary or secondary access key and also learn how to rotate it.
 ms.service: logic-apps
 ms.topic: tutorial
@@ -20,12 +20,12 @@ To obtain an API key, call the following endpoint with the query parameter `getA
 
 **REST** Endpoint: POST /listMcpServerUrl
 
-**POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServerUrl?api-version=2021-02-01&getApikey=true>
+**POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServerUrl?api-version=2021-02-01&getApikey=true
 
 If you have MCP Servers with name and description, then you can use this for getting correct MCP server url.
 
 **REST** Endpoint: POST /listMcpServers
-**POST** <https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01&getApikey=true>
+**POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01&getApikey=true
 
 
 #### ✅ Request Body (JSON) - Optional
@@ -92,7 +92,7 @@ Use the API Key Auth type when you try to add MCP Server to Agent Loop. Check ou
 
 #### VS Code: (mcp.json)
 
-![VS Code usage](media\VSCodeUsage.png)
+![VS Code usage](media/02-manage-mcp-server-api-key/VSCodeUsage.png)
 
 #### Claude Code
 

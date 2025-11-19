@@ -26,6 +26,7 @@ For example, suppose you have a Standard logic app-based MCP server that runs in
   ![Screenshot shows general relationships.](media/architecture.png) 
 
 ### Which workflow can be an MCP tool?
+
 If a workflow meets following criteria, it can be used as an MCP tool.
 
 1. State is enabled
@@ -42,4 +43,4 @@ This course will help you create your first MCP server. Starting from configurin
 
 This module teaches you how to enable the MCP server features in a logic app. This will activate MCP specific endpoints that your agent can work with. Then we will add workflows and use them as tools in agent loop.
 
-[Start with: Build your first MCP server](02_build_mcp_server/01-create-first-mcp-server.mdx)
+[Start with: Build your first MCP server](02_build_mcp_server/01-create-first-mcp-server.md)

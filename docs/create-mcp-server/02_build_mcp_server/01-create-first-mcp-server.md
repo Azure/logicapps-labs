@@ -1,7 +1,6 @@
 ---
 title: 01 - Build your first MCP Server in Azure Logic Apps
 description: Learn how to enable logic app as MCP server and create your first tool.
-description: An overview of the lesson that helps you build Azure Logic Apps as MCP servers.
 ms.service: logic-apps
 ms.topic: tutorial
 ms.date: 11/17/2025

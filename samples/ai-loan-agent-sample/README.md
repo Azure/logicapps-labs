@@ -16,13 +16,15 @@ An AI-powered loan approval system that automates the evaluation of vehicle loan
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmodularity%2Flogicapps-labs%2Frefs%2Fheads%2Floan-agent-deployment%2Fsamples%2Fai-loan-agent-sample%2F1ClickDeploy%2Fsample-arm.json)
 
-**What happens when you deploy:**
-1. Opens Azure Portal and prompts for subscription, [resource group](https://learn.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal) (create new recommended: `rg-ailoan`), region, and project name (default: `ailoan`)
+<details>
+<summary><b>What happens when you deploy</b></summary>
+
+1. Opens Azure Portal and prompts for subscription, [resource group](https://learn.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal) (create new recommended: `rg-ailoan`)
 2. Provisions Azure resources (Logic App, OpenAI, Storage, App Service Plan, Managed Identity)
 3. Configures [RBAC (Role-Based Access Control)](https://learn.microsoft.com/azure/role-based-access-control/overview) permissions for passwordless authentication
 4. Deploys AI agent workflows with built-in test scenarios
 
-**Deployment time:** 5-10 minutes
+</details>
 
 <details>
 <summary><b>What gets deployed</b></summary>

@@ -1,6 +1,6 @@
 ---
 title: 04 - Add Custom MCP tools to your agent
-description: Learn how to add managed MCP (Model Context Protocol) tools to Azure Logic Apps agents using Custom MCP connectors (Azure-hosted MCP servers exposed like custom connectors) including authentication patterns and monitoring.
+description: Learn how to add custom connector MCP (Model Context Protocol) tools to Azure Logic Apps agents using Custom MCP connectors (Azure-hosted MCP servers exposed like custom connectors) including authentication patterns and monitoring.
 ms.service: azure-logic-apps
 ms.topic: tutorial
 ms.date: 11/18/2025
@@ -49,7 +49,8 @@ If you do book the meeting, only book the meeting with the user and do not invit
 
 ![Screenshot shows configured agent with system prompt.](media/03-add-managed-mcp-tools/updatedprompt.png)
 
-### Step 2 - Add the managed MCP Server for email 
+### Step 2 - Add the Custom MCP Server.
+
 1. Click on the "+" icon and add an MCP tool. The MCP server pane will show up on the right side of your screen.
 1. Find and select the "Email Management MCP Server" for "Office 365 Outlook" connector.
 ![Screenshot shows email MCP server connector](media/03-add-managed-mcp-tools/findmcp.png)
@@ -61,6 +62,7 @@ If you do book the meeting, only book the meeting with the user and do not invit
 You have now configured the agent to use the managed MCP server and it will be able to use tools to perform actions such as sending an email.
 
 ### Step 3 - Add the managed MCP Server for meetings
+
 1. Click on the "+" icon and add an MCP tool. The MCP server pane will show up on the right side of your screen.
 1. Find and select the "Meeting Management MCP Server" for "Office 365 Outlook" connector.
 ![Screenshot shows meeting MCP server connector](media/03-add-managed-mcp-tools/findmcp.png)
@@ -74,6 +76,7 @@ This MCP server will allow the agent to schedule meetings on behalf of the user 
 ![Screenshot shows the final flow](media/03-add-managed-mcp-tools/finalflow.png)
 
 ### Step 3 - Use MCP server in agent
+
 You have successfully added the managed MCP servers to your agent! Start a new chat session with the agent to test out this new capabilities, you can use the following prompt as an example: 
 
 ```

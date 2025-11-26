@@ -14,7 +14,7 @@ We will use open source HTTP client [Bruno](https://www.usebruno.com/) for this 
 
 To call the APIs from Bruno, you will need Bearer token. You can get it from [ARMClient](https://github.com/projectkudu/ARMClient). Install it, login and get token by calling `armclient.exe token {subscriptionId}`
 
-### 1. Retrieve API Key for MCP Server 🔑
+### 1. Retrieve API Key for MCP Server
 
 To obtain an API key, call the following endpoint with the query parameter `getApikey=true`
 
@@ -27,8 +27,7 @@ If you have MCP Servers with name and description, then you can use this for get
 **REST** Endpoint: POST /listMcpServers
 **POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/listMcpServers?api-version=2021-02-01&getApikey=true
 
-
-#### ✅ Request Body (JSON) - Optional
+#### Request Body (JSON) - Optional
 
 Request Body is optional and can take 2 properties
 
@@ -39,12 +38,12 @@ Request Body is optional and can take 2 properties
 }
 ```
 
-#### 📌 Notes:
-
+:::note
 - **keyType:** Determines which access key (primary or secondary) is used to generate the API key. If not specified, primary is used as default.
 - **notAfter:** Sets the expiration time for the API key. If not specified, the API Key expires in 24 hours from the request.
+:::
 
-#### ✅ Response (JSON)
+#### Response (JSON)
 
 ```json
 {
@@ -57,13 +56,13 @@ Request Body is optional and can take 2 properties
 }
 ```
 
-### 2. Regenerating the Access Key 🔁
+### 2. Regenerating the Access Key
 
 To invalidate all API keys generated from a specific access key, regenerate the access key using:
 Endpoint: POST /regenerateMcpServerAccessKey
-**POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/regenerateMcpServerAccessKey?api-version=2021-02-01 
+**POST** https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{RGName}/providers/Microsoft.Web/sites/{LAName}/hostruntime/runtime/webhooks/workflow/api/management/regenerateMcpServerAccessKey?api-version=2021-02-01
 
-#### ✅ Request Body (JSON)
+#### Request Body (JSON)
 
 ```json
 {
@@ -71,15 +70,15 @@ Endpoint: POST /regenerateMcpServerAccessKey
 }
 ```
 
-#### ✅ Response : 200
+#### Response : 200
 
 This returns empty JSON if operation is successful.
 
-#### 📌 Notes
-
+:::note
 - **keyType:** Required property that determines which access key (primary or secondary) is to be rotated.
 - This action immediately invalidates all API keys derived from the specified access key.
--	Use this when rotating credentials or responding to a security event.
+- Use this when rotating credentials or responding to a security event.
+:::
 
 ### 3. Usage
 
@@ -96,7 +95,7 @@ Use the API Key Auth type when you try to add MCP Server to Agent Loop. Check ou
 
 #### Claude Code
 
-- To read-	[Connect Claude Code to tools via MCP - Anthropic](https://code.claude.com/docs/en/mcp)
+- To read: [Connect Claude Code to tools via MCP - Anthropic](https://code.claude.com/docs/en/mcp)
 
 **Command:**
 `claude mcp add --transport http MyKeybasedLogicAppMcpServer https://arjun-wcus-mcpserver.azurewebsites.net/api/mcp --header "X-API-Key:*sanitized*"`

@@ -8,7 +8,7 @@ author: DevArjun23
 ms.author: archidda
 ---
 
-This course introduces what’s possible when you build Azure Logic Apps as **MCP servers**. It explains how you can empower your agents with unique capability of invoking the workflows as MCP tools. While the UX is still in the works, we can manually enable this feature by changing some configuration values.
+This module introduces what’s possible when you build Azure Logic Apps as **MCP servers**. It explains how you can empower your agents with unique capability of invoking the workflows as MCP tools. While the UX is still in the works, we can manually enable this feature by changing some configuration values.
 
 ## Azure Logic App as MCP Server
 
@@ -43,4 +43,4 @@ This course will help you create your first MCP server. Starting from configurin
 
 This module teaches you how to enable the MCP server features in a logic app. This will activate MCP specific endpoints that your agent can work with. Then we will add workflows and use them as tools in agent loop.
 
-[Start with: Build your first MCP server](02_build_mcp_server/01-create-first-mcp-server.md)
+[Start with: Build your first MCP server](02-create-first-mcp-server.md)

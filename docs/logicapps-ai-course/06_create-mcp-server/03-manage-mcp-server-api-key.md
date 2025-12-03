@@ -87,11 +87,11 @@ When you configure the MCP Server in hosts with MCP Clients like VS Code, you ca
 #### Agent Loop
 
 Use the API Key Auth type when you try to add MCP Server to Agent Loop. Check out
-[02 - Add BYO MCP tools to your agent](../../logicapps-ai-course/06_extend_agent_functionality_mcp/02-add-byo-mcp-tools.mdx)
+[02 - Add BYO MCP tools to your agent](../07_extend_agent_functionality_mcp/02-add-byo-mcp-tools.mdx)
 
 #### VS Code: (mcp.json)
 
-![VS Code usage](media/02-manage-mcp-server-api-key/VSCodeUsage.png)
+![VS Code usage](media/03-manage-mcp-server-api-key/VSCodeUsage.png)
 
 #### Claude Code
 

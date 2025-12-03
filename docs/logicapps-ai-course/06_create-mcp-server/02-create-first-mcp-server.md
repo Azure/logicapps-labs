@@ -32,11 +32,11 @@ In this lab, we will use the API Center approach so all the necessary resources 
 1. Complete the parameters setup that needs user or model inputs. This will help send a message to either a group chat, channel from your user.
 1. Select Register
 
-    ![Tools Parameters Configured](media/01-create-first-mcp-server/mcptoolparameters.png)
+    ![Tools Parameters Configured](media/02-create-first-mcp-server/mcptoolparameters.png)
 
 1. In the notifications, you can confirm that the tools are saved, logic app setup is completed for auth configuration and MCP Server registered successfully in the APIC resource.
 
-    ![MCPServerRegistered](media/01-create-first-mcp-server/mcpregisterednotification.png)
+    ![MCPServerRegistered](media/02-create-first-mcp-server/mcpregisterednotification.png)
 
    1. Your MCP server is now created and registered.
 

@@ -79,14 +79,12 @@ After deployment, test the agent with different loan scenarios to see how it aut
    <img src="images/navigate-to-designer.png" alt="Navigate to workflow designer" width="600">
 
 2. Click **Run** > [**Run with payload**](https://learn.microsoft.com/azure/logic-apps/test-logic-apps-track-results#run-with-payload)
-3. Paste one of the test payloads below > **Run** (returns success)
-4. Click **Refresh** > click the **Identifier** to open monitoring view
-5. In **Agent log** tab, click **Send Customer Email** tool call
+3. Paste one of the test payloads below and select **Run**. Wait a few seconds for the workflow to finish; on the **Output** tab you’ll see `Status Code: 200` and the agent’s decision message in the response body.
+4. (Optional) Select to open the monitoring view if you want to inspect the workflow execution in detail. The monitoring view shows action inputs/outputs, agent token usage per iteration, and agent tool calls in the **Agent log** tab (for example, **Send Customer Email**).
 
    <img src="images/agent-log-history.png" alt="Agent log history view" width="600">
 
-6. In workflow, click **Loan Agent** action > **Outputs** tab > verify `decision` field
-7. Or select **Loan Agent** action > use **right/left arrows** to navigate iterations to **Send Customer Email**, then click **Loan Agent** again to view outputs
+
 
 **Test these scenarios to see different decision paths:**
 
@@ -99,7 +97,7 @@ Strong credit, modest loan amount:
 {"applicationId":"APP-AUTO-APPROVE-001","name":"Applicant A","email":"applicant.a@example.com","loanAmount":25000,"vehicleMake":"Toyota","vehicleModel":"Camry","salary":75000,"employmentYears":5}
 ```
 
-**Expected result:** `decision` = `"APPROVED"` in Loan Agent action outputs (not in Send Customer Email), no human review
+**Expected result:** Response body confirms approval with loan amount; `decision` = `"APPROVED"`.
 
 </details>
 
@@ -112,7 +110,7 @@ High loan amount, strong financial profile:
 {"applicationId":"APP-REVIEW-REQUIRED-002","name":"Applicant B","email":"applicant.b@example.com","loanAmount":55000,"vehicleMake":"BMW","vehicleModel":"X5","salary":95000,"employmentYears":3}
 ```
 
-**Expected result:** `decision` = `"APPROVED"` or `"PENDING"` in Loan Agent action outputs (agent autonomously decides). If PENDING, Agent log shows "Wait for Human Review" tool call.
+**Expected result:** Edge case. Response body may explain the request is under human review (loan amount > limit, higher risk, luxury vehicle). `decision` most often `"PENDING"`, but approvals/declines are possible.
 
 </details>
 
@@ -125,7 +123,7 @@ Weak credit score, bankruptcy history:
 {"applicationId":"APP-AUTO-REJECT-003","name":"Applicant C","email":"applicant.c@example.com","loanAmount":30000,"vehicleMake":"Honda","vehicleModel":"Accord","salary":45000,"employmentYears":0.5}
 ```
 
-**Expected result:** `decision` = `"REJECTED"` in Loan Agent action outputs
+**Expected result:** Response body states the application was declined for low credit, short employment history, and bankruptcy history; `decision` = `"REJECTED"`.
 
 </details>
 
@@ -138,7 +136,7 @@ Luxury vehicle requiring additional review:
 {"applicationId":"APP-LUXURY-REVIEW-004","name":"Applicant D","email":"applicant.d@example.com","loanAmount":80000,"vehicleMake":"Ferrari","vehicleModel":"F8 Tributo","salary":120000,"employmentYears":4}
 ```
 
-**Expected result:** `decision` = `"PENDING"` in Loan Agent action outputs. Agent log shows "Get special vehicles" and "Wait for Human Review" tool calls.
+**Expected result:** Response body confirms approval after review with loan amount; `decision` = `"APPROVED"`. Monitoring view shows "Get special vehicles" and "Wait for Human Review" before completion.
 
 </details>
 
@@ -188,6 +186,7 @@ Five workflows process loan applications using autonomous AI decision-making:
 <details>
 <summary><b>Workflow details</b></summary>
 
+
 ### LoanApprovalAgent
 
 Orchestrates loan approval using an AI agent. The agent evaluates applications against business rules, autonomously selecting and sequencing tools.
@@ -204,30 +203,35 @@ Orchestrates loan approval using an AI agent. The agent evaluates applications a
 
 ```mermaid
 flowchart TD
-    A[HTTP Trigger<br/>manual] --> B[Simulated Credit Check]
-    A --> C[Simulated Background Check]
-    A --> D[Simulated Employment Verification]
+    A[HTTP Trigger]
+    A --> B[Credit Check]
+    A --> C[Background Check]
+    A --> D[Employment Verification]
+    
     B --> E[Application Summary]
     C --> E
     D --> E
-    E --> F[Loan Agent<br/>AI Orchestrator]
     
-    F --> G{Agent Loop<br/>Iterations}
+    E --> F[Agent Loop Action]
     
-    G -->|Tool 1| H[Get Loan Policy]
-    G -->|Tool 2| I[Get Bank History]
-    G -->|Tool 3| J[Get Risk Profile]
-    G -->|Tool 4| K[Get Special Vehicles]
-    G -->|Tool 5| L[Send Email]
-    G -->|Tool 6| M[Wait for Human Review]
+    F --> G[Get Loan Policy]
+    F --> H[Get Bank History]
+    F --> I[Get Risk Profile]
+    F --> J[Get Special Vehicles]
+    F --> K[Send Email]
+    F --> L[Wait for Human Review]
     
-    H --> G
-    I --> G
-    J --> G
-    K --> G
-    L --> N[Response]
-    M --> O[Manual Approval]
-    O --> L
+    L --> M[Manual Approval]
+    M --> F
+    
+    G --> F
+    H --> F
+    I --> F
+    J --> F
+    K --> F
+    
+    F --> N[Loan Post Processing]
+    N --> O[HTTP Response]
 ```
 
 ### GetCustomerHistory

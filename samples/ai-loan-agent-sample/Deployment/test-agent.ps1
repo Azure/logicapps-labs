@@ -26,6 +26,37 @@ param(
     [string]$WorkflowName = "LoanApprovalAgent"
 )
 
+function Show-AgentResponse {
+    param(
+        [string]$CaseName,
+        $Response
+    )
+
+    Write-Host "  Agent decision output ($CaseName):" -ForegroundColor DarkYellow
+
+    if ($null -eq $Response) {
+        Write-Host "    (No response body returned)" -ForegroundColor Gray
+        return
+    }
+
+    if ($Response -is [string]) {
+        Write-Host "    $Response" -ForegroundColor Green
+        return
+    }
+
+    try {
+        $json = $Response | ConvertTo-Json -Depth 10
+        $indented = "    " + ($json -replace "`n", "`n    ")
+        Write-Host $indented -ForegroundColor Green
+
+        if ($Response.PSObject.Properties.Name -contains 'decision') {
+            Write-Host "    Decision: $($Response.decision)" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "    $Response" -ForegroundColor Green
+    }
+}
+
 Write-Host "`n=== Testing AI Loan Agent ===" -ForegroundColor Cyan
 Write-Host "Resource Group: $ResourceGroupName"
 Write-Host "Logic App: $LogicAppName"
@@ -90,8 +121,9 @@ $payload1 = @{
 } | ConvertTo-Json
 
 try {
-    Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload1 -ContentType "application/json"
+    $result1 = Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload1 -ContentType "application/json"
     Write-Host "✓ Test Case 1 Submitted" -ForegroundColor Green
+    Show-AgentResponse -CaseName "Test Case 1" -Response $result1
 } catch {
     Write-Host "✗ Test Case 1 Failed: $_" -ForegroundColor Red
 }
@@ -113,8 +145,9 @@ $payload2 = @{
 } | ConvertTo-Json
 
 try {
-    Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload2 -ContentType "application/json"
+    $result2 = Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload2 -ContentType "application/json"
     Write-Host "✓ Test Case 2 Submitted" -ForegroundColor Green
+    Show-AgentResponse -CaseName "Test Case 2" -Response $result2
 } catch {
     Write-Host "✗ Test Case 2 Failed: $_" -ForegroundColor Red
 }
@@ -136,8 +169,9 @@ $payload3 = @{
 } | ConvertTo-Json
 
 try {
-    Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload3 -ContentType "application/json" | Out-Null
+    $result3 = Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload3 -ContentType "application/json"
     Write-Host "✓ Test Case 3 Submitted" -ForegroundColor Green
+    Show-AgentResponse -CaseName "Test Case 3" -Response $result3
 } catch {
     Write-Host "✗ Test Case 3 Failed: $_" -ForegroundColor Red
 }
@@ -159,8 +193,9 @@ $payload4 = @{
 } | ConvertTo-Json
 
 try {
-    Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload4 -ContentType "application/json"
+    $result4 = Invoke-RestMethod -Method Post -Uri $callbackUrl -Body $payload4 -ContentType "application/json"
     Write-Host "✓ Test Case 4 Submitted" -ForegroundColor Green
+    Show-AgentResponse -CaseName "Test Case 4" -Response $result4
 } catch {
     Write-Host "✗ Test Case 4 Failed: $_" -ForegroundColor Red
 }

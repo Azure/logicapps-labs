@@ -329,6 +329,18 @@
             "SUCCEEDED"
           ]
         }
+      },
+      "Return_Agent_Response": {
+        "type": "Response",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Loan_Agent')?['lastAssistantMessage']"
+        },
+        "runAfter": {
+          "Loan_post_processing_steps": [
+            "SUCCEEDED"
+          ]
+        }
       }
     },
     "contentVersion": "1.0.0.0",

@@ -60,11 +60,11 @@ The lessons in this module will assume you are familiar with Azure Logic Apps ag
 
 ## MCP Connector Types
 
-| Connector Type | When to use | Characteristics | Auth Options |
-|----------|------------|-----------------|--------------|
-| BYO MCP connector (external MCP server) | You already operate or consume an external MCP server and want direct catalog ingestion. | User supplies base MCP URL + credentials; dynamic tool listing fetched from external host; minimal Azure abstraction. | None, Basic, Client certificate, Active Directory OAuth, Raw, Key, Managed identity. |
-| Managed MCP connector (Azure-hosted) | Fastest path to MCP tools backed by Azure-managed infrastructure and existing managed connectors. | Selection UX mirrors managed API operations; shared connection model; automatic catalog & schema maintenance. | Managed identity, API key (where supported). |
-| Custom MCP connector (user-created) | Need private/tenant-scoped MCP server with custom schema/policies not globally available. | OpenAPI/definition you author; only accessible in your subscription; full control over versioning & throttling. | None, Basic, API Key, OAuth 2.0 (Generic, Azure Active Directory, etc..). |
+| Connector Type | When to use | Characteristics | Auth Options | OBO Authentication Support |
+|----------|------------|-----------------|--------------|-------|
+| BYO MCP connector (external MCP server) | You already operate or consume an external MCP server and want direct catalog ingestion. | User supplies base MCP URL + credentials; dynamic tool listing fetched from external host; minimal Azure abstraction. | None, Basic, Client certificate, Active Directory OAuth, Raw, Key, Managed identity. | |
+| Managed MCP connector (Azure-hosted) | Fastest path to MCP tools backed by Azure-managed infrastructure and existing managed connectors. | Selection UX mirrors managed API operations; shared connection model; automatic catalog & schema maintenance. | Managed identity, OAuth, API key. | ✅ |
+| Custom MCP connector (user-created) | Need private/tenant-scoped MCP server with custom schema/policies not globally available. | OpenAPI/definition you author; only accessible in your subscription; full control over versioning & throttling. | None, Basic, API Key, OAuth 2.0 (Generic, Azure Active Directory, etc..). | ✅ |
 
 > :::note
 > The OAuth options on both the managed and custom connectors allow you to configure per-user/on-behalf-of for conversational workflows.

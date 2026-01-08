@@ -1,0 +1,110 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Initialize_ExcellentProfile": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "ExcellentProfile",
+              "type": "object",
+              "value": {
+                "yearsWithBank": 5,
+                "averageBalance": 15000,
+                "paymentHistory": "Excellent",
+                "accountAge": "5+ years"
+              }
+            }
+          ]
+        },
+        "runAfter": {}
+      },
+      "Initialize_FairProfile": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "FairProfile",
+              "type": "object",
+              "value": {
+                "yearsWithBank": 2,
+                "averageBalance": 5000,
+                "paymentHistory": "Good",
+                "accountAge": "2-3 years"
+              }
+            }
+          ]
+        },
+        "runAfter": {
+          "Initialize_ExcellentProfile": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Initialize_HighRiskProfile": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "HighRiskProfile",
+              "type": "object",
+              "value": {
+                "yearsWithBank": 1,
+                "averageBalance": 2000,
+                "paymentHistory": "Fair",
+                "accountAge": "Under 2 years"
+              }
+            }
+          ]
+        },
+        "runAfter": {
+          "Initialize_FairProfile": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Compose_SelectProfile": {
+        "type": "Compose",
+        "inputs": "@if(contains(triggerBody()?['applicationId'], 'APPROVE-001'), variables('ExcellentProfile'), if(contains(triggerBody()?['applicationId'], 'REQUIRED-002'), variables('FairProfile'), if(contains(triggerBody()?['applicationId'], 'LUXURY-REVIEW-004'), variables('ExcellentProfile'), variables('HighRiskProfile'))))",
+        "runAfter": {
+          "Initialize_HighRiskProfile": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Compose_SelectProfile')"
+        },
+        "runAfter": {
+          "Compose_SelectProfile": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "applicationId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}

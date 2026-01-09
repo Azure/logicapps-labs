@@ -1,0 +1,141 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Initialize_VehicleData": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "VehicleData",
+              "type": "array",
+              "value": [
+                {
+                  "make": "Tesla",
+                  "riskFactor": 1.5
+                },
+                {
+                  "make": "Ferrari",
+                  "riskFactor": 2.5
+                },
+                {
+                  "make": "Lamborghini",
+                  "riskFactor": 2.5
+                },
+                {
+                  "make": "Porsche",
+                  "riskFactor": 1.8
+                },
+                {
+                  "make": "Toyota",
+                  "riskFactor": 0.7
+                }
+              ]
+            }
+          ]
+        },
+        "runAfter": {}
+      },
+      "Parse_JSON": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@variables('VehicleData')",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "make": {
+                  "type": "string"
+                },
+                "riskFactor": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "runAfter": {
+          "Initialize_VehicleData": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Query_Array": {
+        "type": "Query",
+        "inputs": {
+          "from": "@body('Parse_JSON')",
+          "where": "@equals(toLower(item()?['make']), toLower(triggerBody()?['make']))"
+        },
+        "runAfter": {
+          "Parse_JSON": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Condition_VehicleFound": {
+        "type": "If",
+        "expression": {
+          "and": [
+            {
+              "greater": [
+                "@length(body('Query_Array'))",
+                0
+              ]
+            }
+          ]
+        },
+        "actions": {
+          "Response_Found": {
+            "type": "Response",
+            "kind": "http",
+            "inputs": {
+              "statusCode": 200,
+              "body": "@first(body('Query_Array'))"
+            }
+          }
+        },
+        "runAfter": {
+          "Query_Array": [
+            "Succeeded"
+          ]
+        },
+        "else": {
+          "actions": {
+            "Response_Default": {
+              "type": "Response",
+              "kind": "http",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "make": "@triggerBody()?['make']",
+                  "riskFactor": 1.0,
+                  "category": "Standard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "make": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}

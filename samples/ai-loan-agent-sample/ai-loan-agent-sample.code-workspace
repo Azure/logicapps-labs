@@ -7,10 +7,10 @@
   ],
   "settings": {
     "terminal.integrated.env.windows": {
-      "PATH": "C:\\Users\\wsilveira\\.azurelogicapps\\dependencies\\DotNetSDK;${env:PATH}"
+      "PATH": "C:\\Users\\ladunlap\\.azurelogicapps\\dependencies\\DotNetSDK;${env:PATH}"
     },
     "omnisharp.dotNetCliPaths": [
-      "C:\\Users\\wsilveira\\.azurelogicapps\\dependencies\\DotNetSDK"
+      "C:\\Users\\ladunlap\\.azurelogicapps\\dependencies\\DotNetSDK"
     ],
     "azurite.location": "C:\\Users\\wsilveira\\.azurelogicapps\\.azurite"
   }

@@ -1,8 +1,8 @@
 {
-  "label": "Build agentic workflows with Azure Logic Apps",
+  "label": "Build agentic solutions with Azure Logic Apps",
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Build agentic workflows with Azure Logic Apps"
+    "description": "Build agentic solutions with Azure Logic Apps"
   }
 }

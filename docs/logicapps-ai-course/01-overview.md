@@ -102,8 +102,12 @@ This module teaches you to orchestrate multiple specialized agents working toget
 
 [Start with: Multi-agent workflow patterns overview](05_build_multi_agent_systems/01-build-multi-agent-sysystem.md)
 
+### Build MCP Servers
+This module teaches you how to build Azure Logic Apps as **MCP servers**. It explains how you can empower your agents with unique capability of invoking the workflows as MCP tools. While the UX is still in the works, we can manually enable this feature by changing some configuration values.
+[Start with: Logic Apps as MCP servers overview](06_create-mcp-server/01-mcp-overview.md)
+
 ### Extend Agents functionality with MCP capabilities
 
 This module expands your agents with MCP tool capabilities. You'll learn to configure MCP servers for your agent to use including bringing your own (BYO) external MCP servers, managed MCP servers, and custom MCP servers. This will allow you to expand the set of tools that your agent can use with minimal configuration.
 
-[Start with: MCP Overview](06_extend_agent_functionality_mcp/01-mcp-overview.mdx)
+[Start with: MCP Overview](07_extend_agent_functionality_mcp/01-mcp-overview.mdx)

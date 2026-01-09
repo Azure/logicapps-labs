@@ -86,7 +86,7 @@ You can find the JSON document for the agent card hosted at the [well-known URI]
 - Skills and capabilities
 
 > :::note
-> The agent card is generated automatically for every conversational agent.
+> The agent card is generated automatically for every conversational agent. Any default values can be overridden in the trigger description.
 
 Here is a sample agent-card.json for the weather agent:
 

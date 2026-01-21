@@ -6,6 +6,7 @@ You can use this folder to share Logic Apps sample.
 
 - [**Sample Logic Apps Workspace**](./sample-logicapp-workspace/): This is a simple request response project, just to exemplify the required structure.
 - [**AI Loan Agent**](./ai-loan-agent-sample/): AI-powered loan approval system that automates the evaluation of vehicle loan applications using Azure Logic Apps Standard and Azure OpenAI.
+- [**AI Product Return Agent**](./product-return-agent-sample/): AI-powered product return system that automates the evaluation of return requests using Azure Logic Apps Standard and Azure OpenAI. Features autonomous decision-making with policy validation, refund calculations, and human escalation.
 
 ## How to contribute
 

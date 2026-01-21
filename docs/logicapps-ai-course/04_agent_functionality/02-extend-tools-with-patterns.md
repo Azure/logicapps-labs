@@ -58,7 +58,7 @@ This capability has several use cases:
 - Improve agent quality by filtering out unnecessary information from the tool output
 - By default, the last action output becomes the tool output. If you have a chain of several actions, you can construct a custom tool output payload that combines properties from multiple action outputs. 
 
-This can again be accomplished with the Compose action. For example, the imagine a simple weather agent similar to the one we built in module four. When reviewing execution in the monitoring view, we see the `functionCallResult` that was sent back to the LLM:
+This can again be accomplished with the Compose action. For example, the imagine a simple weather agent similar to the one we built in module One. When reviewing execution in the monitoring view, we see the `functionCallResult` that was sent back to the LLM:
 
 ```json
 [

@@ -1,0 +1,10 @@
+[
+  {
+    "incidentId": "INC000123",
+    "trackingId": "WO-12345",
+    "activity": "Diagnosed schema-validation-failed, proposed fix, received approval, resubmitted successfully",
+    "operator": "ops-agent",
+    "timestamp": "2025-12-15T10:30:15Z",
+    "status": "logged"
+  }
+]

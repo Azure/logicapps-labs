@@ -1,0 +1,61 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "actions": {
+      "Initialize_Catalog": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "RepairCatalog",
+              "type": "object",
+              "value": {
+                "schema_validation_error": {
+                  "fixSteps": ["Convert amount field from string to number", "Validate against order schema", "Resubmit to processing queue"]
+                },
+                "timeout_config": {
+                  "fixSteps": ["Increase API timeout from 30s to 300s", "Update retry policy", "Redeploy configuration"]
+                },
+                "missing_required_field": {
+                  "fixSteps": ["Add missing required field with default value", "Apply field mapping transformation"]
+                }
+              }
+            }
+          ]
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@variables('RepairCatalog')[triggerBody()?['failureType']]"
+        },
+        "runAfter": {
+          "Initialize_Catalog": ["Succeeded"]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "failureType": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

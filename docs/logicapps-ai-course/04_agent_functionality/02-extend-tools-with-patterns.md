@@ -33,7 +33,7 @@ To accomplish this, you can mock tool output in two ways:
 2. Replace the Compose action Inputs with the value you would like the tool to return.
 3. When executing the tool, the Compose action will return your provided value as-is.
 
-See the `EchoTool` example in module four.
+See the `EchoTool` example in module One.
 
 ### Mocking using static results
 

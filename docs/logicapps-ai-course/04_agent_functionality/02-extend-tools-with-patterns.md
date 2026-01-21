@@ -386,7 +386,7 @@ Note that in the above screenshot, a few things have changed:
 
 ![Finalizing the action input](./media/02-extend-tools-with-patterns/OutputTransformation-ComposeActionB.png)
 
-In the above screenshot, we finalize the expression by including both the caption and the temperature.
+In the above screenshot, we finalize the expression by including both the condition and the temperature.
 
 ![Demonstrating the final output](./media/02-extend-tools-with-patterns/OutputTransformation-ToolOutput.png)
 

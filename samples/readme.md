@@ -8,6 +8,7 @@ You can use this folder to share Logic Apps sample.
 - [**AI Loan Agent**](./ai-loan-agent-sample/): AI-powered loan approval system that automates the evaluation of vehicle loan applications using Azure Logic Apps Standard and Azure OpenAI.
 - [**AI Product Return Agent**](./product-return-agent-sample/): AI-powered product return system that automates the evaluation of return requests using Azure Logic Apps Standard and Azure OpenAI. Features autonomous decision-making with policy validation, refund calculations, and human escalation.
 - [**Transaction Repair Agent**](./transaction-repair-agent/): Conversational AI agent that helps operations teams diagnose and repair failed work orders through natural chat interaction. Built with Azure Logic Apps Standard and Azure OpenAI, featuring guided workflows, approval management, and ITSM audit logging.
+- [**JSON Remediation Agent**](./json-remediation-agent/): Autonomous operations agent that repairs malformed JSON records, applies deterministic schema corrections, validates structure, and outputs clean, ingestion-ready payloads with no external service dependencies.
 
 ## How to contribute
 

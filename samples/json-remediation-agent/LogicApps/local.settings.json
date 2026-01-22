@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "INCIDENTS_PATH": "data/incidents",
+    "OUTBOX_PATH": "data/outbox",
+    "SCHEMA_PATH": "data/schema",
+    "agent_openAIEndpoint": "",
+    "agent_ResourceID": ""
+  }
+}

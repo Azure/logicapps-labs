@@ -1,0 +1,194 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Incident_Request_Summary": {
+        "type": "Compose",
+        "inputs": {
+          "caseId": "@triggerBody()?['caseId']",
+          "requestDate": "@utcNow()"
+        },
+        "runAfter": {}
+      },
+      "Json_Remediation_Agent": {
+        "type": "Agent",
+        "inputs": {
+          "parameters": {
+            "deploymentId": "gpt-4o-mini",
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are an autonomous data quality agent.\n\nSTEPS:\n1. Call Load_incident_json to get malformed JSON\n2. Call Repair_json to apply transformations\n3. Call Validate_schema to verify compliance\n4. Call Format_response to mark ready\n\nOUTPUT (exact format):\nCASE ID: [caseId]\nSTATUS: [SUCCESS/FAILED]\nCHANGES APPLIED:\n- [describe specific change with before/after values]\n- [e.g., \"Added missing field 'customerId' with value 'UNKNOWN'\"]\n- [e.g., \"Converted priority from string '2' to integer 2\"]\n- [e.g., \"Renamed field 'cust_id' to 'customerId'\"]\n- [e.g., \"Replaced null details with {description: 'No details provided'}\"]\nVALIDATION: [PASSED/FAILED]\nREPAIRED JSON:\n[show final repaired JSON]\n\nIMPORTANT: Be specific about what changed. Compare raw vs repaired JSON from tool results. After Format_response succeeds, STOP."
+              },
+              {
+                "role": "user",
+                "content": "Process incident case: @{outputs('Incident_Request_Summary')}"
+              }
+            ],
+            "agentModelType": "AzureOpenAI",
+            "agentModelSettings": {
+              "deploymentModelProperties": {
+                "name": "gpt-4o-mini",
+                "format": "OpenAI",
+                "version": "2024-07-18"
+              }
+            }
+          },
+          "modelConfigurations": {
+            "model1": {
+              "referenceName": "agent"
+            }
+          }
+        },
+        "limit": {
+          "count": 100
+        },
+        "tools": {
+          "Load_incident_json": {
+            "actions": {
+              "Load_Incident_Data": {
+                "type": "Compose",
+                "inputs": "@if(equals(agentParameters('caseId'), 'incident-missing-field'), '{\"incidentId\":\"INC-9001\",\"priority\":3,\"details\":{\"description\":\"System outage\"}}', if(equals(agentParameters('caseId'), 'incident-wrong-type'), '{\"incidentId\":\"INC-9002\",\"customerId\":\"CUST-456\",\"priority\":\"2\",\"details\":{\"description\":\"Database slowdown\"}}', if(equals(agentParameters('caseId'), 'incident-field-standardization'), '{\"id\":\"INC-9004\",\"cust_id\":\"CUST-101\",\"prio\":3,\"details\":{\"desc\":\"Login errors\"}}', if(equals(agentParameters('caseId'), 'incident-partial-object'), '{\"incidentId\":\"INC-9005\",\"customerId\":\"CUST-202\",\"priority\":2,\"details\":null}', '{}'))))"
+              }
+            },
+            "description": "Load malformed incident JSON by caseId from data store",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "caseId": {
+                  "type": "string",
+                  "description": "The case ID of the incident to load (e.g., 'incident-missing-field')"
+                }
+              },
+              "required": ["caseId"]
+            }
+          },
+          "Repair_json": {
+            "actions": {
+              "Call_JsonRepairEngine": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "JsonRepairEngine"
+                    }
+                  },
+                  "body": {
+                    "payload": "@agentParameters('rawPayload')",
+                    "caseId": "@agentParameters('caseId')"
+                  }
+                }
+              }
+            },
+            "description": "Apply deterministic transformations to repair malformed JSON (add missing fields, fix types, rename fields, normalize values)",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "caseId": {
+                  "type": "string",
+                  "description": "Case ID for reference"
+                },
+                "rawPayload": {
+                  "type": "string",
+                  "description": "The raw incident JSON as a string to repair"
+                }
+              },
+              "required": ["caseId", "rawPayload"]
+            }
+          },
+          "Validate_schema": {
+            "actions": {
+              "Call_SchemaValidator": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "SchemaValidator"
+                    }
+                  },
+                  "body": {
+                    "payload": "@agentParameters('repairedPayload')",
+                    "schemaPath": "data/schema/incident.schema.json"
+                  }
+                }
+              }
+            },
+            "description": "Validate repaired JSON against incident schema (checks required fields, types, and structure)",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "repairedPayload": {
+                  "type": "string",
+                  "description": "The repaired incident JSON as a string to validate"
+                }
+              },
+              "required": ["repairedPayload"]
+            }
+          },
+          "Format_response": {
+            "actions": {
+              "Format_Output": {
+                "type": "Compose",
+                "inputs": {
+                  "success": true,
+                  "caseId": "@agentParameters('caseId')",
+                  "cleanedPayload": "@agentParameters('cleanedPayload')",
+                  "message": "Cleaned JSON ready for ingestion (ephemeral demo - no persistence)"
+                }
+              }
+            },
+            "description": "Mark cleaned JSON ready for ingestion (ephemeral storage for demo purposes)",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "caseId": {
+                  "type": "string",
+                  "description": "Case ID for reference"
+                },
+                "cleanedPayload": {
+                  "type": "string",
+                  "description": "The repaired and validated JSON payload as a JSON string"
+                }
+              },
+              "required": ["caseId", "cleanedPayload"]
+            }
+          }
+        },
+        "runAfter": {
+          "Incident_Request_Summary": ["Succeeded"]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Json_Remediation_Agent')?['lastAssistantMessage']"
+        },
+        "runAfter": {
+          "Json_Remediation_Agent": ["Succeeded"]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "caseId": {
+                "type": "string"
+              }
+            },
+            "required": ["caseId"]
+          }
+        }
+      }
+    }
+  },
+  "kind": "Agentic"
+}

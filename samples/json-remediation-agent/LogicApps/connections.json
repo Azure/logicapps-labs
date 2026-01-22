@@ -1,0 +1,14 @@
+{
+  "agentConnections": {
+    "agent": {
+      "displayName": "Azure OpenAI Connection",
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      },
+      "endpoint": "@appsetting('agent_openAIEndpoint')",
+      "resourceId": "@appsetting('agent_ResourceID')",
+      "type": "model"
+    }
+  },
+  "managedApiConnections": {}
+}

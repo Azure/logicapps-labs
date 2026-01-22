@@ -2,6 +2,8 @@
 
 An AI-powered product return system that automates the evaluation of return requests using Azure Logic Apps Standard and Azure OpenAI. The agent autonomously analyzes return requests, validates policies, checks order details, evaluates customer status, calculates refunds, and makes approval decisions or escalates complex cases to human reviewers.
 
+**[Watch Demo Video](https://youtu.be/ilSGRUpjMdU)**
+
 ---
 
 ## Deploy

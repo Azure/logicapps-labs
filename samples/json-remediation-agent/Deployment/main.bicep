@@ -1,8 +1,8 @@
 // Auto-generated from shared/templates/main.bicep.template
 // To customize: edit this file directly or delete to regenerate from template
 //
-// Logic Apps Agent Sample - Azure Infrastructure as Code
-// Deploys Logic Apps Standard with Azure OpenAI for autonomous agent workflows
+// JSON Remediation Agent - Azure Infrastructure as Code
+// Deploys Logic Apps Standard with Azure OpenAI for autonomous JSON repair and validation
 // Uses managed identity exclusively (no secrets/connection strings)
 
 targetScope = 'resourceGroup'
@@ -15,8 +15,8 @@ param BaseName string
 // uniqueSuffix for when we need unique values
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
-// URL to workflows.zip (replaced by BundleAssets.ps1 with {{WORKFLOWS_ZIP_URL}})
-var workflowsZipUrl = '{{WORKFLOWS_ZIP_URL}}'
+// URL to workflows.zip (replaced by BundleAssets.ps1 with https://raw.githubusercontent.com/modularity/logicapps-labs/json-remediation-agent/samples/json-remediation-agent/Deployment/workflows.zip)
+var workflowsZipUrl = 'https://raw.githubusercontent.com/modularity/logicapps-labs/json-remediation-agent/samples/json-remediation-agent/Deployment/workflows.zip'
 
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {

@@ -1,0 +1,83 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "actions": {
+      "Find_WorkOrder": {
+        "type": "Query",
+        "inputs": {
+          "from": "@variables('WorkOrderQueue')",
+          "where": "@equals(item()?['trackingId'], triggerBody()?['trackingId'])"
+        },
+        "runAfter": {
+          "Initialize_Queue": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@first(body('Find_WorkOrder'))"
+        },
+        "runAfter": {
+          "Find_WorkOrder": [
+            "Succeeded"
+          ]
+        }
+      },
+      "Initialize_Queue": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "WorkOrderQueue",
+              "type": "array",
+              "value": [
+                {
+                  "trackingId": "WO-12345",
+                  "failureType": "schema_validation_error",
+                  "payload": {"orderId": "ORD-9876", "amount": "250.00", "status": "failed"},
+                  "timestamp": "2025-12-15T10:30:00Z"
+                },
+                {
+                  "trackingId": "WO-67890",
+                  "failureType": "timeout_config",
+                  "payload": {"apiEndpoint": "/api/process", "timeout": 30, "error": "timeout_exceeded"},
+                  "timestamp": "2025-12-15T11:15:00Z"
+                },
+                {
+                  "trackingId": "WO-11111",
+                  "failureType": "missing_required_field",
+                  "payload": {"customerId": "CUST-555", "productId": "PROD-123"},
+                  "timestamp": "2025-12-15T09:45:00Z"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "trackingId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

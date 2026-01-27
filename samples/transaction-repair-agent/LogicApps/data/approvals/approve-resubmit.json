@@ -1,0 +1,21 @@
+{
+  "WO-12345": {
+    "approved": true,
+    "approver": "ops-manager",
+    "timestamp": "2025-12-15T10:30:00Z",
+    "notes": "Schema fix is safe - proceed with resubmit"
+  },
+  "WO-67890": {
+    "approved": false,
+    "approver": "ops-manager",
+    "timestamp": "2025-12-15T10:35:00Z",
+    "notes": "Timeout issue requires infrastructure review before resubmit",
+    "reason": "requires-manual-review"
+  },
+  "WO-11111": {
+    "approved": true,
+    "approver": "ops-supervisor",
+    "timestamp": "2025-12-15T10:40:00Z",
+    "notes": "Default shipping address can be applied - proceed"
+  }
+}

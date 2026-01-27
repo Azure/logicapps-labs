@@ -1,0 +1,35 @@
+{
+  "schema-validation-failed": {
+    "steps": [
+      "Convert amount field from string to number",
+      "Validate against order schema",
+      "Resubmit to processing queue"
+    ],
+    "estimatedDuration": "2 minutes",
+    "risk": "low",
+    "category": "data-quality",
+    "documentation": "https://docs.example.com/schema-validation"
+  },
+  "timeout-retry-exhausted": {
+    "steps": [
+      "Increase timeout threshold to 60s",
+      "Reset retry counter",
+      "Resubmit with priority flag"
+    ],
+    "estimatedDuration": "5 minutes",
+    "risk": "medium",
+    "category": "connectivity",
+    "documentation": "https://docs.example.com/timeout-handling"
+  },
+  "transform-patch-required": {
+    "steps": [
+      "Add missing required field with default value",
+      "Apply field mapping transformation",
+      "Resubmit to processing queue"
+    ],
+    "estimatedDuration": "3 minutes",
+    "risk": "low",
+    "category": "transformation",
+    "documentation": "https://docs.example.com/field-mapping"
+  }
+}

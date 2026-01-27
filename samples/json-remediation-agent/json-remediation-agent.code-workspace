@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/__azurite*": true,
+      "**/__blobstorage__*": true,
+      "**/__queuestorage__*": true,
+      "**/node_modules": true
+    },
+    "azureLogicAppsStandard.deploySubpath": "LogicApps",
+    "azureLogicAppsStandard.projectLanguage": "JavaScript",
+    "debug.internalConsoleOptions": "neverOpen"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-azuretools.vscode-azurelogicapps",
+      "ms-azuretools.vscode-azurefunctions",
+      "ms-vscode.azure-account",
+      "Azurite.azurite"
+    ]
+  }
+}

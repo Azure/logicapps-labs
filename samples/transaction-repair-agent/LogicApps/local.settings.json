@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "agent_openAIEndpoint": "",
+    "WORKFLOWS_LOCATION_NAME": "",
+    "WORKFLOWS_RESOURCE_GROUP_NAME": "",
+    "WORKFLOWS_SUBSCRIPTION_ID": "",
+    "agent_ResourceID": "",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+  }
+}

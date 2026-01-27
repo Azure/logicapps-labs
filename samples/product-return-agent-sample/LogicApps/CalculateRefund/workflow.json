@@ -1,0 +1,64 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Calculate_Refund_Amount": {
+        "type": "Compose",
+        "inputs": {
+          "orderTotal": "@triggerBody()?['orderTotal']",
+          "reason": "@triggerBody()?['reason']",
+          "category": "@triggerBody()?['category']",
+          "condition": "@triggerBody()?['condition']",
+          "refundAmount": "@if(equals(triggerBody()?['reason'], 'defective'), triggerBody()?['orderTotal'], if(and(equals(triggerBody()?['category'], 'electronics'), equals(triggerBody()?['condition'], 'opened')), mul(triggerBody()?['orderTotal'], 0.8), if(equals(triggerBody()?['reason'], 'changed_mind'), sub(triggerBody()?['orderTotal'], 10), triggerBody()?['orderTotal'])))",
+          "fees": {
+            "restockingFee": "@if(and(equals(triggerBody()?['category'], 'electronics'), equals(triggerBody()?['condition'], 'opened')), mul(triggerBody()?['orderTotal'], 0.2), 0)",
+            "shippingFee": "@if(equals(triggerBody()?['reason'], 'changed_mind'), 10, 0)"
+          },
+          "explanation": "@if(equals(triggerBody()?['reason'], 'defective'), 'Full refund for defective item', if(and(equals(triggerBody()?['category'], 'electronics'), equals(triggerBody()?['condition'], 'opened')), 'Refund minus 20% restocking fee for opened electronics', if(equals(triggerBody()?['reason'], 'changed_mind'), 'Refund minus $10 shipping fee', 'Full refund')))"
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Calculate_Refund_Amount')"
+        },
+        "runAfter": {
+          "Calculate_Refund_Amount": [
+            "SUCCEEDED"
+          ]
+        }
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "orderTotal": {
+                "type": "number"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}

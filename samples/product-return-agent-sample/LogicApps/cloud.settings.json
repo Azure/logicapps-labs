@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "WORKFLOWS_SUBSCRIPTION_ID": "your-subscription-id",
+    "WORKFLOWS_LOCATION_NAME": "eastus2",
+    "WORKFLOWS_RESOURCE_GROUP_NAME": "your-resource-group",
+    "agent_openAIEndpoint": "https://your-openai-endpoint.openai.azure.com/",
+    "agent_ResourceID": "/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.CognitiveServices/accounts/your-openai-account"
+  }
+}

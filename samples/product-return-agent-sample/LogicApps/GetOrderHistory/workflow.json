@@ -1,0 +1,53 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Order_Details": {
+        "type": "Compose",
+        "inputs": {
+          "orderId": "@triggerBody()?['orderId']",
+          "customerId": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 'CUST001', if(equals(triggerBody()?['orderId'], 'ORD002'), 'CUST002', if(equals(triggerBody()?['orderId'], 'ORD003'), 'CUST003', if(equals(triggerBody()?['orderId'], 'ORD004'), 'CUST001', 'UNKNOWN'))))",
+          "product": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 'Coffee Maker Pro', if(equals(triggerBody()?['orderId'], 'ORD002'), 'Premium Coffee Beans', if(equals(triggerBody()?['orderId'], 'ORD003'), 'Espresso Machine Deluxe', if(equals(triggerBody()?['orderId'], 'ORD004'), 'Coffee Grinder', 'Unknown Product'))))",
+          "category": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 'electronics', if(equals(triggerBody()?['orderId'], 'ORD002'), 'perishable', if(equals(triggerBody()?['orderId'], 'ORD003'), 'electronics', if(equals(triggerBody()?['orderId'], 'ORD004'), 'electronics', 'other'))))",
+          "price": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 150, if(equals(triggerBody()?['orderId'], 'ORD002'), 89, if(equals(triggerBody()?['orderId'], 'ORD003'), 450, if(equals(triggerBody()?['orderId'], 'ORD004'), 120, 0))))",
+          "purchaseDate": "@if(equals(triggerBody()?['orderId'], 'ORD001'), '2024-11-19', if(equals(triggerBody()?['orderId'], 'ORD002'), '2024-11-24', if(equals(triggerBody()?['orderId'], 'ORD003'), '2024-10-30', if(equals(triggerBody()?['orderId'], 'ORD004'), '2024-11-14', 'unknown'))))",
+          "daysOld": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 15, if(equals(triggerBody()?['orderId'], 'ORD002'), 10, if(equals(triggerBody()?['orderId'], 'ORD003'), 35, if(equals(triggerBody()?['orderId'], 'ORD004'), 20, 0))))",
+          "condition": "@if(equals(triggerBody()?['orderId'], 'ORD001'), 'unopened', if(equals(triggerBody()?['orderId'], 'ORD002'), 'opened', if(equals(triggerBody()?['orderId'], 'ORD003'), 'unopened', if(equals(triggerBody()?['orderId'], 'ORD004'), 'opened', 'unknown'))))"
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Order_Details')"
+        },
+        "runAfter": {
+          "Order_Details": [
+            "SUCCEEDED"
+          ]
+        }
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "orderId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}

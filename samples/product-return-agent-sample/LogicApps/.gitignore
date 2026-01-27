@@ -1,0 +1,7 @@
+.vscode/
+local.settings.json
+__azurite*
+__blobstorage__*
+__queuestorage__*
+node_modules/
+*.zip

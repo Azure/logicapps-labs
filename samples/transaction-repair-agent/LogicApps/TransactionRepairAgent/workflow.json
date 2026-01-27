@@ -1,0 +1,208 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Transaction_Repair_Agent": {
+        "type": "Agent",
+        "inputs": {
+          "parameters": {
+            "deploymentId": "gpt-4o-mini",
+            "messages": [
+              {
+                "role": "system",
+                "content": "You're a friendly transaction repair assistant helping operations teams fix failed work orders. When a user provides a work order tracking ID, follow these steps:\n\n1) Retrieve the failed work order details\n2) Analyze the failure and propose a repair plan\n3) Check if the repair requires approval\n4) If approved, resubmit the corrected work order. If denied, skip resubmission\n5) ALWAYS log the action (approved/denied) to ITSM for audit trail\n\nBe conversational and explain what you're doing at each step. Call ONE tool per turn. After logging to ITSM, confirm completion and ask if they need help with another work order."
+              }
+            ],
+            "agentModelType": "AzureOpenAI",
+            "agentModelSettings": {
+              "deploymentModelProperties": {
+                "name": "gpt-4o-mini",
+                "format": "OpenAI",
+                "version": "2024-07-18"
+              },
+              "agentHistoryReductionSettings": {
+                "agentHistoryReductionType": "maximumTokenCountReduction",
+                "maximumTokenCount": 128000
+              }
+            }
+          },
+          "modelConfigurations": {
+            "model1": {
+              "referenceName": "agent"
+            }
+          }
+        },
+        "tools": {
+          "Get_failed_workorder": {
+            "actions": {
+              "Call_GetWorkOrder": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "GetWorkOrder"
+                    }
+                  },
+                  "body": {
+                    "trackingId": "@agentParameters('trackingId')"
+                  }
+                }
+              }
+            },
+            "description": "Get work order details by tracking ID",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "trackingId": {
+                  "type": "string",
+                  "description": "Work order tracking ID (e.g., WO-12345)"
+                }
+              },
+              "required": ["trackingId"]
+            }
+          },
+          "Propose_fix": {
+            "actions": {
+              "Call_GetFixPlan": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "GetFixPlan"
+                    }
+                  },
+                  "body": {
+                    "failureType": "@agentParameters('failureType')"
+                  }
+                }
+              }
+            },
+            "description": "Get repair plan for the failure type",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "failureType": {
+                  "type": "string",
+                  "description": "Type of failure (e.g., 'Schema validation error', 'Timeout error')"
+                }
+              },
+              "required": ["failureType"]
+            }
+          },
+          "Get_approval": {
+            "actions": {
+              "Call_GetApproval": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "GetApproval"
+                    }
+                  },
+                  "body": {
+                    "trackingId": "@agentParameters('trackingId')"
+                  }
+                }
+              }
+            },
+            "description": "Check if repair is approved for this work order",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "trackingId": {
+                  "type": "string",
+                  "description": "Work order tracking ID"
+                }
+              },
+              "required": ["trackingId"]
+            }
+          },
+          "Resubmit_workorder": {
+            "actions": {
+              "Call_ResubmitWorkOrder": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "ResubmitWorkOrder"
+                    }
+                  },
+                  "body": {
+                    "trackingId": "@agentParameters('trackingId')",
+                    "payload": "@json(agentParameters('payload'))"
+                  }
+                }
+              }
+            },
+            "description": "Resubmit the corrected work order",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "trackingId": {
+                  "type": "string",
+                  "description": "Work order tracking ID"
+                },
+                "payload": {
+                  "type": "string",
+                  "description": "Corrected JSON payload as string"
+                }
+              },
+              "required": ["trackingId", "payload"]
+            }
+          },
+          "Log_to_itsm": {
+            "actions": {
+              "Call_LogToITSM": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "LogToITSM"
+                    }
+                  },
+                  "body": {
+                    "trackingId": "@agentParameters('trackingId')",
+                    "action": "@agentParameters('action')"
+                  }
+                }
+              }
+            },
+            "description": "Log repair action to ITSM system",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "trackingId": {
+                  "type": "string",
+                  "description": "Work order tracking ID"
+                },
+                "action": {
+                  "type": "string",
+                  "description": "Action taken (e.g., 'Resubmitted' or 'Denied')"
+                }
+              },
+              "required": ["trackingId", "action"]
+            }
+          }
+        },
+        "runAfter": {
+          "When_a_new_chat_session_starts": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "When_a_new_chat_session_starts": {
+        "type": "Request",
+        "kind": "Agent",
+        "inputs": {
+          "agentName": "TransactionRepairAgent",
+          "agentDescription": "Analyzes failed work orders and orchestrates repair with approval workflow"
+        }
+      }
+    }
+  },
+  "kind": "Agent"
+}

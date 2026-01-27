@@ -1,0 +1,55 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "actions": {
+      "Initialize_Approvals": {
+        "type": "InitializeVariable",
+        "inputs": {
+          "variables": [
+            {
+              "name": "ApprovalResponses",
+              "type": "object",
+              "value": {
+                "WO-12345": "APPROVED",
+                "WO-67890": "DENIED",
+                "WO-11111": "APPROVED"
+              }
+            }
+          ]
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@variables('ApprovalResponses')[triggerBody()?['trackingId']]"
+        },
+        "runAfter": {
+          "Initialize_Approvals": ["Succeeded"]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "trackingId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

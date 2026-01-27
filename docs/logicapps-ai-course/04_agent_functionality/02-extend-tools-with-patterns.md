@@ -33,7 +33,7 @@ To accomplish this, you can mock tool output in two ways:
 2. Replace the Compose action Inputs with the value you would like the tool to return.
 3. When executing the tool, the Compose action will return your provided value as-is.
 
-See the `EchoTool` example in module four.
+See the `EchoTool` example in module One.
 
 ### Mocking using static results
 
@@ -58,7 +58,7 @@ This capability has several use cases:
 - Improve agent quality by filtering out unnecessary information from the tool output
 - By default, the last action output becomes the tool output. If you have a chain of several actions, you can construct a custom tool output payload that combines properties from multiple action outputs. 
 
-This can again be accomplished with the Compose action. For example, the imagine a simple weather agent similar to the one we built in module four. When reviewing execution in the monitoring view, we see the `functionCallResult` that was sent back to the LLM:
+This can again be accomplished with the Compose action. For example, the imagine a simple weather agent similar to the one we built in module One. When reviewing execution in the monitoring view, we see the `functionCallResult` that was sent back to the LLM:
 
 ```json
 [
@@ -386,7 +386,7 @@ Note that in the above screenshot, a few things have changed:
 
 ![Finalizing the action input](./media/02-extend-tools-with-patterns/OutputTransformation-ComposeActionB.png)
 
-In the above screenshot, we finalize the expression by including both the caption and the temperature.
+In the above screenshot, we finalize the expression by including both the condition and the temperature.
 
 ![Demonstrating the final output](./media/02-extend-tools-with-patterns/OutputTransformation-ToolOutput.png)
 

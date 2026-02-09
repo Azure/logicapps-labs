@@ -1,0 +1,104 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Parse_Payload": {
+        "type": "Compose",
+        "inputs": "@json(triggerBody()?['payload'])",
+        "runAfter": {}
+      },
+      "Set_CustomerId": {
+        "type": "Compose",
+        "inputs": "@coalesce(outputs('Parse_Payload')?['customerId'], outputs('Parse_Payload')?['cust_id'], 'UNKNOWN')",
+        "runAfter": {
+          "Parse_Payload": ["Succeeded"]
+        }
+      },
+      "Set_IncidentId": {
+        "type": "Compose",
+        "inputs": "@coalesce(outputs('Parse_Payload')?['incidentId'], outputs('Parse_Payload')?['id'])",
+        "runAfter": {
+          "Parse_Payload": ["Succeeded"]
+        }
+      },
+      "Set_Priority": {
+        "type": "Compose",
+        "inputs": "@if(equals(string(outputs('Parse_Payload')?['priority']), string(outputs('Parse_Payload')?['priority'])), if(greater(length(coalesce(string(outputs('Parse_Payload')?['priority']), '')), 0), int(string(outputs('Parse_Payload')?['priority'])), coalesce(int(outputs('Parse_Payload')?['prio']), 3)), 3)",
+        "runAfter": {
+          "Parse_Payload": ["Succeeded"]
+        }
+      },
+      "Set_Details": {
+        "type": "Compose",
+        "inputs": "@if(or(equals(outputs('Parse_Payload')?['details'], null), empty(outputs('Parse_Payload')?['details'])), json('{\"description\":\"No details provided\"}'), if(contains(coalesce(outputs('Parse_Payload')?['details'], json('{}')), 'desc'), json(concat('{\"description\":\"', string(outputs('Parse_Payload')?['details']?['desc']), '\"}')), outputs('Parse_Payload')?['details']))",
+        "runAfter": {
+          "Parse_Payload": ["Succeeded"]
+        }
+      },
+      "Compose_Repaired": {
+        "type": "Compose",
+        "inputs": {
+          "incidentId": "@outputs('Set_IncidentId')",
+          "customerId": "@outputs('Set_CustomerId')",
+          "priority": "@outputs('Set_Priority')",
+          "details": "@outputs('Set_Details')"
+        },
+        "runAfter": {
+          "Set_CustomerId": ["Succeeded"],
+          "Set_IncidentId": ["Succeeded"],
+          "Set_Priority": ["Succeeded"],
+          "Set_Details": ["Succeeded"]
+        }
+      },
+      "Compose_Changes": {
+        "type": "Compose",
+        "inputs": [
+          "normalized customerId",
+          "normalized priority",
+          "normalized details"
+        ],
+        "runAfter": {
+          "Compose_Repaired": ["Succeeded"]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": {
+            "repaired": "@outputs('Compose_Repaired')",
+            "changes": "@outputs('Compose_Changes')"
+          }
+        },
+        "runAfter": {
+          "Compose_Changes": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "payload": {
+                "type": "object"
+              },
+              "caseId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

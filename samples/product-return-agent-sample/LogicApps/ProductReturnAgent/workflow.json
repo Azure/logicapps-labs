@@ -1,0 +1,341 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Product_Return_Agent": {
+        "type": "Agent",
+        "inputs": {
+          "parameters": {
+            "deploymentId": "gpt-4o-mini",
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a product return agent.\n\n1. GATHER DATA: Call Get_order_details, Get_customer_status, Get_return_history, Get_return_policy, and Analyze_product_image\n\n2. MAKE DECISION: Read Get_return_policy and apply rules in order. Stop at first match.\n\n3. TAKE ACTION based on decision:\n   - ESCALATE → Call Escalate_to_human\n   - REJECT → Call Notify_customer(decision='REJECTED', refundAmount=0)\n   - APPROVE → Call Calculate_refund, then Notify_customer(decision='APPROVED', refundAmount=result)\n\n4. OUTPUT (exact format):\nORDER ID: [id]\nDECISION: [APPROVED/REJECTED/ESCALATED]\nREFUND AMOUNT: $[amount]\nREASON: [brief explanation]\n\nIMPORTANT: Use Calculate_refund result. Don't calculate manually."
+              },
+              {
+                "role": "user",
+                "content": "This is the return request - @{outputs('Return_Request_Summary')}"
+              }
+            ],
+            "agentModelType": "AzureOpenAI",
+            "agentModelSettings": {
+              "deploymentModelProperties": {
+                "name": "gpt-4o-mini",
+                "format": "OpenAI",
+                "version": "2024-07-18"
+              }
+            }
+          },
+          "modelConfigurations": {
+            "model1": {
+              "referenceName": "agent"
+            }
+          }
+        },
+        "limit": {
+          "count": 100
+        },
+        "tools": {
+          "Get_return_policy": {
+            "actions": {
+              "Return_Policy": {
+                "type": "Compose",
+                "inputs": "PRODUCT RETURN POLICY\n\nAPPLY RULES IN THIS ORDER (stop when a rule matches):\n\n1. ESCALATE TO HUMAN (highest priority):\n   If ALL THREE conditions are true:\n   - Customer status = 'Premium' (not 'Standard')\n   - Return history flagged = true\n   - Order price > $400\n   Then: Escalate to human agent. Do not calculate refund.\n\n2. AUTO-REJECT:\n   If ANY of these is true:\n   - Order not found (customerId='UNKNOWN' or product='Unknown Product' or price=0)\n   - Order is over 60 days old\n   - Product category is 'perishable' AND condition is 'opened'\n   Then: Reject the return. Refund = $0.\n\n3. APPROVE:\n   If none of the above rules matched:\n   - Call Calculate_refund to determine refund amount\n   - Approve the return with the calculated refund"
+              }
+            },
+            "description": "Get complete return policy with decision rules"
+          },
+          "Get_order_details": {
+            "actions": {
+              "Call_GetOrderHistory_Workflow": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "GetOrderHistory"
+                    }
+                  },
+                  "body": {
+                    "orderId": "@agentParameters('orderId')"
+                  }
+                }
+              }
+            },
+            "description": "Get order details including product, price, and purchase date",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "orderId": {
+                  "type": "string",
+                  "description": "Order ID"
+                }
+              },
+              "required": [
+                "orderId"
+              ]
+            }
+          },
+          "Get_customer_status": {
+            "actions": {
+              "Customer_Status": {
+                "type": "Compose",
+                "inputs": {
+                  "customerId": "@agentParameters('customerId')",
+                  "status": "@if(equals(agentParameters('customerId'), 'CUST003'), 'Premium', 'Standard')",
+                  "returnWindow": "@if(equals(agentParameters('customerId'), 'CUST003'), 60, 30)"
+                }
+              }
+            },
+            "description": "Get customer status (Premium or Standard) and return window",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "customerId": {
+                  "type": "string",
+                  "description": "Customer ID"
+                }
+              },
+              "required": [
+                "customerId"
+              ]
+            }
+          },
+          "Calculate_refund": {
+            "actions": {
+              "Call_CalculateRefund_Workflow": {
+                "type": "Workflow",
+                "inputs": {
+                  "host": {
+                    "workflow": {
+                      "id": "CalculateRefund"
+                    }
+                  },
+                  "body": {
+                    "orderTotal": "@agentParameters('orderTotal')",
+                    "reason": "@agentParameters('reason')",
+                    "category": "@agentParameters('category')",
+                    "condition": "@agentParameters('condition')"
+                  }
+                }
+              }
+            },
+            "description": "Calculate refund amount based on order total, reason, and product condition",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "orderTotal": {
+                  "type": "number",
+                  "description": "Original order total"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Return reason: defective, changed_mind, wrong_item"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "Product category: electronics, perishable, other"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Product condition: opened or unopened"
+                }
+              },
+              "required": [
+                "orderTotal",
+                "reason",
+                "category",
+                "condition"
+              ]
+            }
+          },
+          "Escalate_to_human": {
+            "actions": {
+              "Escalation_Response": {
+                "type": "Compose",
+                "inputs": {
+                  "status": "ESCALATED",
+                  "message": "This return request requires human review. A specialist will contact you within 24 hours.",
+                  "reason": "@agentParameters('escalationReason')"
+                }
+              }
+            },
+            "description": "Escalate complex cases to human review",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "escalationReason": {
+                  "type": "string",
+                  "description": "Reason for escalation"
+                }
+              },
+              "required": [
+                "escalationReason"
+              ]
+            }
+          },
+          "Analyze_product_image": {
+            "actions": {
+              "Image_Analysis_Result": {
+                "type": "Compose",
+                "inputs": {
+                  "imageUrl": "@agentParameters('imageData')",
+                  "damageLevel": "@if(contains(agentParameters('imageData'), 'ORD001'), 'minor', if(contains(agentParameters('imageData'), 'ORD002'), 'severe', if(contains(agentParameters('imageData'), 'ORD003'), 'none', if(contains(agentParameters('imageData'), 'ORD004'), 'minor', if(contains(agentParameters('imageData'), 'ORD005'), 'moderate', 'unknown')))))",
+                  "confidence": "@if(contains(agentParameters('imageData'), 'ORD001'), 0.85, if(contains(agentParameters('imageData'), 'ORD002'), 0.95, if(contains(agentParameters('imageData'), 'ORD003'), 0.90, if(contains(agentParameters('imageData'), 'ORD004'), 0.87, if(contains(agentParameters('imageData'), 'ORD005'), 0.88, 0.0)))))",
+                  "findings": "@if(contains(agentParameters('imageData'), 'ORD001'), createArray('Surface scratches'), if(contains(agentParameters('imageData'), 'ORD002'), createArray('Package torn', 'Contents exposed'), if(contains(agentParameters('imageData'), 'ORD003'), createArray('No visible damage'), if(contains(agentParameters('imageData'), 'ORD004'), createArray('Item has been used', 'Minor wear'), if(contains(agentParameters('imageData'), 'ORD005'), createArray('Packaging compromised'), createArray('Unable to analyze'))))))"
+                }
+              }
+            },
+            "description": "Analyze product image to detect damage and condition",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "imageData": {
+                  "type": "string",
+                  "description": "Product image URL or data"
+                }
+              },
+              "required": [
+                "imageData"
+              ]
+            }
+          },
+          "Get_return_history": {
+            "actions": {
+              "Return_History_Result": {
+                "type": "Compose",
+                "inputs": {
+                  "customerId": "@agentParameters('customerId')",
+                  "returnCount": "@if(equals(agentParameters('customerId'), 'CUST001'), 1, if(equals(agentParameters('customerId'), 'CUST002'), 2, if(equals(agentParameters('customerId'), 'CUST003'), 5, if(equals(agentParameters('customerId'), 'CUST004'), 0, 0))))",
+                  "flagged": "@if(equals(agentParameters('customerId'), 'CUST003'), true, false)",
+                  "reason": "@if(equals(agentParameters('customerId'), 'CUST003'), 'Excessive returns in 6 months', '')"
+                }
+              }
+            },
+            "description": "Get customer return history and fraud flags",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "customerId": {
+                  "type": "string",
+                  "description": "Customer ID"
+                }
+              },
+              "required": [
+                "customerId"
+              ]
+            }
+          },
+          "Notify_customer": {
+            "actions": {
+              "Notification_Result": {
+                "type": "Compose",
+                "inputs": {
+                  "notificationSent": true,
+                  "channel": "email",
+                  "timestamp": "@utcNow()",
+                  "messageId": "@guid()",
+                  "customerId": "@agentParameters('customerId')",
+                  "decision": "@agentParameters('decision')",
+                  "refundAmount": "@coalesce(agentParameters('refundAmount'), 0)",
+                  "message": "@coalesce(agentParameters('message'), '')"
+                }
+              }
+            },
+            "description": "Send notification to customer about return decision",
+            "agentParameterSchema": {
+              "type": "object",
+              "properties": {
+                "customerId": {
+                  "type": "string",
+                  "description": "Customer ID"
+                },
+                "decision": {
+                  "type": "string",
+                  "description": "Return decision: APPROVED, REJECTED, or ESCALATED"
+                },
+                "refundAmount": {
+                  "type": "number",
+                  "description": "Refund amount (optional, defaults to 0 if not provided)"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Notification message to customer"
+                }
+              },
+              "required": [
+                "customerId",
+                "decision"
+              ]
+            }
+          }
+        },
+        "runAfter": {
+          "Return_Request_Summary": [
+            "SUCCEEDED"
+          ]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@outputs('Product_Return_Agent')?['lastAssistantMessage']"
+        },
+        "runAfter": {
+          "Product_Return_Agent": [
+            "SUCCEEDED"
+          ]
+        }
+      },
+      "Return_Request_Summary": {
+        "type": "Compose",
+        "inputs": {
+          "orderId": "@triggerBody()?['orderId']",
+          "customerId": "@triggerBody()?['customerId']",
+          "reason": "@triggerBody()?['reason']",
+          "description": "@triggerBody()?['description']",
+          "imageData": "@triggerBody()?['imageData']",
+          "requestDate": "@utcNow()"
+        },
+        "runAfter": {}
+      }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "orderId": {
+                "type": "string"
+              },
+              "customerId": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "imageData": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "orderId",
+              "customerId",
+              "reason"
+            ]
+          }
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {}
+  },
+  "kind": "Agentic"
+}

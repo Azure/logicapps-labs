@@ -1,0 +1,41 @@
+[
+  {
+    "trackingId": "WO-12345",
+    "failureReason": "schema-validation-failed",
+    "failureDetails": "Field 'amount' has type string but should be number",
+    "payload": {
+      "orderId": "ORD-9001",
+      "customerId": "CUST-456",
+      "amount": "invalid",
+      "timestamp": "2025-12-15T09:00:00Z"
+    },
+    "queueName": "order-processing",
+    "retries": 3
+  },
+  {
+    "trackingId": "WO-67890",
+    "failureReason": "timeout-retry-exhausted",
+    "failureDetails": "Downstream service did not respond within 30s after 5 retries",
+    "payload": {
+      "orderId": "ORD-9002",
+      "customerId": "CUST-789",
+      "amount": 150.00,
+      "timestamp": "2025-12-15T09:15:00Z"
+    },
+    "queueName": "order-processing",
+    "retries": 5
+  },
+  {
+    "trackingId": "WO-11111",
+    "failureReason": "transform-patch-required",
+    "failureDetails": "Missing required field 'shippingAddress' in payload",
+    "payload": {
+      "orderId": "ORD-9003",
+      "customerId": "CUST-101",
+      "amount": 200.00,
+      "timestamp": "2025-12-15T09:30:00Z"
+    },
+    "queueName": "order-processing",
+    "retries": 0
+  }
+]

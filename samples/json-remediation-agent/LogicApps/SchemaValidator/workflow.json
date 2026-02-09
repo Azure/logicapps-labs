@@ -1,0 +1,83 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Parse_Payload": {
+        "type": "Compose",
+        "inputs": "@json(triggerBody()?['payload'])",
+        "runAfter": {}
+      },
+      "Check_Required_Fields": {
+        "type": "Compose",
+        "inputs": {
+          "hasIncidentId": "@not(empty(coalesce(outputs('Parse_Payload')?['incidentId'], '')))",
+          "hasPriority": "@not(equals(outputs('Parse_Payload')?['priority'], null))",
+          "hasCustomerId": "@not(empty(coalesce(outputs('Parse_Payload')?['customerId'], '')))",
+          "hasDetails": "@not(equals(outputs('Parse_Payload')?['details'], null))",
+          "hasDescription": "@not(empty(coalesce(outputs('Parse_Payload')?['details']?['description'], '')))"
+        },
+        "runAfter": {
+          "Parse_Payload": ["Succeeded"]
+        }
+      },
+      "Determine_IsValid": {
+        "type": "Compose",
+        "inputs": "@and(and(and(outputs('Check_Required_Fields').hasIncidentId, outputs('Check_Required_Fields').hasPriority), and(outputs('Check_Required_Fields').hasCustomerId, outputs('Check_Required_Fields').hasDetails)), outputs('Check_Required_Fields').hasDescription)",
+        "runAfter": {
+          "Check_Required_Fields": ["Succeeded"]
+        }
+      },
+      "Build_Violations": {
+        "type": "Compose",
+        "inputs": [
+          "@if(outputs('Check_Required_Fields').hasIncidentId, null, 'Missing required field: incidentId')",
+          "@if(outputs('Check_Required_Fields').hasPriority, null, 'Missing required field: priority')",
+          "@if(outputs('Check_Required_Fields').hasCustomerId, null, 'Missing required field: customerId')",
+          "@if(outputs('Check_Required_Fields').hasDetails, null, 'Missing required field: details')",
+          "@if(outputs('Check_Required_Fields').hasDescription, null, 'Missing required field: details.description')"
+        ],
+        "runAfter": {
+          "Determine_IsValid": ["Succeeded"]
+        }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "http",
+        "inputs": {
+          "statusCode": 200,
+          "body": {
+            "isValid": "@outputs('Determine_IsValid')",
+            "violations": "@outputs('Build_Violations')"
+          }
+        },
+        "runAfter": {
+          "Build_Violations": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "payload": {
+                "type": "object"
+              },
+              "schemaPath": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

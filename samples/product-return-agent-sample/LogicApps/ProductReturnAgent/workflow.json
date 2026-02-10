@@ -6,7 +6,7 @@
         "type": "Agent",
         "inputs": {
           "parameters": {
-            "deploymentId": "gpt-4o-mini",
+            "deploymentId": "gpt-5-mini",
             "messages": [
               {
                 "role": "system",
@@ -20,9 +20,9 @@
             "agentModelType": "AzureOpenAI",
             "agentModelSettings": {
               "deploymentModelProperties": {
-                "name": "gpt-4o-mini",
+                "name": "gpt-5-mini",
                 "format": "OpenAI",
-                "version": "2024-07-18"
+                "version": "2025-08-07"
               }
             }
           },

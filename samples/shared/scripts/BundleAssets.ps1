@@ -20,6 +20,10 @@
     Required. Name of the sample folder (e.g., "product-return-agent-sample").
     All paths are built from this parameter.
 
+.PARAMETER Force
+    Optional. Forces regeneration of main.bicep even if it already exists.
+    Use this to update the workflowsZipUrl or reset to template defaults.
+
 .EXAMPLE
     # From anywhere in the repository:
     .\samples\shared\scripts\BundleAssets.ps1 -Sample "product-return-agent-sample"
@@ -27,6 +31,10 @@
 .EXAMPLE
     # From samples folder:
     .\shared\scripts\BundleAssets.ps1 -Sample "ai-loan-agent-sample"
+
+.EXAMPLE
+    # Force regeneration of main.bicep:
+    .\samples\shared\scripts\BundleAssets.ps1 -Sample "product-return-agent-sample" -Force
 
 .NOTES
     Requirements:
@@ -45,7 +53,10 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$Sample
+    [string]$Sample,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -147,8 +158,12 @@ if (-not (Test-Path $deploymentFolder)) {
 # TEMPLATE GENERATION: Create main.bicep if it doesn't exist
 # ============================================================================
 
-if (-not (Test-Path $bicepPath)) {
-    Write-Host "`nGenerating main.bicep from template..." -ForegroundColor Cyan
+if (-not (Test-Path $bicepPath) -or $Force) {
+    if ($Force -and (Test-Path $bicepPath)) {
+        Write-Host "`nRegenerating main.bicep (forced overwrite)..." -ForegroundColor Cyan
+    } else {
+        Write-Host "`nGenerating main.bicep from template..." -ForegroundColor Cyan
+    }
     
     # Use hardcoded upstream repo for URL generation
     $workflowsUrl = "https://raw.githubusercontent.com/$upstreamRepo/$upstreamBranch/samples/$Sample/Deployment/workflows.zip"
@@ -165,7 +180,11 @@ if (-not (Test-Path $bicepPath)) {
     
     try {
         New-MainBicepFromTemplate -TemplatePath $templatePath -OutputPath $bicepPath -WorkflowsZipUrl $workflowsUrl
-        Write-Host "  ✓ Created: main.bicep" -ForegroundColor Green
+        if ($Force) {
+            Write-Host "  ✓ Regenerated: main.bicep" -ForegroundColor Green
+        } else {
+            Write-Host "  ✓ Created: main.bicep" -ForegroundColor Green
+        }
         Write-Host "  Location: $bicepPath" -ForegroundColor Gray
     } catch {
         Write-Host "✗ Failed to generate main.bicep: $($_.Exception.Message)" -ForegroundColor Red
@@ -173,6 +192,7 @@ if (-not (Test-Path $bicepPath)) {
     }
 } else {
     Write-Host "`nUsing existing main.bicep (not overwriting)" -ForegroundColor Cyan
+    Write-Host "  Tip: Use -Force to regenerate" -ForegroundColor Gray
     Write-Host "  Location: $bicepPath" -ForegroundColor Gray
 }
 

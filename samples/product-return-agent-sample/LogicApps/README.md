@@ -64,11 +64,11 @@ These workflows are automatically deployed when using the 1-click deployment. Fo
 
 ## Agent Configuration
 
-The ProductReturnAgent workflow uses Azure OpenAI GPT-4o-mini model with these settings:
+The ProductReturnAgent workflow uses Azure OpenAI GPT-5-mini model with these settings:
 
 - **System prompt:** Instructs agent to call one tool per turn in sequence
 - **Tools:** 5 tools for policy, orders, customer status, refund calculation, and escalation
-- **Model:** gpt-4o-mini (version 2024-07-18)
+- **Model:** gpt-5-mini (version 2025-08-07)
 - **Authentication:** Managed Identity (no API keys required)
 
 See the [main README](../README.md) for more details on testing and extending the workflows.

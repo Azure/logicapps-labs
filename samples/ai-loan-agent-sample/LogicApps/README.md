@@ -172,7 +172,7 @@ Your completed `local.settings.json` should look similar to this:
 - Verify the endpoint URL is correct and includes `https://`
 - Ensure the endpoint URL ends with a trailing slash (`/`)
 - Check that the resource ID matches your Azure OpenAI resource exactly
-- Verify your Azure OpenAI deployment has the `gpt-4.1-mini` model deployed
+- Verify your Azure OpenAI deployment has the `gpt-5-mini` model deployed
 
 **Runtime Issues:**
 - Verify .NET 8 SDK is installed

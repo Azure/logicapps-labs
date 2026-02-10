@@ -10,11 +10,11 @@ A conversational AI agent that helps operations teams diagnose and repair failed
 
 **Prerequisites:**
 - Azure subscription with contributor access
-- Region supporting Azure OpenAI (gpt-4o-mini) and Logic Apps Standard - see [region selection](#region-selection)
+- Region supporting Azure OpenAI (gpt-5-mini) and Logic Apps Standard - see [region selection](#region-selection)
 
 **Deploy to your Azure subscription:**
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmodularity%2Flogicapps-labs%2Ftransaction-repair-agent%2Fsamples%2Ftransaction-repair-agent%2FDeployment%2Fsample-arm.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Flogicapps-labs%2Fmain%2Fsamples%2Ftransaction-repair-agent%2FDeployment%2Fsample-arm.json)
 
 <details>
 <summary><b>What happens when you deploy</b></summary>
@@ -32,7 +32,7 @@ A conversational AI agent that helps operations teams diagnose and repair failed
 | Resource | Purpose |
 |----------|----------|
 | Logic App Standard | Hosts conversational agent workflows |
-| Azure OpenAI | gpt-4o-mini model for agent reasoning |
+| Azure OpenAI | gpt-5-mini model for agent reasoning |
 | Storage Account | Workflow state and run history |
 | App Service Plan | Compute resources |
 | Managed Identity | Passwordless authentication |

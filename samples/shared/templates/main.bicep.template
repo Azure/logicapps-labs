@@ -33,7 +33,7 @@ module storage '../../shared/modules/storage.bicep' = {
   }
 }
 
-// Azure OpenAI with gpt-4o-mini model
+// Azure OpenAI with gpt-5-mini model
 module openai '../../shared/modules/openai.bicep' = {
   name: '${take(BaseName, 44)}-openai-deployment'
   params: {

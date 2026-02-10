@@ -1,8 +1,8 @@
 // Auto-generated from shared/templates/main.bicep.template
 // To customize: edit this file directly or delete to regenerate from template
 //
-// AI Product Return Agent - Azure Infrastructure as Code
-// Deploys Logic Apps Standard with Azure OpenAI for autonomous product return decisions
+// Logic Apps Agent Sample - Azure Infrastructure as Code
+// Deploys Logic Apps Standard with Azure OpenAI for autonomous agent workflows
 // Uses managed identity exclusively (no secrets/connection strings)
 
 targetScope = 'resourceGroup'
@@ -15,8 +15,8 @@ param BaseName string
 // uniqueSuffix for when we need unique values
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
-// URL to workflows.zip (replaced by BundleAssets.ps1 with https://raw.githubusercontent.com/modularity/logicapps-labs/product-return-sample/samples/product-return-agent-sample/Deployment/workflows.zip)
-var workflowsZipUrl = 'https://raw.githubusercontent.com/modularity/logicapps-labs/product-return-sample/samples/product-return-agent-sample/Deployment/workflows.zip'
+// URL to workflows.zip (replaced by BundleAssets.ps1 with https://raw.githubusercontent.com/Azure/logicapps-labs/main/samples/product-return-agent-sample/Deployment/workflows.zip)
+var workflowsZipUrl = 'https://raw.githubusercontent.com/Azure/logicapps-labs/main/samples/product-return-agent-sample/Deployment/workflows.zip'
 
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -33,7 +33,7 @@ module storage '../../shared/modules/storage.bicep' = {
   }
 }
 
-// Azure OpenAI with gpt-4o-mini model
+// Azure OpenAI with gpt-5-mini model
 module openai '../../shared/modules/openai.bicep' = {
   name: '${take(BaseName, 44)}-openai-deployment'
   params: {

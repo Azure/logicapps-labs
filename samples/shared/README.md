@@ -54,7 +54,7 @@ Six reusable modules provide complete Logic Apps infrastructure:
 | Module | Purpose |
 |--------|---------|
 | **storage.bicep** | Storage Account for Logic App runtime (managed identity only, HTTPS/TLS 1.2, no shared keys) |
-| **openai.bicep** | Azure OpenAI S0 with gpt-4o-mini model (GlobalStandard, 150K tokens) |
+| **openai.bicep** | Azure OpenAI S0 with gpt-5-mini model (GlobalStandard, 150K tokens) |
 | **logicapp.bicep** | Logic App Standard with App Service Plan (WS1 SKU, system + user-assigned identities) |
 | **storage-rbac.bicep** | Storage Blob/Queue/Table Data Contributor roles for Logic App |
 | **openai-rbac.bicep** | Cognitive Services OpenAI User role for Logic App |
@@ -65,7 +65,11 @@ Six reusable modules provide complete Logic Apps infrastructure:
 Generates all deployment artifacts for a sample:
 
 ```powershell
+# Basic usage
 .\samples\shared\scripts\BundleAssets.ps1 -Sample "your-sample-name"
+
+# Force regeneration of main.bicep (overwrites existing file)
+.\samples\shared\scripts\BundleAssets.ps1 -Sample "your-sample-name" -Force
 ```
 
 **Generates:**
@@ -73,9 +77,13 @@ Generates all deployment artifacts for a sample:
 2. `sample-arm.json` - Compiled ARM template
 3. `workflows.zip` - Bundled LogicApps folder
 
+**Parameters:**
+- `-Sample` (required) - Name of the sample folder
+- `-Force` (optional) - Regenerates main.bicep even if it exists (useful for updating URLs)
+
 **How it works:**
 - Uses hardcoded `Azure/logicapps-labs` main branch for upstream URLs
-- Never overwrites existing `main.bicep` (delete to regenerate)
+- Preserves existing `main.bicep` unless `-Force` is specified
 - Replaces `{{WORKFLOWS_ZIP_URL}}` template placeholder with upstream URL
 - Requires Bicep CLI and PowerShell 5.1+
 

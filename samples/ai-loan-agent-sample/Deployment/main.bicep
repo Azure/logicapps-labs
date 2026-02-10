@@ -1,5 +1,8 @@
-// AI Loan Agent - Azure Infrastructure as Code
-// Deploys Logic Apps Standard with Azure OpenAI for autonomous loan decisions
+// Auto-generated from shared/templates/main.bicep.template
+// To customize: edit this file directly or delete to regenerate from template
+//
+// Logic Apps Agent Sample - Azure Infrastructure as Code
+// Deploys Logic Apps Standard with Azure OpenAI for autonomous agent workflows
 // Uses managed identity exclusively (no secrets/connection strings)
 
 targetScope = 'resourceGroup'
@@ -12,6 +15,9 @@ param BaseName string
 // uniqueSuffix for when we need unique values
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
+// URL to workflows.zip (replaced by BundleAssets.ps1 with https://raw.githubusercontent.com/Azure/logicapps-labs/main/samples/ai-loan-agent-sample/Deployment/workflows.zip)
+var workflowsZipUrl = 'https://raw.githubusercontent.com/Azure/logicapps-labs/main/samples/ai-loan-agent-sample/Deployment/workflows.zip'
+
 // User-Assigned Managed Identity for Logic App → Storage authentication
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: '${take(BaseName, 60)}-managedidentity'
@@ -19,17 +25,17 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
 }
 
 // Storage Account for workflow runtime
-module storage 'modules/storage.bicep' = {
-  name: '${BaseName}-storage-deployment'
+module storage '../../shared/modules/storage.bicep' = {
+  name: '${take(BaseName, 43)}-storage-deployment'
   params: {
     storageAccountName: toLower(take(replace('${take(BaseName, 16)}${uniqueSuffix}', '-', ''), 24))
     location: resourceGroup().location
   }
 }
 
-// Azure OpenAI with gpt-4.1-mini model
-module openai 'modules/openai.bicep' = {
-  name: '${BaseName}-openai-deployment'
+// Azure OpenAI with gpt-5-mini model
+module openai '../../shared/modules/openai.bicep' = {
+  name: '${take(BaseName, 44)}-openai-deployment'
   params: {
     openAIName: '${take(BaseName, 54)}-openai'
     location: resourceGroup().location
@@ -37,8 +43,8 @@ module openai 'modules/openai.bicep' = {
 }
 
 // Logic Apps Standard with dual managed identities
-module logicApp 'modules/logicapp.bicep' = {
-  name: '${BaseName}-logicapp-deployment'
+module logicApp '../../shared/modules/logicapp.bicep' = {
+  name: '${take(BaseName, 42)}-logicapp-deployment'
   params: {
     logicAppName: '${take(BaseName, 22)}${uniqueSuffix}'
     location: resourceGroup().location
@@ -50,37 +56,29 @@ module logicApp 'modules/logicapp.bicep' = {
 }
 
 // RBAC: Logic App → Storage (Blob, Queue, Table Contributor roles)
-// dependsOn ensures RBAC is assigned after all resources exist (important for incremental deployments)
-module storageRbac 'modules/storage-rbac.bicep' = {
-  name: '${BaseName}-storage-rbac-deployment'
+module storageRbac '../../shared/modules/storage-rbac.bicep' = {
+  name: '${take(BaseName, 38)}-storage-rbac-deployment'
   params: {
     storageAccountName: storage.outputs.storageAccountName
     logicAppPrincipalId: userAssignedIdentity.properties.principalId
   }
   dependsOn: [
-    storage
-    userAssignedIdentity
     logicApp
   ]
 }
 
 // RBAC: Logic App → Azure OpenAI (Cognitive Services User role)
-// dependsOn ensures RBAC is assigned after all resources exist (important for incremental deployments)
-module openaiRbac 'modules/openai-rbac.bicep' = {
-  name: '${BaseName}-openai-rbac-deployment'
+module openaiRbac '../../shared/modules/openai-rbac.bicep' = {
+  name: '${take(BaseName, 39)}-openai-rbac-deployment'
   params: {
     openAIName: openai.outputs.name
     logicAppPrincipalId: logicApp.outputs.systemAssignedPrincipalId
   }
-  dependsOn: [
-    openai
-    logicApp
-  ]
 }
 
 // Deploy workflows using deployment script with RBAC
-module workflowDeployment 'modules/deployment-script.bicep' = {
-  name: '${BaseName}-workflow-deployment'
+module workflowDeployment '../../shared/modules/deployment-script.bicep' = {
+  name: '${take(BaseName, 42)}-workflow-deployment'
   params: {
     deploymentScriptName: '${BaseName}-deploy-workflows'
     location: resourceGroup().location
@@ -88,13 +86,11 @@ module workflowDeployment 'modules/deployment-script.bicep' = {
     deploymentIdentityPrincipalId: userAssignedIdentity.properties.principalId
     logicAppName: logicApp.outputs.name
     resourceGroupName: resourceGroup().name
-    workflowsZipUrl: 'https://raw.githubusercontent.com/modularity/logicapps-labs/loan-agent-deployment/samples/ai-loan-agent-sample/1ClickDeploy/workflows.zip'
+    workflowsZipUrl: workflowsZipUrl
   }
   dependsOn: [
     storageRbac
     openaiRbac
-    logicApp
-    userAssignedIdentity
   ]
 }
 

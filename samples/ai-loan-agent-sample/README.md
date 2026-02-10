@@ -10,12 +10,11 @@ An AI-powered loan approval system that automates the evaluation of vehicle loan
 
 **Prerequisites:**
 - Azure subscription with contributor access
-- Region supporting Azure OpenAI (GPT-4.1-mini) and Logic Apps Standard - see [region selection](#region-selection)
+- Region supporting Azure OpenAI (GPT-5-mini) and Logic Apps Standard - see [region selection](#region-selection)
 
 **Deploy to your Azure subscription:**
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmodularity%2Flogicapps-labs%2Frefs%2Fheads%2Floan-agent-deployment%2Fsamples%2Fai-loan-agent-sample%2F1ClickDeploy%2Fsample-arm.json)
-
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Flogicapps-labs%2Fmain%2Fsamples%2Fai-loan-agent-sample%2FDeployment%2Fsample-arm.json)
 <details>
 <summary><b>What happens when you deploy</b></summary>
 
@@ -32,7 +31,7 @@ An AI-powered loan approval system that automates the evaluation of vehicle loan
 | Resource | Purpose |
 |----------|----------|
 | Logic App Standard | Hosts AI agent workflows |
-| Azure OpenAI | GPT-4.1-mini model for agent reasoning |
+| Azure OpenAI | GPT-5-mini model for agent reasoning |
 | Storage Account | Workflow state and run history |
 | App Service Plan | Compute resources |
 | Managed Identity | Passwordless authentication |

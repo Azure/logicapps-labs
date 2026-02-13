@@ -2,7 +2,7 @@ FUNCTION Z_GET_ORDERS_ANALYSIS.
 *"----------------------------------------------------------------------
 *"*"Local Interface:
 *"  IMPORTING
-*"     VALUE(DEST) TYPE  CHAR20 DEFAULT ''
+*"     VALUE(DEST) TYPE  CHAR20 DEFAULT 'YOURDESTINATION'
 *"  EXPORTING
 *"     VALUE(EXCEPTIONMSG) TYPE  ZCHAR1000
 *"     VALUE(ANALYSIS) TYPE  STRING

@@ -16,7 +16,7 @@
     "@microsoft/agents-hosting-express": "^1.0.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "adaptivecards-templating": "^2.3.1",
-    "express": "^5.1.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "^2.40.0"
